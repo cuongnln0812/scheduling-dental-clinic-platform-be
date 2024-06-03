@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.entity.UserType;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
@@ -73,17 +74,17 @@ public class AuthenticateService implements IAuthenticateService {
         if (dentistRepository.existsByEmail(email)) {
             var dentist = dentistRepository.findByEmail(email)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist cannot found!"));
-            if(!dentist.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Dentist is forbidden!");
+            if(!dentist.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Dentist is forbidden!");
             return new ClinicAccount(dentist, UserType.DENTIST);
         }else if (staffRepository.existsByEmail(email)) {
             var staff = staffRepository.findByEmail(email)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Staff cannot found!"));
-            if(!staff.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Staff is forbidden!");
+            if(!staff.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Staff is forbidden!");
             return new ClinicAccount(staff, UserType.STAFF);
         }else if (ownerRepository.existsByEmail(email)) {
             var owner = ownerRepository.findByEmail(email)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner cannot found!"));
-            if(!owner.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Owner is forbidden!");
+            if(!owner.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Owner is forbidden!");
             return new ClinicAccount(owner, UserType.OWNER);
         }
         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic account not found with email: " + email);
