@@ -35,10 +35,6 @@ public class ClinicBranch {
     private String phone;
     @Column(unique = true)
     private String email;
-    @Column(name = "opening_time")
-    private LocalTime openingTime;
-    @Column(name = "closing_time")
-    private LocalTime closingTime;
     private Float totalRating;
     @Column(name = "is_main")
     private boolean isMain;

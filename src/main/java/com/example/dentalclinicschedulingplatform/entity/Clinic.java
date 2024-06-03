@@ -39,10 +39,6 @@ public class Clinic {
     private String description;
     @Column(name = "website_url")
     private String websiteUrl;
-    @Column(name = "opening_time")
-    private LocalTime openingTime;
-    @Column(name = "closing_time")
-    private LocalTime closingTime;
     private String logo;
     @Column(name = "total_rating")
     private Float totalRating;
