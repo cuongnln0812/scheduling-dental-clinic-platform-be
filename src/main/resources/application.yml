@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:Mysql://localhost:3306/dentalClinic
     username: root
-    password: 123456
+    password: 12345
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
