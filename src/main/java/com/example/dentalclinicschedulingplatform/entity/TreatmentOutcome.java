@@ -46,4 +46,7 @@ public class TreatmentOutcome {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "appointment_id", referencedColumnName = "appointment_id")
     private Appointment appointment;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 }

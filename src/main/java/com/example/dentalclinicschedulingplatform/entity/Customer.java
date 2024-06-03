@@ -47,6 +47,8 @@ public class Customer implements UserDetails {
     private List<Appointment> appointments;
     @OneToMany(mappedBy = "customer")
     private List<Feedback> feedbacks;
+    @OneToMany(mappedBy = "customer")
+    private List<TreatmentOutcome> treatmentOutcomes;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
