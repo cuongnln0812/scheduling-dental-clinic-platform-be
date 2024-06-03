@@ -40,9 +40,7 @@ public class ClinicBranch {
     @Column(name = "closing_time")
     private LocalTime closingTime;
     private Float totalRating;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
