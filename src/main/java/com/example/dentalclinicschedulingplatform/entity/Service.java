@@ -39,9 +39,7 @@ public class Service {
     private Integer duration;
     @Column(name = "service_type")
     private String serviceType;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;

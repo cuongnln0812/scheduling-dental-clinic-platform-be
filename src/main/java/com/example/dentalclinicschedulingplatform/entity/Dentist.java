@@ -47,9 +47,7 @@ public class Dentist implements UserDetails {
     @Column(length = Length.LOB_DEFAULT)
     private String experience;
     private String avatar;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
 
     @OneToMany(mappedBy = "dentist")
     private List<Appointment> appointments;

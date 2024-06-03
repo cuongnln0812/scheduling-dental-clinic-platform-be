@@ -38,10 +38,7 @@ public class ClinicStaff implements UserDetails {
     private LocalDate dob;
     private String gender;
     private String avatar;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
-
+    private Status status;
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
     private List<Blog> blogs;
     @ManyToOne

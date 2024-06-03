@@ -46,9 +46,7 @@ public class Clinic {
     private String logo;
     @Column(name = "total_rating")
     private Float totalRating;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
