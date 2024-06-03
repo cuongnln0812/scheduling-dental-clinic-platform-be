@@ -40,7 +40,8 @@ public class ClinicBranch {
     @Column(name = "closing_time")
     private LocalTime closingTime;
     private Float totalRating;
-    private Status status;
+    @Column(name = "is_main")
+    private boolean isMain;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
