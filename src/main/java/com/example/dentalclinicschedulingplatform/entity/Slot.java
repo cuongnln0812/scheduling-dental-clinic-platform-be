@@ -33,7 +33,6 @@ public class Slot {
     private LocalTime startTime;
     @Column(name = "end_time")
     private LocalTime endTime;
-    private LocalDate date;
     private boolean status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
@@ -47,6 +46,8 @@ public class Slot {
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
+    @OneToOne(mappedBy = "slot")
+    private Appointment appointment;
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private ClinicBranch clinicBranch;
