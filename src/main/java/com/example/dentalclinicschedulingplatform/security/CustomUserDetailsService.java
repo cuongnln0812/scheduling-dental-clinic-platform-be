@@ -40,30 +40,30 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String user) throws UsernameNotFoundException {
         if(userType==UserType.CUSTOMER) {
-            Customer customer = customerRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Customer Email "+ email+ "not found"));
+            Customer customer = customerRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Customer account not found"));
 
             SimpleGrantedAuthority customerAuth = new SimpleGrantedAuthority(UserType.CUSTOMER.toString());
             Collection<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(customerAuth);
             return new User(customer.getEmail(), customer.getPassword(), authorities);
         } else if(userType == UserType.DENTIST) {
-            Dentist dentist = dentistRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Dentist Email "+ email+ "not found"));
+            Dentist dentist = dentistRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Dentist account not found"));
 
             SimpleGrantedAuthority dentistAuth = new SimpleGrantedAuthority(UserType.DENTIST.toString());
             Collection<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(dentistAuth);
             return new User(dentist.getEmail(), dentist.getPassword(), authorities);
         } else if(userType == UserType.STAFF) {
-            ClinicStaff staff = staffRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Staff Email "+ email+ "not found"));
+            ClinicStaff staff = staffRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Staff account not found"));
 
             SimpleGrantedAuthority staffAuth = new SimpleGrantedAuthority(UserType.STAFF.toString());
             Collection<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(staffAuth);
             return new User(staff.getEmail(), staff.getPassword(), authorities);
         } else if(userType == UserType.OWNER) {
-            ClinicOwner owner = ownerRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Owner Email "+ email+ "not found"));
+            ClinicOwner owner = ownerRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Owner account not found"));
 
             SimpleGrantedAuthority ownerAuth = new SimpleGrantedAuthority(UserType.OWNER.toString());
             Collection<GrantedAuthority> authorities = new ArrayList<>();

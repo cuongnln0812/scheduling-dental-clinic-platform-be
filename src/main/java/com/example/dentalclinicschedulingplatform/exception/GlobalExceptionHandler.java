@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.exception;
 
+import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import org.modelmapper.ValidationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,85 +16,58 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorRes> handleResourceNotFoundException(
-            ResourceNotFoundException ex,
-            WebRequest request
+    public ResponseEntity<ApiResponse<String>> handleResourceNotFoundException(
+            ResourceNotFoundException ex
     ) {
-        ErrorRes errorDetails = new ErrorRes();
-        errorDetails.setMessage(ex.getMessage());
-        errorDetails.setHttpStatus(HttpStatus.NOT_FOUND.value());
-        errorDetails.setDetails(request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorRes> handleApiException(
-            ApiException ex,
-            WebRequest request
-    ) {
-        ErrorRes errorDetails = new ErrorRes();
-        errorDetails.setMessage(ex.getMessage());
-        errorDetails.setHttpStatus(ex.getStatus().value());
-        errorDetails.setDetails(request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, ex.getStatus());
+    public ResponseEntity<ApiResponse<String>> handleApiException(ApiException ex) {
+        ApiResponse<String> response = new ApiResponse<>(ex.getStatus(), ex.getMessage());
+        return new ResponseEntity<>(response, ex.getStatus());
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorRes> handleValidationException(
-            ValidationException ex,
-            WebRequest request
+    public ResponseEntity<ApiResponse<String>> handleValidationException(
+            ValidationException ex
     ) {
-        ErrorRes errorDetails = new ErrorRes();
-        errorDetails.setMessage(ex.getMessage());
-        errorDetails.setHttpStatus(HttpStatus.BAD_REQUEST.value());
-        errorDetails.setDetails(request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<String>> handleAuthenticationException() {
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Invalid username/email or password!");
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", "failed");
-        body.put("httpStatus", HttpStatus.UNAUTHORIZED.value());
-        body.put("message", "Bad credentials");
-        // Do not include the stack trace in the response
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ApiResponse<String>> handleAuthenticationException(AuthenticationException e) {
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorRes> handleAccessDeniedException(
-            AccessDeniedException ex,
-            WebRequest request
+    public ResponseEntity<ApiResponse<String>> handleAccessDeniedException(
+            AccessDeniedException ex
     ) {
-        ErrorRes errorDetails = new ErrorRes();
-        errorDetails.setMessage("You do not have access to this!");
-        errorDetails.setHttpStatus(HttpStatus.UNAUTHORIZED.value());
-        errorDetails.setDetails(request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.FORBIDDEN, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", "failed");
-        body.put("httpStatus", status.value());
-
-        //get all the errors
         List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-
-        body.put("messages", errors);
-
-        return new ResponseEntity<>(body, status);
+        ApiResponse<List<String>> response = new ApiResponse<>(HttpStatus.resolve(status.value()), ex.getMessage(), errors);
+        return new ResponseEntity<>(response, status);
     }
 }

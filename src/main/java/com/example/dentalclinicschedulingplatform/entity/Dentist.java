@@ -32,6 +32,7 @@ public class Dentist implements UserDetails {
     private Long id;
     @Column(name = "full_name")
     private String fullName;
+    @Column(unique = true)
     private String username;
     @Column(unique = true)
     private String email;
