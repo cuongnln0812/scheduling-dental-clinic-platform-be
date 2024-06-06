@@ -29,7 +29,7 @@ public class AuthenticationController {
                 HttpStatus.OK,
                 "Authenticate successfully!",
                 authenticationService.authenticateCustomerAccount(request));
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/login/clinic")
     public ResponseEntity<?> authenticateClinic(@Valid @RequestBody AuthenticationRequest request){
@@ -37,11 +37,14 @@ public class AuthenticationController {
                 HttpStatus.OK,
                 "Authenticate successfully!",
                 authenticationService.authenticateClinicAccount(request));
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody CustomerRegisterRequest request){
-        return ResponseEntity.ok(authenticationService.registerCustomerAccount(request));
+    public ResponseEntity<ApiResponse<String> > register(@Valid @RequestBody CustomerRegisterRequest request){
+        ApiResponse<String> response = new ApiResponse<>(
+                HttpStatus.CREATED,
+                authenticationService.registerCustomerAccount(request));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 //    @PostMapping("/change-password")
@@ -51,9 +54,12 @@ public class AuthenticationController {
 //    }
 
     @GetMapping("/user-information")
-    public ResponseEntity<?> getUserInfo() {
-        UserInformationRes user = authenticationService.getUserInfo();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<ApiResponse<UserInformationRes>> getUserInfo() {
+        ApiResponse<UserInformationRes> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get user information successfully",
+                authenticationService.getUserInfo());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
