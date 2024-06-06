@@ -1,9 +1,11 @@
 package com.example.dentalclinicschedulingplatform.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ResourceNotFoundException extends RuntimeException {
     private String resourceName;
     private String fieldName;
@@ -24,21 +26,5 @@ public class ResourceNotFoundException extends RuntimeException {
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.stringFieldValue = stringFieldValue;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public long getFieldValue() {
-        return fieldValue;
-    }
-
-    public String getStringFieldValue(){
-        return stringFieldValue;
     }
 }
