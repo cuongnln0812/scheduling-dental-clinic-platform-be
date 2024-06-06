@@ -48,6 +48,7 @@ public class Dentist implements UserDetails {
     @Column(length = Length.LOB_DEFAULT)
     private String experience;
     private String avatar;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @OneToMany(mappedBy = "dentist")

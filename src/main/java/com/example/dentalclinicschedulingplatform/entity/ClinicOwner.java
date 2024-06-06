@@ -40,6 +40,7 @@ public class ClinicOwner implements UserDetails {
     private LocalDate dob;
     private String gender;
     private String avatar;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @OneToOne(mappedBy = "clinicOwner")
