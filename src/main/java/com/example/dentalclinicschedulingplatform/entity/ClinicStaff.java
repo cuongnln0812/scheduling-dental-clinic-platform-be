@@ -29,11 +29,14 @@ public class ClinicStaff implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
     private Long id;
+    @Column(unique = true)
+    private String username;
     @Column(name = "full_name")
     private String fullName;
     @Column(unique = true)
     private String email;
     private String password;
+    @Column(unique = true)
     private String phone;
     private LocalDate dob;
     private String gender;
