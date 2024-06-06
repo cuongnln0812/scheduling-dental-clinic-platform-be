@@ -9,6 +9,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.Authentication
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
@@ -16,10 +17,12 @@ import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
 import com.example.dentalclinicschedulingplatform.security.CustomUserDetailsService;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
+import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -99,6 +102,20 @@ public class AuthenticateService implements IAuthenticateService {
         return "Account created successfully";
     }
 
+    @Override
+    public UserInformationRes getUserInfo(){
+        String role = SecurityUtils.getRoleName();
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInformationRes res = new UserInformationRes();
+        if(role.equals(UserType.CUSTOMER.toString())){
+            Customer user = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            res.setUsername(user.getUsername());
+            res.setGender(role);
+        }
+        return res;
+    }
+
     private ClinicAccount determineClinicAcc(String request) {
         if (dentistRepository.existsByEmailOrUsername(request, request)) {
             var dentist = dentistRepository.findByUsernameOrEmail(request, request)
@@ -118,6 +135,4 @@ public class AuthenticateService implements IAuthenticateService {
         }
         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic account not found with username/email: " + request);
     }
-
-
 }
