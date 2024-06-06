@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegist
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +22,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate/customer")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request){
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request){
         return ResponseEntity.ok(authenticationService.authenticateCustomerAccount(request));
     }
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody CustomerRegisterRequest request){
+    public ResponseEntity<?> register(@Valid @RequestBody CustomerRegisterRequest request){
         return ResponseEntity.ok(authenticationService.registerCustomerAccount(request));
     }
 
