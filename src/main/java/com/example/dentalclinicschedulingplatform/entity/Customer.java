@@ -44,6 +44,9 @@ public class Customer implements UserDetails {
     private String gender;
     private String avatar;
     private boolean status;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
+
 
     @OneToMany(mappedBy = "customer")
     private List<Appointment> appointments;
@@ -54,7 +57,7 @@ public class Customer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     @Override

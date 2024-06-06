@@ -1,6 +1,8 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,10 @@ public class AuthenticationController {
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request){
         return ResponseEntity.ok(authenticationService.authenticateCustomerAccount(request));
     }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody CustomerRegisterRequest request){
+        return ResponseEntity.ok(authenticationService.registerCustomerAccount(request));
+    }
 
 //    @PostMapping("/change-password")
 //    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeReq request) {
@@ -29,10 +35,10 @@ public class AuthenticationController {
 //        return ResponseUtils.ok("Password changed successfully", HttpStatus.OK);
 //    }
 
-//    @GetMapping("/user-information")
-//    public ResponseEntity<?> getUserInfo() {
-//        UserAuthRes user = authenticationService.getUserInfo();
-//        return ResponseUtils.response(user, "User information retrieved successfully!", HttpStatus.OK);
-//    }
+    @GetMapping("/user-information")
+    public ResponseEntity<?> getUserInfo() {
+        UserInformationRes user = authenticationService.getUserInfo();
+        return ResponseEntity.ok(user);
+    }
 
 }
