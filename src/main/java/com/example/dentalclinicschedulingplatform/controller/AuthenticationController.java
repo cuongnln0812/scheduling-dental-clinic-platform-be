@@ -2,6 +2,8 @@ package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,9 +23,21 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/authenticate/customer")
-    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request){
-        return ResponseEntity.ok(authenticationService.authenticateCustomerAccount(request));
+    @PostMapping("/login/customer")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@Valid @RequestBody AuthenticationRequest request){
+        ApiResponse<AuthenticationResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Authenticate successfully!",
+                authenticationService.authenticateCustomerAccount(request));
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/login/clinic")
+    public ResponseEntity<?> authenticateClinic(@Valid @RequestBody AuthenticationRequest request){
+        ApiResponse<AuthenticationResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Authenticate successfully!",
+                authenticationService.authenticateClinicAccount(request));
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CustomerRegisterRequest request){
