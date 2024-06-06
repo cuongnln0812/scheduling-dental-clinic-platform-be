@@ -36,7 +36,9 @@ public class Customer implements UserDetails {
     private String fullName;
     @Column(unique = true)
     private String email;
+    private String address;
     private String password;
+    @Column(unique = true)
     private String phone;
     private LocalDate dob;
     private String gender;
@@ -47,6 +49,8 @@ public class Customer implements UserDetails {
     private List<Appointment> appointments;
     @OneToMany(mappedBy = "customer")
     private List<Feedback> feedbacks;
+    @OneToMany(mappedBy = "customer")
+    private List<TreatmentOutcome> treatmentOutcomes;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

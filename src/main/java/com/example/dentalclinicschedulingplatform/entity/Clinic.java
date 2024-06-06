@@ -39,16 +39,10 @@ public class Clinic {
     private String description;
     @Column(name = "website_url")
     private String websiteUrl;
-    @Column(name = "opening_time")
-    private LocalTime openingTime;
-    @Column(name = "closing_time")
-    private LocalTime closingTime;
     private String logo;
     @Column(name = "total_rating")
     private Float totalRating;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;

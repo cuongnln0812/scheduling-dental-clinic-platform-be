@@ -32,8 +32,7 @@ public class Blog {
     private String thumbnail;
     @Column(name = "publish_date")
     private LocalDate publishDate;
-    private boolean status;
-    private boolean isApproved;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;

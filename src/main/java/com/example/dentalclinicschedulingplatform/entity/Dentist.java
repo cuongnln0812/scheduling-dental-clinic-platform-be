@@ -32,6 +32,7 @@ public class Dentist implements UserDetails {
     private Long id;
     @Column(name = "full_name")
     private String fullName;
+    @Column(unique = true)
     private String username;
     @Column(unique = true)
     private String email;
@@ -47,9 +48,7 @@ public class Dentist implements UserDetails {
     @Column(length = Length.LOB_DEFAULT)
     private String experience;
     private String avatar;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
 
     @OneToMany(mappedBy = "dentist")
     private List<Appointment> appointments;

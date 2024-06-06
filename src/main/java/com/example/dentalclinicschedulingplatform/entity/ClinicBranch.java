@@ -35,14 +35,9 @@ public class ClinicBranch {
     private String phone;
     @Column(unique = true)
     private String email;
-    @Column(name = "opening_time")
-    private LocalTime openingTime;
-    @Column(name = "closing_time")
-    private LocalTime closingTime;
     private Float totalRating;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    @Column(name = "is_main")
+    private boolean isMain;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
@@ -60,10 +55,14 @@ public class ClinicBranch {
     private List<Feedback> feedbacks;
     @OneToMany(mappedBy = "clinicBranch", fetch = FetchType.LAZY)
     private List<Appointment> appointments;
-    @OneToMany(mappedBy = "clinicBranch")
+    @OneToMany(mappedBy = "clinicBranch", fetch = FetchType.LAZY)
     private List<Dentist> dentists;
-    @OneToMany(mappedBy = "clinicBranch")
+    @OneToMany(mappedBy = "clinicBranch", fetch = FetchType.LAZY)
     private List<ClinicStaff> staffs;
+    @OneToMany(mappedBy = "clinicBranch")
+    private List<WorkingHours> workingHours;
+    @OneToMany(mappedBy = "clinicBranch")
+    private List<Slot> slots;
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;

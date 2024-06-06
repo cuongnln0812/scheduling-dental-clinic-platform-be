@@ -28,18 +28,19 @@ public class ClinicOwner implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "owner_id")
     private Long id;
+    @Column(unique = true)
+    private String username;
     @Column(name = "full_name")
     private String fullName;
     @Column(unique = true)
     private String email;
     private String password;
+    @Column(unique = true)
     private String phone;
     private LocalDate dob;
     private String gender;
     private String avatar;
-    private boolean status;
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    private Status status;
 
     @OneToOne(mappedBy = "clinicOwner")
     private Clinic clinic;

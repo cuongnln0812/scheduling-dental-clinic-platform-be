@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -15,6 +17,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "appointment")
 public class Appointment {
     @Id
@@ -33,18 +36,19 @@ public class Appointment {
     private int customerAge;
     @Column(name = "customer_email")
     private String customerEmail;
-    @Column(name = "bracnh_location")
-    private String branchLocation;
     @Column(name = "appointment_date")
     private LocalDate appointmentDate;
-    @Column(name = "appointment_time")
-    private LocalTime appointmentTime;
     @Column(name = "service_duration")
     private int duration;
     private String status;
-
+    @CreatedDate
+    @Column(name = "created_date",nullable = false, updatable = false)
+    private LocalDateTime createdDate;
     @OneToOne(mappedBy = "appointment")
     private TreatmentOutcome treatmentOutcome;
+    @OneToOne
+    @JoinColumn(name = "slot_id", referencedColumnName = "slot_id")
+    private Slot slot;
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;

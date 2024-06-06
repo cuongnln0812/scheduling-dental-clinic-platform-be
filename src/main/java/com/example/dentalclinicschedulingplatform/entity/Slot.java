@@ -5,15 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.Length;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -21,25 +21,19 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "service")
-public class Service {
+@Table(name = "slot")
+public class Slot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "slot_id")
     private Long id;
-    @Column(name = "service_name")
-    private String serviceName;
-    @Column(length = Length.LOB_DEFAULT)
-    private String description;
-    @Column(name = "unit_of_price")
-    private String unitOfPrice;
-    @Column(name = "minimum_price")
-    private Float minimumPrice;
-    @Column(name = "maximum_price")
-    private Float maximumPrice;
-    private Integer duration;
-    @Column(name = "service_type")
-    private String serviceType;
-    private Status status;
+    @Column(name = "slot_no")
+    private int slotNo;
+    @Column(name = "start_time")
+    private LocalTime startTime;
+    @Column(name = "end_time")
+    private LocalTime endTime;
+    private boolean status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
@@ -52,14 +46,9 @@ public class Service {
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
-
-    @OneToMany(mappedBy = "service")
-    private List<Appointment> appointments;
+    @OneToOne(mappedBy = "slot")
+    private Appointment appointment;
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-    @ManyToOne
-    @JoinColumn(name = "clinic_id")
-    private Clinic clinic;
-
+    @JoinColumn(name = "branch_id")
+    private ClinicBranch clinicBranch;
 }
