@@ -42,13 +42,15 @@ public class ClinicOwner implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
     @OneToOne(mappedBy = "clinicOwner")
     private Clinic clinic;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     @Override

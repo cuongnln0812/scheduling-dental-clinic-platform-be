@@ -50,6 +50,8 @@ public class Dentist implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
     @OneToMany(mappedBy = "dentist")
     private List<Appointment> appointments;
@@ -59,7 +61,7 @@ public class Dentist implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     @Override

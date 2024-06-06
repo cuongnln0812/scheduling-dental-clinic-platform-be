@@ -43,6 +43,8 @@ public class ClinicStaff implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
     private List<Blog> blogs;
     @ManyToOne
@@ -50,7 +52,7 @@ public class ClinicStaff implements UserDetails {
     private ClinicBranch clinicBranch;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     @Override

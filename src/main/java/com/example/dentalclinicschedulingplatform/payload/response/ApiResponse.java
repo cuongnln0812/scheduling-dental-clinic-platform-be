@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     private HttpStatus status;
     private final LocalDateTime timestamp = LocalDateTime.now();
@@ -17,28 +19,26 @@ public class ApiResponse<T> {
     private String message;
     private T data;
 
-    //Only for exception response
-    public ApiResponse(HttpStatus status, boolean success, String message) {
-        this.status = status;
-        this.success = success;
-        this.message = message;
-    }
-    //Only for exception response
+    // General constructor for all response types
     public ApiResponse(HttpStatus status, boolean success, String message, T data) {
         this.status = status;
+        this.message = message;
         this.success = success;
-        this.message = message;
         this.data = data;
     }
 
-    public ApiResponse(HttpStatus status, String message) {
-        this.status = status;
-        this.message = message;
+    // Overloaded constructor for no data
+    public ApiResponse(HttpStatus status, boolean success, String message) {
+        this(status, success, message, null);
     }
 
+    // Overloaded constructor for default success
     public ApiResponse(HttpStatus status, String message, T data) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
+        this(status, true, message,  data);
+    }
+
+    // Overloaded constructor for default success and no data
+    public ApiResponse(HttpStatus status, String message) {
+        this(status, true, message, null);
     }
 }
