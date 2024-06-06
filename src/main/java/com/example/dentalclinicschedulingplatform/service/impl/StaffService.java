@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
 
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.CreateStaffRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
@@ -45,7 +46,7 @@ public class StaffService implements IStaffService {
 //            if(iClinicBranchRepository.findAllBelongClinicOwner(clinicBranch.getId(), owner.getId()).isEmpty())
 //                throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
 
-            if (iStaffRepository.existsByEmail(request.getEmail())) {
+            if (iStaffRepository.existsByEmailOrUsername(request.getEmail(), request.getFullName())) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Email is existed");
             } else {
                 ClinicStaff clinicStaff = new ClinicStaff();
@@ -58,8 +59,7 @@ public class StaffService implements IStaffService {
                 clinicStaff.setGender(request.getGender());
                 clinicStaff.setAvatar(request.getAvatar());
                 clinicStaff.setClinicBranch(null);
-                clinicStaff.setStatus(false);
-                clinicStaff.setApproved(false);
+                clinicStaff.setStatus(Status.PENDING);
                 //clinicStaff.setClinicBranch(clinicBranch);
 
                 clinicStaff = iStaffRepository.save(clinicStaff);
