@@ -26,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleResourceNotFoundException(
             ResourceNotFoundException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.NOT_FOUND, ex.getMessage());
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.NOT_FOUND, "Resource not found!");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleValidationException(
             ValidationException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, "Validation failed!");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse<String>> handleAuthenticationException(AuthenticationException e) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, e.getMessage());
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Authentication failed!");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -60,14 +60,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleAccessDeniedException(
             AccessDeniedException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.FORBIDDEN, ex.getMessage());
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.FORBIDDEN, "You are not allowed to access to this!");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        ApiResponse<List<String>> response = new ApiResponse<>(HttpStatus.resolve(status.value()), ex.getMessage(), errors);
+        ApiResponse<List<String>> response = new ApiResponse<>((HttpStatus.resolve(status.value())), "Invalid arguments", errors);
         return new ResponseEntity<>(response, status);
     }
 }
