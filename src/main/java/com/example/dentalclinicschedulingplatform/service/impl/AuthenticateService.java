@@ -98,6 +98,7 @@ public class AuthenticateService implements IAuthenticateService {
         user.setPhone(request.getPhone());
         user.setDob(request.getDob());
         user.setAddress(request.getAddress());
+        user.setStatus(true);
         customerRepository.save(user);
         return "Account created successfully";
     }
@@ -111,7 +112,13 @@ public class AuthenticateService implements IAuthenticateService {
             Customer user = customerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res.setUsername(user.getUsername());
-            res.setGender(role);
+            res.setEmail(user.getEmail());
+            res.setFullName(user.getFullName());
+            res.setGender(user.getGender());
+            res.setPhone(user.getPhone());
+            res.setDob(user.getDob());
+            res.setAddress(user.getAddress());
+            res.setRole(role);
         }
         return res;
     }

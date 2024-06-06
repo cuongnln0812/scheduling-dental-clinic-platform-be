@@ -26,13 +26,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleResourceNotFoundException(
             ResourceNotFoundException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.NOT_FOUND, "Resource not found!");
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.NOT_FOUND, false, "Resource not found!");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiResponse<String>> handleApiException(ApiException ex) {
-        ApiResponse<String> response = new ApiResponse<>(ex.getStatus(), ex.getMessage());
+        ApiResponse<String> response = new ApiResponse<>(ex.getStatus(), false, ex.getMessage());
         return new ResponseEntity<>(response, ex.getStatus());
     }
 
@@ -40,19 +40,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleValidationException(
             ValidationException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, "Validation failed!");
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, false, "Validation failed!");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<String>> handleAuthenticationException() {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Invalid username/email or password!");
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED,false,  "Invalid username/email or password!");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse<String>> handleAuthenticationException(AuthenticationException e) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Authentication failed!");
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.UNAUTHORIZED, false, "Authentication failed!");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -60,14 +60,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleAccessDeniedException(
             AccessDeniedException ex
     ) {
-        ApiResponse<String> response = new ApiResponse<>(HttpStatus.FORBIDDEN, "You are not allowed to access to this!");
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.FORBIDDEN, false, "You are not allowed to access to this!");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        ApiResponse<List<String>> response = new ApiResponse<>((HttpStatus.resolve(status.value())), "Invalid arguments", errors);
+        ApiResponse<List<String>> response = new ApiResponse<>((HttpStatus.resolve(status.value())), false, "Invalid arguments", errors);
         return new ResponseEntity<>(response, status);
     }
 }

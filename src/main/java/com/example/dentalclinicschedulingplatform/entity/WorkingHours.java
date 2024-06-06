@@ -26,6 +26,7 @@ public class WorkingHours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "working_hours_id")
     private Long id;
+    @Enumerated(EnumType.STRING)
     private DayInWeek day;
     private Shift shift;
     @Column(name = "start_time")
