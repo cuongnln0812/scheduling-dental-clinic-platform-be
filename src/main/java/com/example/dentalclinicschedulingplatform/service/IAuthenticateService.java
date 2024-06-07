@@ -7,8 +7,7 @@ import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegis
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 
 public interface IAuthenticateService {
-    AuthenticationResponse authenticateCustomerAccount(AuthenticationRequest request);
-    AuthenticationResponse authenticateClinicAccount(AuthenticationRequest request);
-    String registerCustomerAccount(CustomerRegisterRequest request);
+    AuthenticationResponse authenticateAccount(AuthenticationRequest request);
+    CustomerRegisterResponse registerCustomerAccount(CustomerRegisterRequest request);
     UserInformationRes getUserInfo();
 }

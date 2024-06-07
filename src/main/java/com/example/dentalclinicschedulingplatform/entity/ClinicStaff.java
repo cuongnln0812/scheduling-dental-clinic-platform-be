@@ -24,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "clinic_staff")
-public class ClinicStaff implements UserDetails {
+public class ClinicStaff{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
@@ -35,6 +35,7 @@ public class ClinicStaff implements UserDetails {
     private String fullName;
     @Column(unique = true)
     private String email;
+    private String address;
     private String password;
     @Column(unique = true)
     private String phone;
@@ -43,45 +44,9 @@ public class ClinicStaff implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
     private List<Blog> blogs;
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private ClinicBranch clinicBranch;
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
