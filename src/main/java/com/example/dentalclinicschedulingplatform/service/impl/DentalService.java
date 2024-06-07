@@ -41,9 +41,11 @@ public class DentalService implements IDentalService {
         List<Service> serviceList = serviceRepository.findServicesByCategoryId(categoryId);
         List<ServiceViewResponse> serviceViewResponseList = new ArrayList<>();
         for (Service serviceItem : serviceList) {
-            serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(),
-                    serviceItem.getServiceName(), serviceItem.getDescription(), serviceItem.getUnitOfPrice(),
-                    serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration()));
+            if (serviceItem.getStatus().equals(Status.ACTIVE.toString())){
+                serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(),
+                        serviceItem.getServiceName(), serviceItem.getDescription(), serviceItem.getUnitOfPrice(),
+                        serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration()));
+            }
         }
         return serviceViewResponseList;
     }
