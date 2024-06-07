@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.Authentication
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,28 +24,21 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/login/customer")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@Valid @RequestBody AuthenticationRequest request){
         ApiResponse<AuthenticationResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Authenticate successfully!",
-                authenticationService.authenticateCustomerAccount(request));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-    @PostMapping("/login/clinic")
-    public ResponseEntity<?> authenticateClinic(@Valid @RequestBody AuthenticationRequest request){
-        ApiResponse<AuthenticationResponse> response = new ApiResponse<>(
-                HttpStatus.OK,
-                "Authenticate successfully!",
-                authenticationService.authenticateClinicAccount(request));
+                authenticationService.authenticateAccount(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String> > register(@Valid @RequestBody CustomerRegisterRequest request){
-        ApiResponse<String> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponse<CustomerRegisterResponse> > register(@Valid @RequestBody CustomerRegisterRequest request){
+        ApiResponse<CustomerRegisterResponse> response = new ApiResponse<>(
                 HttpStatus.CREATED,
+                "Account registered successfully!",
                 authenticationService.registerCustomerAccount(request));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 //    @PostMapping("/change-password")

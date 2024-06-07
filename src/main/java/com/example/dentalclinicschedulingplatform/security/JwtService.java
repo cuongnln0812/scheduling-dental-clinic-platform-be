@@ -6,15 +6,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -28,7 +28,7 @@ public class JwtService {
     }
 
     public String extractUserType(String token) {
-        return extractClaim(token, claims -> claims.get("usertype").toString());
+        return extractClaim(token, claims -> claims.get("role").toString());
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -36,21 +36,24 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails, String usertype) {
-        return generateToken(new HashMap<>(), userDetails, usertype);
+    public String generateToken(Authentication authentication) {
+        return generateToken(new HashMap<>(), authentication);
     }
 
     public String generateToken(
             Map<String, Objects> extraClaims,
-            UserDetails userDetails, String usertype) {
+            Authentication authentication) {
         // Create claims object and put extra claims
         Map<String, Object> claims = new HashMap<>(extraClaims);
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         // Add userType claim
-        claims.put("usertype", usertype);
+        claims.put("role", authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
         return Jwts
                 .builder()
                 .setClaims(claims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(authentication.getName())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date((System.currentTimeMillis() + EXPIRATION_DATE)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
