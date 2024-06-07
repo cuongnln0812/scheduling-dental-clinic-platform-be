@@ -9,6 +9,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.Authentication
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
@@ -16,10 +17,12 @@ import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
 import com.example.dentalclinicschedulingplatform.security.CustomUserDetailsService;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
+import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -95,8 +98,29 @@ public class AuthenticateService implements IAuthenticateService {
         user.setPhone(request.getPhone());
         user.setDob(request.getDob());
         user.setAddress(request.getAddress());
+        user.setStatus(true);
         customerRepository.save(user);
         return "Account created successfully";
+    }
+
+    @Override
+    public UserInformationRes getUserInfo(){
+        String role = SecurityUtils.getRoleName();
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInformationRes res = new UserInformationRes();
+        if(role.equals(UserType.CUSTOMER.toString())){
+            Customer user = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            res.setUsername(user.getUsername());
+            res.setEmail(user.getEmail());
+            res.setFullName(user.getFullName());
+            res.setGender(user.getGender());
+            res.setPhone(user.getPhone());
+            res.setDob(user.getDob());
+            res.setAddress(user.getAddress());
+            res.setRole(role);
+        }
+        return res;
     }
 
     private ClinicAccount determineClinicAcc(String request) {
@@ -118,6 +142,4 @@ public class AuthenticateService implements IAuthenticateService {
         }
         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic account not found with username/email: " + request);
     }
-
-
 }
