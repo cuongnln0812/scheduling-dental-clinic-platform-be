@@ -42,6 +42,7 @@ public class Clinic {
     private String logo;
     @Column(name = "total_rating")
     private Float totalRating;
+    @Enumerated(EnumType.STRING)
     private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
