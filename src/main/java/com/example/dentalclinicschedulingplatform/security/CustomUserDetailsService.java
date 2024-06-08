@@ -1,10 +1,12 @@
 package com.example.dentalclinicschedulingplatform.security;
 
 import com.example.dentalclinicschedulingplatform.entity.*;
+import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
 import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -23,7 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final DentistRepository dentistRepository;
     private final StaffRepository staffRepository;
     private final OwnerRepository ownerRepository;
-    private UserType userType;
 
     public CustomUserDetailsService(CustomerRepository customerRepository,
                                     DentistRepository dentistRepository,
@@ -35,41 +38,41 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.ownerRepository = ownerRepository;
     }
 
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
     @Override
     public UserDetails loadUserByUsername(String user) throws UsernameNotFoundException {
-        if(userType==UserType.CUSTOMER) {
-            Customer customer = customerRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Customer account not found"));
-
-            SimpleGrantedAuthority customerAuth = new SimpleGrantedAuthority(UserType.CUSTOMER.toString());
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(customerAuth);
-            return new User(customer.getEmail(), customer.getPassword(), authorities);
-        } else if(userType == UserType.DENTIST) {
-            Dentist dentist = dentistRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Dentist account not found"));
-
-            SimpleGrantedAuthority dentistAuth = new SimpleGrantedAuthority(UserType.DENTIST.toString());
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(dentistAuth);
-            return new User(dentist.getEmail(), dentist.getPassword(), authorities);
-        } else if(userType == UserType.STAFF) {
-            ClinicStaff staff = staffRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Staff account not found"));
-
-            SimpleGrantedAuthority staffAuth = new SimpleGrantedAuthority(UserType.STAFF.toString());
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(staffAuth);
-            return new User(staff.getEmail(), staff.getPassword(), authorities);
-        } else if(userType == UserType.OWNER) {
-            ClinicOwner owner = ownerRepository.findByUsernameOrEmail(user, user).orElseThrow(()-> new UsernameNotFoundException("Owner account not found"));
-
-            SimpleGrantedAuthority ownerAuth = new SimpleGrantedAuthority(UserType.OWNER.toString());
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(ownerAuth);
-            return new User(owner.getEmail(), owner.getPassword(), authorities);
+        Optional<Customer> optionalCustomer = customerRepository.findByUsernameOrEmail(user, user);
+        if (optionalCustomer.isPresent()) {
+            Customer customer = optionalCustomer.get();
+            if(!customer.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Customer is forbidden!");
+            return new User(customer.getEmail(), customer.getPassword(), getAuthorities(UserType.CUSTOMER));
         }
-        return null;
+
+        Optional<Dentist> optionalDentist = dentistRepository.findByUsernameOrEmail(user, user);
+        if (optionalDentist.isPresent()) {
+            Dentist dentist = optionalDentist.get();
+            if(dentist.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Dentist is forbidden!");
+            return new User(dentist.getEmail(), dentist.getPassword(), getAuthorities(UserType.DENTIST));
+        }
+
+        Optional<ClinicStaff> optionalStaff = staffRepository.findByUsernameOrEmail(user, user);
+        if (optionalStaff.isPresent()) {
+            ClinicStaff staff = optionalStaff.get();
+            if(staff.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Staff is forbidden!");
+            return new User(staff.getEmail(), staff.getPassword(), getAuthorities(UserType.STAFF));
+        }
+
+        Optional<ClinicOwner> optionalOwner = ownerRepository.findByUsernameOrEmail(user, user);
+        if (optionalOwner.isPresent()) {
+            ClinicOwner owner = optionalOwner.get();
+            if(owner.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Owner is forbidden!");
+            return new User(owner.getEmail(), owner.getPassword(), getAuthorities(UserType.OWNER));
+        }
+        throw new UsernameNotFoundException("User account not found");
+    }
+
+    private List<GrantedAuthority> getAuthorities(UserType userType) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + userType.toString()));
+        return authorities;
     }
 }
