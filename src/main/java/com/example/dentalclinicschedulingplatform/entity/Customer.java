@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "customer")
-public class Customer implements UserDetails {
+public class Customer{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
@@ -51,39 +51,4 @@ public class Customer implements UserDetails {
     private List<Feedback> feedbacks;
     @OneToMany(mappedBy = "customer")
     private List<TreatmentOutcome> treatmentOutcomes;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
