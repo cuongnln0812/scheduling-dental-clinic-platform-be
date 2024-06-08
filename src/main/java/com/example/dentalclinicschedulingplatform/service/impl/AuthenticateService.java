@@ -54,7 +54,6 @@ public class AuthenticateService implements IAuthenticateService {
                         request.getPassword()));
 
         var jwtToken = jwtService.generateToken(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setToken(jwtToken);
         return authenticationResponse;
@@ -92,22 +91,22 @@ public class AuthenticateService implements IAuthenticateService {
             Customer user = customerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(role);
+            res.setRole(UserType.CUSTOMER.toString());
         }else if(role.equals("ROLE_" + UserType.DENTIST)){
             Dentist user = dentistRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(role);
+            res.setRole(UserType.DENTIST.toString());
         }else if(role.equals("ROLE_" + UserType.STAFF)){
             ClinicStaff user = staffRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(role);
+            res.setRole(UserType.STAFF.toString());
         }else if(role.equals("ROLE_" + UserType.OWNER)){
             ClinicOwner user = ownerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(role);
+            res.setRole(UserType.OWNER.toString());
         }
         return res;
     }
