@@ -4,10 +4,14 @@ import com.example.dentalclinicschedulingplatform.entity.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Length;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
 public class DentistDetailResponse {
     private Long id;
     private String fullName;
@@ -22,5 +26,5 @@ public class DentistDetailResponse {
     private String experience;
     private String avatar;
     private String branchName;
-    private Status status;
+    private String status;
 }

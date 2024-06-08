@@ -14,6 +14,7 @@ import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticateService implements IAuthenticateService {
     private final JwtService jwtService;
     private final PasswordEncoder  passwordEncoder;
@@ -35,17 +37,6 @@ public class AuthenticateService implements IAuthenticateService {
     private final DentistRepository dentistRepository;
     private final StaffRepository staffRepository;
     private final OwnerRepository ownerRepository;
-
-    public AuthenticateService(JwtService jwtService, PasswordEncoder passwordEncoder, ModelMapper modelMapper, AuthenticationManager authenticationManager, CustomerRepository customerRepository, DentistRepository dentistRepository, StaffRepository staffRepository, OwnerRepository ownerRepository) {
-        this.jwtService = jwtService;
-        this.passwordEncoder = passwordEncoder;
-        this.modelMapper = modelMapper;
-        this.authenticationManager = authenticationManager;
-        this.customerRepository = customerRepository;
-        this.dentistRepository = dentistRepository;
-        this.staffRepository = staffRepository;
-        this.ownerRepository = ownerRepository;
-    }
 
     public AuthenticationResponse authenticateAccount(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -65,18 +56,9 @@ public class AuthenticateService implements IAuthenticateService {
         // add check if username already exists
         if(isUsernameOrEmailExisted(request.getUsername(), request.getEmail()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Username/Email is already used");
-        if(customerRepository.existsByPhone(request.getPhone()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Phone number is already used");
-
         Customer user = new Customer();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        modelMapper.map(request, user);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFullName(request.getFullName());
-        user.setGender(request.getGender());
-        user.setPhone(request.getPhone());
-        user.setDob(request.getDob());
-        user.setAddress(request.getAddress());
         user.setStatus(true);
         user = customerRepository.save(user);
         return modelMapper.map(user, CustomerRegisterResponse.class);
