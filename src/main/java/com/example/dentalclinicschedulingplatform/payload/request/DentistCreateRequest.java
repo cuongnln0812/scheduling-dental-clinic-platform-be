@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -45,6 +46,6 @@ public class DentistCreateRequest {
     private String experience;
     @NotBlank(message = "Description must not be blank")
     private String avatar;
-    @NotBlank(message = "Status must not be blank")
-    private String status;
+    @NotNull(message = "Status must not be null")
+    private Status status;
 }

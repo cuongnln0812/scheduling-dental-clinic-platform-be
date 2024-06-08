@@ -26,5 +26,5 @@ public class DentistDetailResponse {
     private String experience;
     private String avatar;
     private String branchName;
-    private String status;
+    private Status status;
 }

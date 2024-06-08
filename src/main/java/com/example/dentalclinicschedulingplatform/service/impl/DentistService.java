@@ -1,18 +1,16 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
-import com.example.dentalclinicschedulingplatform.entity.Customer;
 import com.example.dentalclinicschedulingplatform.entity.Dentist;
 import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistListResponse;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
+import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
-import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,13 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class DentistService implements IDentistService {
 
     private final ModelMapper modelMapper;
     private final DentistRepository dentistRepository;
-    private final AuthenticateService authenticateService;
+    private final IAuthenticateService authenticateService;
 
     @Override
     public Page<DentistListResponse> getDentistListByBranch(Long branchId, int page, int size) {
@@ -50,6 +47,7 @@ public class DentistService implements IDentistService {
     }
 
     @Override
+    @Transactional
     public DentistDetailResponse createDentist(DentistCreateRequest request) {
         if(authenticateService.isUsernameOrEmailExisted(request.getUsername(), request.getEmail()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Username/Email is already used");
@@ -61,6 +59,7 @@ public class DentistService implements IDentistService {
     }
 
     @Override
+    @Transactional
     public DentistDetailResponse updateDentistDetails(DentistUpdateRequest request) {
         Dentist existingDentist = dentistRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", request.getId()));
@@ -71,6 +70,7 @@ public class DentistService implements IDentistService {
     }
 
     @Override
+    @Transactional
     public DentistDetailResponse removeDentist(Long id) {
         Dentist existingDentist = dentistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));

@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateR
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistListResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
 
 public interface IDentistService{
     Page<DentistListResponse> getDentistListByBranch(Long id, int page, int size);

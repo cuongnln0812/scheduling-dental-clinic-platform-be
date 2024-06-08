@@ -10,6 +10,7 @@ import com.example.dentalclinicschedulingplatform.utils.AppConstants;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class DentistController {
 
     @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
     @PostMapping()
-    private ResponseEntity<ApiResponse<DentistDetailResponse>> createDentistAccount(
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> createDentistAccount(
             @Valid @RequestBody DentistCreateRequest request){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.CREATED,
@@ -37,7 +38,7 @@ public class DentistController {
 
     @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("")
-    private ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
+    public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
             @RequestParam(required = false) Long branchId,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
@@ -49,7 +50,7 @@ public class DentistController {
     }
     @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("/{dentistId}")
-    private ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistList(
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistList(
             @PathVariable("dentistId") Long dentistId){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
@@ -60,7 +61,7 @@ public class DentistController {
 
     @PreAuthorize("hasAnyRole('DENTIST', 'OWNER', 'STAFF')")
     @PutMapping()
-    private ResponseEntity<ApiResponse<DentistDetailResponse>> updateDentist(
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> updateDentist(
             @Valid @RequestBody DentistUpdateRequest request){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
@@ -71,7 +72,7 @@ public class DentistController {
 
     @PreAuthorize("hasAnyRole('OWNER')")
     @DeleteMapping("/{dentistId}")
-    private ResponseEntity<ApiResponse<DentistDetailResponse>> removeDentist(
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> removeDentist(
             @PathVariable("dentistId") Long dentistId){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,

@@ -93,7 +93,8 @@ public class AuthenticateService implements IAuthenticateService {
         return res;
     }
 
-    boolean isUsernameOrEmailExisted(String username, String email) {
+    @Override
+    public boolean isUsernameOrEmailExisted(String username, String email) {
         return customerRepository.existsByUsernameOrEmail(username, email) ||
                 dentistRepository.existsByEmailOrUsername(username, email) ||
                 staffRepository.existsByEmailOrUsername(username, email) ||
