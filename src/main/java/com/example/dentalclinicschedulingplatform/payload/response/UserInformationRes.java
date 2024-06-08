@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerRegisterResponse {
+public class UserInformationRes {
     private String username;
     private String fullName;
     private String email;
@@ -19,4 +19,5 @@ public class CustomerRegisterResponse {
     private String phone;
     private LocalDate dob;
     private String address;
+    private String role;
 }
