@@ -1,19 +1,18 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class CategoryViewResponse {
+public class ServiceViewListResponse {
     private Long id;
-    private String categoryName;
-    private boolean status;
-    private List<ServiceViewDetailsResponse> services;
+    private String serviceName;
+    private Status status;
+    private Long clinicId;
 }

@@ -2,14 +2,17 @@ package com.example.dentalclinicschedulingplatform.service;
 
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 
 import java.util.List;
 
 public interface IDentalService {
-    List<ServiceViewResponse> viewServicesByCategoryId(Long categoryId);
-    List<ServiceViewResponse> viewServicesByClinicId(Long clinicId);
-    ServiceViewResponse createNewService(UserInformationRes userInformationRes, ServiceCreateRequest request);
-    ServiceViewResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request);
+    List<ServiceViewDetailsResponse> viewServicesByCategoryId(Long categoryId);
+    List<ServiceViewListResponse> viewServicesByClinic(Long clinicId, int page, int size);
+    ServiceViewDetailsResponse createNewService(UserInformationRes userInformationRes, ServiceCreateRequest request);
+    ServiceViewDetailsResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request);
+    ServiceViewDetailsResponse deleteService(UserInformationRes userInformation, Long serviceId);
+//    List<ServiceViewListResponse>
 }
