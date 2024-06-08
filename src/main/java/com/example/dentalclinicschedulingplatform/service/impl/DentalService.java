@@ -47,7 +47,8 @@ public class DentalService implements IDentalService {
         List<ServiceViewResponse> serviceViewResponseList = new ArrayList<>();
         for (Service serviceItem : serviceList) {
             if (serviceItem.getStatus().equals(Status.ACTIVE)){
-                serviceViewResponseList.add(modelMapper.map(serviceItem, ServiceViewResponse.class));
+                serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(), serviceItem.getServiceName(),
+                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice()));
             }
         }
         return serviceViewResponseList;
@@ -64,7 +65,8 @@ public class DentalService implements IDentalService {
 
         for (Service serviceItem :serviceList) {
             if (serviceItem.getStatus().equals(Status.ACTIVE)) {
-                serviceViewResponseList.add(modelMapper.map(serviceItem, ServiceViewResponse.class));
+                serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(), serviceItem.getServiceName(),
+                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice()));
             }
         }
         return serviceViewResponseList;
@@ -125,7 +127,7 @@ public class DentalService implements IDentalService {
                 .orElse(null);
 
         Service updatedService = serviceRepository.findById(request.getServiceId())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service does exist"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service does not exist"));
 
         if (owner == null) {
             ClinicStaff staff = staffRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
@@ -141,15 +143,15 @@ public class DentalService implements IDentalService {
 
             List<Service> services = serviceRepository.findServicesByClinicId(clinicId);
 
-            if (!categories.contains(currCategory)) {
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
-            }
-
             if (!services.contains(updatedService)) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Services does not belong to current clinic");
             }
 
-            if (updatedService.getServiceName().equals(request.getServiceName())){
+            if (!categories.contains(currCategory)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
+            }
+
+            if (!updatedService.getServiceName().equals(request.getServiceName())){
                 Service existingService = serviceRepository.findByServiceNameAndClinicId(request.getServiceName(), clinicId);
                 if (existingService != null) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
@@ -169,7 +171,8 @@ public class DentalService implements IDentalService {
             updatedService.setCategory(currCategory);
 
             serviceRepository.save(updatedService);
-            return modelMapper.map(updatedService, ServiceViewResponse.class);
+            return new ServiceViewResponse(updatedService.getId(), updatedService.getServiceName(),
+                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice());
         }
 
         Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
@@ -182,15 +185,15 @@ public class DentalService implements IDentalService {
 
         List<Service> services = serviceRepository.findServicesByClinicId(clinic.getId());
 
-        if (!categories.contains(currCategory)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
-        }
-
         if (!services.contains(updatedService)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Services does not belong to current clinic");
         }
 
-        if (updatedService.getServiceName().equals(request.getServiceName())){
+        if (!categories.contains(currCategory)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
+        }
+
+        if (!updatedService.getServiceName().equals(request.getServiceName())){
             Service existingService = serviceRepository.findByServiceNameAndClinicId(request.getServiceName(), clinic.getId());
             if (existingService != null) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
@@ -210,6 +213,7 @@ public class DentalService implements IDentalService {
         updatedService.setCategory(currCategory);
 
         serviceRepository.save(updatedService);
-        return modelMapper.map(updatedService, ServiceViewResponse.class);
+        return new ServiceViewResponse(updatedService.getId(), updatedService.getServiceName(),
+                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice());
     }
 }
