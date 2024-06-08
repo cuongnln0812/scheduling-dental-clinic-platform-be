@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "dentist")
-public class Dentist implements UserDetails {
+public class Dentist{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dentist_id")
@@ -36,6 +36,7 @@ public class Dentist implements UserDetails {
     private String username;
     @Column(unique = true)
     private String email;
+    private String address;
     private String password;
     @Column(unique = true)
     private String phone;
@@ -50,47 +51,10 @@ public class Dentist implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
 
     @OneToMany(mappedBy = "dentist")
     private List<Appointment> appointments;
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private ClinicBranch clinicBranch;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
