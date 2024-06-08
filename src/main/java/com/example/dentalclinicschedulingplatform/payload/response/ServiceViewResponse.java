@@ -25,9 +25,7 @@ import java.util.List;
 public class ServiceViewResponse {
     private Long id;
     private String serviceName;
-    private String description;
     private String unitOfPrice;
     private Float minimumPrice;
     private Float maximumPrice;
-    private Integer duration;
 }
