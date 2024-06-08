@@ -14,13 +14,13 @@ public enum Status {
 
     private final String status;
 
-    public static void isValid(String status) {
+    public static void isValid(Status status) {
         if (status == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Status is not valid");
         }
         for (Status s : Status.values()) {
-            if (!s.status.equals(status)) {
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Status is not valid");
+            if (s.status.equals(status.name())) {
+                return;
             }
         }
         throw new ApiException(HttpStatus.BAD_REQUEST, "Status is not valid");
