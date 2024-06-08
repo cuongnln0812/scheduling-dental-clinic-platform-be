@@ -56,7 +56,8 @@ public class CategoryService implements ICategoryService {
         for (Category categoryItem : categories) {
             if (categoryItem.isStatus()) {
                 List<ServiceViewResponse> serviceViewResponseList = dentalService.viewServicesByCategoryId(categoryItem.getId());
-                categoryViewResponseList.add(modelMapper.map(categoryItem, CategoryViewResponse.class));
+                categoryViewResponseList.add(new CategoryViewResponse(categoryItem.getId(), categoryItem.getCategoryName(),
+                        categoryItem.isStatus(), serviceViewResponseList));
             }
         }
         return categoryViewResponseList;
@@ -114,6 +115,12 @@ public class CategoryService implements ICategoryService {
             Clinic currClinic  = clinicRepository.findById(clinicId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
+            List<Category> categories = categoryRepository.findCategoriesByClinicId(currClinic.getId());
+
+            if (!categories.contains(updateCategory)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
+            }
+
             if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
                 Category existingCategory = categoryRepository.findByCategoryNameAndClinicId(request.getCategoryName(), currClinic.getId());
                 if (existingCategory != null){
@@ -126,10 +133,17 @@ public class CategoryService implements ICategoryService {
             updateCategory.setModifiedDate(LocalDateTime.now());
 
             categoryRepository.save(updateCategory);
-            return modelMapper.map(updateCategory, CategoryViewResponse.class);
+            return new CategoryViewResponse(updateCategory.getId(), updateCategory.getCategoryName(),
+                    updateCategory.isStatus(), dentalService.viewServicesByCategoryId(updateCategory.getId()));
         }
         Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
+
+        List<Category> categories = categoryRepository.findCategoriesByClinicId(currClinic.getId());
+
+        if (!categories.contains(updateCategory)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
+        }
 
         if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
             Category existingCategory = categoryRepository.findByCategoryNameAndClinicId(request.getCategoryName(), currClinic.getId());
@@ -143,6 +157,7 @@ public class CategoryService implements ICategoryService {
         updateCategory.setModifiedDate(LocalDateTime.now());
 
         categoryRepository.save(updateCategory);
-        return modelMapper.map(updateCategory, CategoryViewResponse.class);
+        return new CategoryViewResponse(updateCategory.getId(), updateCategory.getCategoryName(),
+                updateCategory.isStatus(), dentalService.viewServicesByCategoryId(updateCategory.getId()));
     }
 }

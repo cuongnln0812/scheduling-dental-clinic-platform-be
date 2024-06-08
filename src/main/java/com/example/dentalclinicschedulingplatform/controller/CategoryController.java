@@ -43,7 +43,7 @@ public class CategoryController {
         CategoryViewResponse newCategory = categoryService.createNewCategory(authenticationService.getUserInfo(), request);
         ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Created categories successfully",
+                "Created category successfully",
                 newCategory);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -53,7 +53,7 @@ public class CategoryController {
         CategoryViewResponse updateCategory = categoryService.updateCategory(authenticationService.getUserInfo(), request);
         ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Updated categories successfully",
+                "Updated category successfully",
                 updateCategory);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
