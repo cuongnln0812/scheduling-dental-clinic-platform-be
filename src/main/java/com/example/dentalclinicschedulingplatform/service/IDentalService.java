@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.service;
 
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.ServiceUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 
@@ -10,4 +11,5 @@ public interface IDentalService {
     List<ServiceViewResponse> viewServicesByCategoryId(Long categoryId);
     List<ServiceViewResponse> viewServicesByClinicId(Long clinicId);
     ServiceViewResponse createNewService(UserInformationRes userInformationRes, ServiceCreateRequest request);
+    ServiceViewResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request);
 }
