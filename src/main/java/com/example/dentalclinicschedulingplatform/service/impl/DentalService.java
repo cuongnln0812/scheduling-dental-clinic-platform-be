@@ -4,7 +4,8 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IDentalService;
@@ -12,10 +13,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -38,42 +44,51 @@ public class DentalService implements IDentalService {
     @Autowired
     private ModelMapper modelMapper;
     @Override
-    public List<ServiceViewResponse> viewServicesByCategoryId(Long categoryId) {
+    public List<ServiceViewDetailsResponse> viewServicesByCategoryId(Long categoryId) {
 
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category does not exist"));
 
         List<Service> serviceList = serviceRepository.findServicesByCategoryId(categoryId);
-        List<ServiceViewResponse> serviceViewResponseList = new ArrayList<>();
+        List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = new ArrayList<>();
         for (Service serviceItem : serviceList) {
             if (serviceItem.getStatus().equals(Status.ACTIVE)){
-                serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(), serviceItem.getServiceName(),
-                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice()));
+                serviceViewDetailsResponseList.add(new ServiceViewDetailsResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.getDescription(),
+                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.getStatus()));
             }
         }
-        return serviceViewResponseList;
+        return serviceViewDetailsResponseList;
     }
 
     @Override
-    public List<ServiceViewResponse> viewServicesByClinicId(Long clinicId) {
+    public List<ServiceViewListResponse> viewServicesByClinic(Long clinicId, int page, int size) {
 
-        Clinic clinic = clinicRepository.findById(clinicId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
+        Pageable pageRequest = PageRequest.of(page, size);
+        List<ServiceViewListResponse> serviceViewListResponses = new ArrayList<>();
 
-        List<Service> serviceList = serviceRepository.findServicesByClinicId(clinicId);
-        List<ServiceViewResponse> serviceViewResponseList = new ArrayList<>();
-
-        for (Service serviceItem :serviceList) {
-            if (serviceItem.getStatus().equals(Status.ACTIVE)) {
-                serviceViewResponseList.add(new ServiceViewResponse(serviceItem.getId(), serviceItem.getServiceName(),
-                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice()));
+        if (clinicId == null) {
+            Page<Service> servicePage = serviceRepository.findAll(pageRequest);
+            for (Service serviceItem: servicePage) {
+                serviceViewListResponses.add(modelMapper.map(serviceItem, ServiceViewListResponse.class));
             }
+            serviceViewListResponses.sort(Comparator.comparing(ServiceViewListResponse::getId));
+            return serviceViewListResponses;
+        }else {
+            Clinic clinic = clinicRepository.findById(clinicId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
+
+            Page<Service> serviceList = serviceRepository.findServicesByClinicId(clinicId, pageRequest);
+
+            for (Service serviceItem :serviceList) {
+                serviceViewListResponses.add(modelMapper.map(serviceItem, ServiceViewListResponse.class));
+            }
+            serviceViewListResponses.sort(Comparator.comparing(ServiceViewListResponse::getId));
+            return serviceViewListResponses;
         }
-        return serviceViewResponseList;
     }
 
     @Override
-    public ServiceViewResponse createNewService(UserInformationRes userInformationRes, ServiceCreateRequest request) {
+    public ServiceViewDetailsResponse createNewService(UserInformationRes userInformationRes, ServiceCreateRequest request) {
         if (!userInformationRes.getRole().equals(UserType.OWNER.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
         }
@@ -114,13 +129,18 @@ public class DentalService implements IDentalService {
 
         serviceRepository.save(newService);
 
-        return modelMapper.map(newService, ServiceViewResponse.class);
+        return modelMapper.map(newService, ServiceViewDetailsResponse.class);
     }
 
     @Override
-    public ServiceViewResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request) {
+    public ServiceViewDetailsResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request) {
         if (!userInformationRes.getRole().equals(UserType.OWNER.toString()) && !userInformationRes.getRole().equals(UserType.STAFF.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        if (Arrays.stream(Status.values())
+                .noneMatch(e -> e.equals(request.getStatus()))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only Status (ACTIVE, INACTIVE, PENDING)");
         }
 
         ClinicOwner owner = ownerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
@@ -169,10 +189,11 @@ public class DentalService implements IDentalService {
             updatedService.setModifiedBy(staff.getEmail());
             updatedService.setModifiedDate(LocalDateTime.now());
             updatedService.setCategory(currCategory);
+            updatedService.setStatus(request.getStatus());
 
             serviceRepository.save(updatedService);
-            return new ServiceViewResponse(updatedService.getId(), updatedService.getServiceName(),
-                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice());
+            return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
+                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(), updatedService.getServiceType(), updatedService.getStatus());
         }
 
         Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
@@ -207,13 +228,49 @@ public class DentalService implements IDentalService {
         updatedService.setMaximumPrice(request.getMaximumPrice());
         updatedService.setDuration(request.getDuration());
         updatedService.setServiceType(request.getServiceType());
-        updatedService.setStatus(Status.PENDING);
+        updatedService.setStatus(request.getStatus());
         updatedService.setModifiedBy(owner.getEmail());
         updatedService.setModifiedDate(LocalDateTime.now());
         updatedService.setCategory(currCategory);
 
         serviceRepository.save(updatedService);
-        return new ServiceViewResponse(updatedService.getId(), updatedService.getServiceName(),
-                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice());
+        return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
+                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(),updatedService.getServiceType(), updatedService.getStatus());
+    }
+
+    @Override
+    public ServiceViewDetailsResponse deleteService(UserInformationRes userInformation, Long serviceId) {
+        if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        Service deletedService = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service does not exist"));
+
+        ClinicOwner owner = ownerRepository.findByUsernameOrEmail(userInformation.getUsername(), userInformation.getEmail())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner does not exist"));
+
+        Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
+
+        List<Service> services = serviceRepository.findServicesByClinicId(currClinic.getId());
+
+        if (!services.contains(deletedService)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
+        }
+
+        if (deletedService.getStatus().equals(Status.ACTIVE)) {
+            deletedService.setStatus(Status.INACTIVE);
+        }else {
+            throw new ApiException(HttpStatus.CONFLICT, "The service is already been deactivated or is pending");
+        }
+
+        deletedService.setModifiedDate(LocalDateTime.now());
+        deletedService.setModifiedBy(owner.getEmail());
+
+        serviceRepository.save(deletedService);
+
+        return new ServiceViewDetailsResponse(deletedService.getId(), deletedService.getServiceName(), deletedService.getDescription(),
+                deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice(), deletedService.getDuration(), deletedService.getServiceType(), deletedService.getStatus());
     }
 }

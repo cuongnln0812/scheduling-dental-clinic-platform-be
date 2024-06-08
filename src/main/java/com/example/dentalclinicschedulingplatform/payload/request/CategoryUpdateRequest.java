@@ -17,4 +17,7 @@ public class CategoryUpdateRequest {
 
     @NotBlank(message = "Category name can not be null")
     public String categoryName;
+
+    @NotNull(message = "Category status can not be null")
+    public boolean categoryStatus;
 }
