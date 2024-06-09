@@ -23,7 +23,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @Entity
 @Table(name = "clinic_owner")
-public class ClinicOwner implements UserDetails {
+public class ClinicOwner{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "owner_id")
@@ -34,6 +34,7 @@ public class ClinicOwner implements UserDetails {
     private String fullName;
     @Column(unique = true)
     private String email;
+    private String address;
     private String password;
     @Column(unique = true)
     private String phone;
@@ -42,44 +43,7 @@ public class ClinicOwner implements UserDetails {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
 
     @OneToOne(mappedBy = "clinicOwner")
     private Clinic clinic;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
