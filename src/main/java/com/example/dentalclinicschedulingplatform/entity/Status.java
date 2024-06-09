@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @ToString
 public enum Status {
     PENDING("PENDING"),
+    DENIED("DENIED"),
     ACTIVE("ACTIVE"),
     INACTIVE("INACTIVE");
 
@@ -24,5 +25,11 @@ public enum Status {
             }
         }
         throw new ApiException(HttpStatus.BAD_REQUEST, "Status is not valid");
+    }
+
+    public static Status toggleStatus(Status userStatus) {
+        if(userStatus.equals(Status.PENDING) || userStatus.equals(Status.DENIED))
+            throw new ApiException(HttpStatus.CONFLICT, "Status cannot be changed");
+        return userStatus.equals(Status.ACTIVE) ? Status.INACTIVE : Status.ACTIVE;
     }
 }

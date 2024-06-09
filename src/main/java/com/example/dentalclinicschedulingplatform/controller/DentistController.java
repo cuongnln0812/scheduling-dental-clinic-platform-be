@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,21 +38,48 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/approval/{dentistId}")
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> approveDentistAccount(
+             @PathVariable("dentistId") Long id, @RequestParam boolean isApproved){
+        ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Approve dentist successfully!",
+                dentistService.approveDentistAccount(id, isApproved));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
             @RequestParam(required = false) Long branchId,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
-            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String dir,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String by)
+    {
         ApiResponse<Page<DentistListResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get list dentist successfully!",
-                dentistService.getDentistListByBranch(branchId, page, size));
+                dentistService.getDentistListByBranch(branchId, page, size, dir, by));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/pending-list")
+    public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getPendingList(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
+        ApiResponse<Page<DentistListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get pending dentist list successfully!",
+                dentistService.getPendingDentistList(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("/{dentistId}")
-    public ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistList(
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistDetail(
             @PathVariable("dentistId") Long dentistId){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,

@@ -46,6 +46,6 @@ public class DentistCreateRequest {
     private String experience;
     @NotBlank(message = "Description must not be blank")
     private String avatar;
-    @NotNull(message = "Status must not be null")
-    private Status status;
+    @NotNull(message = "Clinic branch must not be blank")
+    private Long branchId;
 }
