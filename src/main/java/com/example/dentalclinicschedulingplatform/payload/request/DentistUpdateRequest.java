@@ -50,4 +50,6 @@ public class DentistUpdateRequest {
     private String avatar;
     @NotNull(message = "Status must not be null")
     private Status status;
+    @NotNull(message = "Clinic branch must not be blank")
+    private Long branchId;
 }

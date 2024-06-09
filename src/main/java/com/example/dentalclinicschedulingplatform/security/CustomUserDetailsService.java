@@ -43,28 +43,28 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<Customer> optionalCustomer = customerRepository.findByUsernameOrEmail(user, user);
         if (optionalCustomer.isPresent()) {
             Customer customer = optionalCustomer.get();
-            if(!customer.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Customer is forbidden!");
+            if(!customer.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(customer.getEmail(), customer.getPassword(), getAuthorities(UserType.CUSTOMER));
         }
 
         Optional<Dentist> optionalDentist = dentistRepository.findByUsernameOrEmail(user, user);
         if (optionalDentist.isPresent()) {
             Dentist dentist = optionalDentist.get();
-            if(dentist.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Dentist is forbidden!");
+            if(!dentist.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(dentist.getEmail(), dentist.getPassword(), getAuthorities(UserType.DENTIST));
         }
 
         Optional<ClinicStaff> optionalStaff = staffRepository.findByUsernameOrEmail(user, user);
         if (optionalStaff.isPresent()) {
             ClinicStaff staff = optionalStaff.get();
-            if(staff.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Staff is forbidden!");
+            if(!staff.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(staff.getEmail(), staff.getPassword(), getAuthorities(UserType.STAFF));
         }
 
         Optional<ClinicOwner> optionalOwner = ownerRepository.findByUsernameOrEmail(user, user);
         if (optionalOwner.isPresent()) {
             ClinicOwner owner = optionalOwner.get();
-            if(owner.getStatus().equals(Status.INACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Owner is forbidden!");
+            if(!owner.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(owner.getEmail(), owner.getPassword(), getAuthorities(UserType.OWNER));
         }
         throw new UsernameNotFoundException("User account not found");
