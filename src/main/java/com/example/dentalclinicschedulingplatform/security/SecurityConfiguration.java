@@ -42,7 +42,7 @@ public class SecurityConfiguration {
                                                                 "/swagger-ui.html",
                                                                 "/webjars/**",
                                                                 "/swagger-ui/**",
-                                                        "/staff/api/v1/create/**")
+                                                        "/api/v1/staff/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/v1/auth/user-information",
                                                                 "/api/v1/auth/change-password",

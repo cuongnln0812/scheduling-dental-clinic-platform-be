@@ -14,11 +14,13 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
     @Override
     Optional<ClinicBranch> findById(Long id);
 
-    @Query(value = "SELECT cb.branch_id FROM public.clinic_branch cb " +
-                   "where cb.clinic_id = " +
-                   "(SELECT clinic_id FROM public.clinic c WHERE c.owner_id = :ownerId) " +
-                   "AND cb.branch_id = :branchId;" , nativeQuery = true)
-    Optional<ClinicBranch> findAllBelongClinicOwner(@Param("branchId") Long branchId,
+    @Query(value = "SELECT cb.* FROM public.clinic_branch cb " +
+                   "WHERE cb.clinic_id = " +
+                   "(SELECT c.clinic_id FROM public.clinic c WHERE c.owner_id = :ownerId) " +
+                   "AND cb.branch_id = :branchId", nativeQuery = true)
+    Optional<ClinicBranch> findByBranchIdAndOwnerId(@Param("branchId") Long branchId,
                                                     @Param("ownerId") Long ownerId);
+
+
 
 }
