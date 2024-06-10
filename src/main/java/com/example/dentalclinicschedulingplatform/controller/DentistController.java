@@ -27,7 +27,7 @@ public class DentistController {
 
     private final IDentistService dentistService;
 
-    @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF')")
     @PostMapping()
     public ResponseEntity<ApiResponse<DentistDetailResponse>> createDentistAccount(
             @Valid @RequestBody DentistCreateRequest request){
@@ -49,7 +49,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
             @RequestParam(required = false) Long branchId,
@@ -77,7 +77,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistDetail(
             @PathVariable("dentistId") Long dentistId){
@@ -88,7 +88,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('DENTIST', 'OWNER', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DENTIST', 'OWNER', 'STAFF')")
     @PutMapping()
     public ResponseEntity<ApiResponse<DentistDetailResponse>> updateDentist(
             @Valid @RequestBody DentistUpdateRequest request){
@@ -99,7 +99,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @DeleteMapping("/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> removeDentist(
             @PathVariable("dentistId") Long dentistId){
