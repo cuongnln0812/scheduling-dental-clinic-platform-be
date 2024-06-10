@@ -27,7 +27,7 @@ public class ClinicBranch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "branch_id")
-    private Long id;
+    private Long branchId;
     @Column(name = "branch_name")
     private String branchName;
     private String address;
