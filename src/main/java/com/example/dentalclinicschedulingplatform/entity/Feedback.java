@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long feedbackId;
     private String comment;
     private Integer rating;
     @Column(name = "created_date_time", updatable = false)

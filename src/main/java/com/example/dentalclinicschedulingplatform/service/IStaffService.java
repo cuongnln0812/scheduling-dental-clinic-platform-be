@@ -7,5 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface IStaffService {
     ResponseEntity<StaffResponse> createStaff(CreateStaffRequest request);
-
 }
+
