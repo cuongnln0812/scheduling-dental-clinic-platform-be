@@ -4,13 +4,11 @@ import com.example.dentalclinicschedulingplatform.entity.Blog;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDate;
@@ -22,33 +20,42 @@ import java.util.List;
 @ToString
 public class CreateStaffRequest {
 
-    @NotBlank(message="Name cannot be blank")
+    @NotBlank(message="Name can not be blank")
     private String fullName;
 
     @NotBlank
     @Email(message="Invalid email address")
     private String email;
 
-    @NotBlank(message="Password cannot be blank")
+    @NotBlank(message = "User name can not be blank")
+    private String username;
+
+    @NotBlank(message="Password can not be blank")
     @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
             message="Password must be at least 6 characters long, containing at least one uppercase letter and one digit")
     private String password;
 
-    @NotBlank(message="Phone number cannot be blank")
+    @NotBlank(message="Phone number can not be blank")
     @Pattern(regexp="^[0-9]{10,12}$", message="Invalid phone number")
     private String phone;
 
-    @NotNull(message="Day of birth cannot be blank")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message="Day of birth can not be blank")
     private LocalDate dob;
 
-    @NotBlank
+    @NotBlank(message = "Address can not be blank")
+    private String address;
+
+    @NotBlank(message="Gender can not be blank")
     private String gender;
 
-    @NotBlank
     private String avatar;
 
-    @NotBlank
-    private Long clinicBranchId;
+//    @NotBlank(message="Clinic branch can not be blank")
+//    //@Size(min=1, message= "Clinic branch can not be blank")
+//    private Long clinicBranchId;
 
+    @NotNull(message = "Clinic branch ID cannot be null")
+    private Long clinicBranchId;
 
 }
