@@ -13,11 +13,11 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long>{
 
     Optional<Category> findById(Long categoryId);
-    Category findByCategoryNameAndClinicId(String categoryName, Long clinicId);
-    List<Category> findCategoriesByClinicId(Long clinicId);
+    Category findByCategoryNameAndClinic_ClinicId(String categoryName, Long clinicId);
+    List<Category> findCategoriesByClinic_ClinicId(Long clinicId);
 //    @Query(value = "SELECT * FROM Category " +
 //            "WHERE clinic_id = :clinicId " +
 //            "OFFSET :offSet ROWS FETCH NEXT :limit ROWS ONLY", nativeQuery = true)
-    Page<Category> findCategoriesByClinicId(Long clinicId, Pageable pageable);
+    Page<Category> findCategoriesByClinic_ClinicId(Long clinicId, Pageable pageable);
     Page<Category> findAll(Pageable pageable);
 }

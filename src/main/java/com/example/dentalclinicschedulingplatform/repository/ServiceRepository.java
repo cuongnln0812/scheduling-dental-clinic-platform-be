@@ -13,8 +13,8 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Override
     Optional<Service> findById(Long serviceId);
     List<Service> findServicesByCategoryId(Long categoryId);
-    List<Service> findServicesByClinicId(Long clinicId);
-    Page<Service> findServicesByClinicId(Long clinicId, Pageable pageable);
+    List<Service> findServicesByClinic_ClinicId(Long clinicId);
+    Page<Service> findServicesByClinic_ClinicId(Long clinicId, Pageable pageable);
     Page<Service> findAll(Pageable pageable);
-    Service findByServiceNameAndClinicId(String serviceName, Long clinicId);
+    Service findByServiceNameAndClinic_ClinicId(String serviceName, Long clinicId);
 }

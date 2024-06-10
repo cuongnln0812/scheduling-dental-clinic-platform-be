@@ -12,7 +12,6 @@ import com.example.dentalclinicschedulingplatform.service.IDentalService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,20 +28,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DentalService implements IDentalService {
 
-    @Autowired
-    private ServiceRepository serviceRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ClinicRepository clinicRepository;
-    @Autowired
-    private OwnerRepository ownerRepository;
-    @Autowired
-    private StaffRepository staffRepository;
-    @Autowired
-    private ClinicBranchRepository clinicBranchRepository;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ServiceRepository serviceRepository;
+    private final CategoryRepository categoryRepository;
+    private final ClinicRepository clinicRepository;
+    private final OwnerRepository ownerRepository;
+    private final StaffRepository staffRepository;
+    private final ClinicBranchRepository clinicBranchRepository;
+    private final ModelMapper modelMapper;
     @Override
     public List<ServiceViewDetailsResponse> viewServicesByCategoryId(Long categoryId) {
 
@@ -77,7 +69,7 @@ public class DentalService implements IDentalService {
             Clinic clinic = clinicRepository.findById(clinicId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-            Page<Service> serviceList = serviceRepository.findServicesByClinicId(clinicId, pageRequest);
+            Page<Service> serviceList = serviceRepository.findServicesByClinic_ClinicId(clinicId, pageRequest);
 
             for (Service serviceItem :serviceList) {
                 serviceViewListResponses.add(modelMapper.map(serviceItem, ServiceViewListResponse.class));
@@ -102,13 +94,13 @@ public class DentalService implements IDentalService {
         Category currCategory = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category does not exist"));
 
-        List<Category> categories = categoryRepository.findCategoriesByClinicId(clinic.getId());
+        List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId());
 
         if (!categories.contains(currCategory)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
         }
 
-        Service existingService = serviceRepository.findByServiceNameAndClinicId(request.getServiceName(), clinic.getId());
+        Service existingService = serviceRepository.findByServiceNameAndClinic_ClinicId(request.getServiceName(), clinic.getClinicId());
         if (existingService != null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
         }
@@ -159,9 +151,9 @@ public class DentalService implements IDentalService {
             Category currCategory = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category does not exist"));
 
-            List<Category> categories = categoryRepository.findCategoriesByClinicId(clinicId);
+            List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinicId);
 
-            List<Service> services = serviceRepository.findServicesByClinicId(clinicId);
+            List<Service> services = serviceRepository.findServicesByClinic_ClinicId(clinicId);
 
             if (!services.contains(updatedService)) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Services does not belong to current clinic");
@@ -172,7 +164,7 @@ public class DentalService implements IDentalService {
             }
 
             if (!updatedService.getServiceName().equals(request.getServiceName())){
-                Service existingService = serviceRepository.findByServiceNameAndClinicId(request.getServiceName(), clinicId);
+                Service existingService = serviceRepository.findByServiceNameAndClinic_ClinicId(request.getServiceName(), clinicId);
                 if (existingService != null) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
                 }
@@ -202,9 +194,9 @@ public class DentalService implements IDentalService {
         Category currCategory = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category does not exist"));
 
-        List<Category> categories = categoryRepository.findCategoriesByClinicId(clinic.getId());
+        List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId());
 
-        List<Service> services = serviceRepository.findServicesByClinicId(clinic.getId());
+        List<Service> services = serviceRepository.findServicesByClinic_ClinicId(clinic.getClinicId());
 
         if (!services.contains(updatedService)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Services does not belong to current clinic");
@@ -215,7 +207,7 @@ public class DentalService implements IDentalService {
         }
 
         if (!updatedService.getServiceName().equals(request.getServiceName())){
-            Service existingService = serviceRepository.findByServiceNameAndClinicId(request.getServiceName(), clinic.getId());
+            Service existingService = serviceRepository.findByServiceNameAndClinic_ClinicId(request.getServiceName(), clinic.getClinicId());
             if (existingService != null) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
             }
@@ -253,7 +245,7 @@ public class DentalService implements IDentalService {
         Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-        List<Service> services = serviceRepository.findServicesByClinicId(currClinic.getId());
+        List<Service> services = serviceRepository.findServicesByClinic_ClinicId(currClinic.getClinicId());
 
         if (!services.contains(deletedService)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");

@@ -34,7 +34,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
                    "WHERE co.owner_id = :ownerId", nativeQuery = true)
     Page<ClinicStaff> findAllStaffByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
-    Page<ClinicStaff> findAllByClinicBranch_Id(Long branchId, Pageable pageable);
+    Page<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId, Pageable pageable);
     Page<ClinicStaff> findAll(Pageable pageable);
     @Query(value = "SELECT c.clinic_id " +
             "FROM clinic_staff cs join clinic_branch cb on cs.branch_id = cb.branch_id "+
