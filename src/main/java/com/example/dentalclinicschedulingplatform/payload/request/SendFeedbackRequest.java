@@ -1,8 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,14 +14,15 @@ public class SendFeedbackRequest {
     @NotBlank(message = "Comment cannot be null")
     private String comment;
 
-    @Size(min = 1, max = 5, message = "Rating must be between 1 and 5 digits")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
     @NotNull(message = "Rating cannot be null")
-    private int rating;
+    private Integer rating;
 
-    @NotBlank(message = "BranchClinicID cannot be null")
+    @NotNull(message = "BranchClinicID cannot be null")
     private long branchclinicID;
 
-    @NotBlank(message = "UserID cannot be null")
+    @NotNull(message = "UserID cannot be null")
     private long userID;
 
 
