@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.example.dentalclinicschedulingplatform.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,16 +10,16 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserInformationRes {
-    private String username;
+@NoArgsConstructor
+public class DentistListResponse {
+    private Long dentistId;
     private String fullName;
+    private String username;
     private String email;
-    private String gender;
     private String phone;
     private LocalDate dob;
-    private String address;
-    private String role;
+    private String gender;
+    private String branchName;
+    private Status status;
 }
