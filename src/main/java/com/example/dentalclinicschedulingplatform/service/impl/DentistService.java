@@ -85,9 +85,9 @@ public class DentistService implements IDentistService {
             return modelMapper.map(dentist, DentistDetailResponse.class);
         }else {
             dentist.setStatus(Status.DENIED);
-            dentist = dentistRepository.save(dentist);
+            dentistRepository.delete(dentist);
+            return modelMapper.map(dentist, DentistDetailResponse.class);
         }
-        return modelMapper.map(dentist, DentistDetailResponse.class);
     }
 
 
