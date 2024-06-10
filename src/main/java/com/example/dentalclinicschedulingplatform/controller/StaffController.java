@@ -40,7 +40,7 @@ public class StaffController {
             summary = "View detail staff"
     )
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
-    @GetMapping("/view/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>> viewStaff(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         StaffResponse newStaff = iStaffService.viewStaff(id);
@@ -54,7 +54,7 @@ public class StaffController {
             summary = "Create staff"
     )
     @PreAuthorize("hasAnyRole('OWNER')")
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<ApiResponse<StaffResponse>> createStaff(@Valid @RequestBody StaffCreateRequest request) {
         log.info("Has request with data: {}", request.toString());
         StaffResponse newStaff = iStaffService.createStaff(authenticateService.getUserInfo(), request);
@@ -69,7 +69,7 @@ public class StaffController {
             summary = "Update staff"
     )
     @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
-    @PutMapping("/update")
+    @PutMapping()
     public ResponseEntity<ApiResponse<StaffResponse>> updateStaff(@Valid @RequestBody StaffUpdateRequest request) {
         log.info("Has request with data: {}", request.toString());
         StaffResponse staffResponse = iStaffService.updateStaff(authenticateService.getUserInfo(), request);
@@ -84,7 +84,7 @@ public class StaffController {
             summary = "Delete staff"
     )
     @PreAuthorize("hasAnyRole('OWNER')")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>> deleteStaff(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         StaffResponse staffResponse = iStaffService.deleteStaff(authenticateService.getUserInfo(), id);
