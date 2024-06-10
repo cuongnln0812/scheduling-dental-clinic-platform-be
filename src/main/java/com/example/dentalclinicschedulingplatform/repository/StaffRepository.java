@@ -36,4 +36,9 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
 
     Page<ClinicStaff> findAllByClinicBranch_Id(Long branchId, Pageable pageable);
     Page<ClinicStaff> findAll(Pageable pageable);
+    @Query(value = "SELECT c.clinic_id " +
+            "FROM clinic_staff cs join clinic_branch cb on cs.branch_id = cb.branch_id "+
+            "join clinic c on cb.clinic_id = c.clinic_id " +
+            "WHERE cs.staff_id = :staffId", nativeQuery = true)
+    Long getClinicIdOfStaff(Long staffId);
 }
