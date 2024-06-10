@@ -7,10 +7,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegist
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
-import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
-import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
-import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
-import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
+import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
@@ -38,6 +35,7 @@ public class AuthenticateService implements IAuthenticateService {
     private final ModelMapper modelMapper;
     private final JavaMailSender mailSender;
     private final AuthenticationManager authenticationManager;
+    private final SystemAdminRepository systemAdminRepository;
     private final CustomerRepository customerRepository;
     private final DentistRepository dentistRepository;
     private final StaffRepository staffRepository;
@@ -116,6 +114,11 @@ public class AuthenticateService implements IAuthenticateService {
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
             res.setRole(UserType.OWNER.toString());
+        } else if (role.equals("ROLE_" + UserType.ADMIN)) {
+            SystemAdmin user = systemAdminRepository.findByUsername(name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            res = modelMapper.map(user, UserInformationRes.class);
+            res.setRole(UserType.ADMIN.toString());
         }
         return res;
     }
