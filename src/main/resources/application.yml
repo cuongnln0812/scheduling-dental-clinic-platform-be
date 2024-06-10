@@ -32,6 +32,7 @@ spring:
 app:
   jwt-secret: f2a8eaca88afbce3d63682f93dfd1a7b9c849ad4fc1fd16c3fc6234d60f773f0
   jwt-expiration-milliseconds: 604880000
+#  server-url: "http://localhost:8080/"
 
 server:
   port: 8080

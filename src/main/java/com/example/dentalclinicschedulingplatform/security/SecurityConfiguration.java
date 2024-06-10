@@ -33,7 +33,9 @@ public class SecurityConfiguration {
                                                 .requestMatchers(
                                                         //"/api/v1/staff/**",
                                                                 "/api/v1/auth/login/**",
-                                                        "/api/v1/auth/register",
+                                                                "/api/v1/auth/register",
+                                                                "/api/v1/dentists",
+                                                                "/api/dentists/{dentistId}",
                                                                 "/v2/api-docs",
                                                                 "/v3/api-docs",
                                                                 "/v3/api-docs/**",
@@ -43,7 +45,10 @@ public class SecurityConfiguration {
                                                                 "/configuration/security",
                                                                 "/swagger-ui.html",
                                                                 "/webjars/**",
-                                                                "/swagger-ui/**")
+                                                                "/swagger-ui/**",
+                                                        "/api/v1/staff/**",
+                                                        "/api/v1/service/list",
+                                                        "api/v1/category/list")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",
