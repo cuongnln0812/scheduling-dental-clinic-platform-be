@@ -51,4 +51,6 @@ public class Customer{
     private List<Feedback> feedbacks;
     @OneToMany(mappedBy = "customer")
     private List<TreatmentOutcome> treatmentOutcomes;
+    @OneToMany(mappedBy = "customer")
+    private List<RefreshToken> refreshTokens;
 }

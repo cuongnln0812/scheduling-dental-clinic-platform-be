@@ -10,4 +10,5 @@ public interface IAuthenticateService {
     AuthenticationResponse authenticateAccount(AuthenticationRequest request);
     CustomerRegisterResponse registerCustomerAccount(CustomerRegisterRequest request);
     UserInformationRes getUserInfo();
+    boolean isUsernameOrEmailExisted(String username, String email);
 }

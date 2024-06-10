@@ -3,6 +3,7 @@ package com.example.dentalclinicschedulingplatform.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,11 +43,12 @@ public class SecurityConfiguration {
                                                                 "/swagger-ui.html",
                                                                 "/webjars/**",
                                                                 "/swagger-ui/**",
-                                                        "/staff/api/v1/create/**")
+                                                        "/api/v1/staff/**")
                                                 .permitAll()
-                                                .requestMatchers("/api/v1/auth/user-information",
-                                                                "/api/v1/auth/change-password",
-                                                        "/api/v1/auth//homepage-statistics",
+                                                .requestMatchers(
+                                                        "/api/v1/auth/user-information",
+                                                        "/api/v1/auth/change-password",
+                                                        "/api/v1/auth/homepage-statistics",
                                                         "/api/v1/output-standard/**")
                                                 .authenticated()
                                                 .anyRequest().authenticated())

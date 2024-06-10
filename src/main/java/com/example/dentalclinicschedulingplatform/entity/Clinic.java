@@ -27,7 +27,7 @@ public class Clinic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "clinic_id")
-    private Long id;
+    private Long clinicId;
     @Column(name = "clinic_name")
     private String clinicName;
     private String address;
