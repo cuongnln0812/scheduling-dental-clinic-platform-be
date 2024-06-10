@@ -38,7 +38,7 @@ public class ServiceController {
     @Operation(
             summary = "View all services (clinicId is null) / View services by clinic"
     )
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<ServiceViewListResponse>>> viewCategoryListByClinic
             (@RequestParam(required = false) Long clinicId,
              @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,

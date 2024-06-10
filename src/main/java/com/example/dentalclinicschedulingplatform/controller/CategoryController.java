@@ -35,7 +35,7 @@ public class CategoryController {
     @Operation(
             summary = "View categories by clinic"
     )
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<CategoryViewResponse>>> viewCategoryListByClinic
             (@RequestParam Long clinicId,
              @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
