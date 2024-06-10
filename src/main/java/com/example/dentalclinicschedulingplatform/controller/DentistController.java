@@ -57,7 +57,7 @@ public class DentistController {
     @Operation(summary = "Get dentist list by branch", description = "If branchId is null, it will return all dentist account in the system," +
             " but if branchIdi is set it will return the list of that branch. " +
             "Anyone can perform this request!")
-        @GetMapping("")
+    @GetMapping()
     public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
             @RequestParam(required = false) Long branchId,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
@@ -88,7 +88,6 @@ public class DentistController {
 
     @Operation(summary = "Get dentist detail information", description = "Get dentist details information by dentistId. " +
             "Anyone can perform this request!")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER', 'DENTIST', 'OWNER', 'STAFF')")
     @GetMapping("/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> getDentistDetail(
             @PathVariable("dentistId") Long dentistId){

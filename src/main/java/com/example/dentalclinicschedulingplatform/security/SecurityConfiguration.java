@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                                                                 "/api/v1/auth/login/**",
                                                                 "/api/v1/auth/register",
                                                                 "/api/v1/dentists",
+                                                                "/api/dentists/{dentistId}",
                                                                 "/v2/api-docs",
                                                                 "/v3/api-docs",
                                                                 "/v3/api-docs/**",
