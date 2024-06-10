@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.time.LocalDate;
 public class DentistService implements IDentistService {
 
     private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final DentistRepository dentistRepository;
     private final ClinicBranchRepository branchRepository;
@@ -68,6 +70,7 @@ public class DentistService implements IDentistService {
         if(isApproved) {
             dentist.setStatus(Status.ACTIVE);
             String randomPassword = AutomaticGeneratedPassword.generateRandomPassword();
+            dentist.setPassword(passwordEncoder.encode(randomPassword));
             dentist = dentistRepository.save(dentist);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
@@ -85,9 +88,9 @@ public class DentistService implements IDentistService {
             return modelMapper.map(dentist, DentistDetailResponse.class);
         }else {
             dentist.setStatus(Status.DENIED);
-            dentist = dentistRepository.save(dentist);
+            dentistRepository.delete(dentist);
+            return modelMapper.map(dentist, DentistDetailResponse.class);
         }
-        return modelMapper.map(dentist, DentistDetailResponse.class);
     }
 
 

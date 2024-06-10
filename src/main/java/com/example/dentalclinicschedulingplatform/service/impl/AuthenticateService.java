@@ -70,7 +70,7 @@ public class AuthenticateService implements IAuthenticateService {
         message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
         message.setTo(user.getEmail());
         // Set a meaningful message
-        message.setSubject("[FAMS] - Tài khoản được tạo thành công");
+        message.setSubject("[F-Dental] - Tài khoản được tạo thành công");
         String body = "Kính gửi " + user.getUsername() + ",\n\n" +
                 "Cảm ơn bạn đã tạo tài khoản trên " + "F-Dental" + "! Chúng tôi rất vui mừng được chào đón bạn đến với cộng đồng của mình và hỗ trợ bạn đạt được mục tiêu sức khỏe răng miệng.\n\n" +
                 "Để bắt đầu:\n\n" +
