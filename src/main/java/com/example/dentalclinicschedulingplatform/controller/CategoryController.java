@@ -38,8 +38,8 @@ public class CategoryController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<List<CategoryViewResponse>>> viewCategoryListByClinic
             (@RequestParam Long clinicId,
-             @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int page,
-             @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int size){
+             @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+             @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
         ApiResponse<List<CategoryViewResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get categories successfully",
