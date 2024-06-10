@@ -29,20 +29,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ClinicRepository clinicRepository;
-    @Autowired
-    private OwnerRepository ownerRepository;
-    @Autowired
-    private DentalService dentalService;
-    @Autowired
-    private StaffRepository staffRepository;
-    @Autowired
-    private ClinicBranchRepository clinicBranchRepository;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final CategoryRepository categoryRepository;
+    private final ClinicRepository clinicRepository;
+    private final OwnerRepository ownerRepository;
+    private final DentalService dentalService;
+    private final StaffRepository staffRepository;
+    private final ClinicBranchRepository clinicBranchRepository;
+    private final ModelMapper modelMapper;
     @Override
     public List<CategoryViewResponse> viewListCategoryByClinic(Long clinicId, int page, int size) {
 
@@ -52,7 +45,7 @@ public class CategoryService implements ICategoryService {
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
 
-        Page<Category> categories = categoryRepository.findCategoriesByClinicId(clinic.getId(), pageRequest);
+        Page<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId(), pageRequest);
         for (Category categoryItem : categories) {
             List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = dentalService.viewServicesByCategoryId(categoryItem.getId());
             categoryViewResponseList.add(new CategoryViewResponse(categoryItem.getId(), categoryItem.getCategoryName(),
@@ -73,7 +66,7 @@ public class CategoryService implements ICategoryService {
         Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-        Category category = categoryRepository.findByCategoryNameAndClinicId(request.getCategoryName(), clinic.getId());
+        Category category = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), clinic.getClinicId());
 
         if (category != null){
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
@@ -115,14 +108,14 @@ public class CategoryService implements ICategoryService {
             Clinic currClinic  = clinicRepository.findById(clinicId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-            List<Category> categories = categoryRepository.findCategoriesByClinicId(currClinic.getId());
+            List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(currClinic.getClinicId());
 
             if (!categories.contains(updateCategory)) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
             }
 
             if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
-                Category existingCategory = categoryRepository.findByCategoryNameAndClinicId(request.getCategoryName(), currClinic.getId());
+                Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
                 if (existingCategory != null){
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
                 }
@@ -140,14 +133,14 @@ public class CategoryService implements ICategoryService {
         Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-        List<Category> categories = categoryRepository.findCategoriesByClinicId(currClinic.getId());
+        List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(currClinic.getClinicId());
 
         if (!categories.contains(updateCategory)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
         }
 
         if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
-            Category existingCategory = categoryRepository.findByCategoryNameAndClinicId(request.getCategoryName(), currClinic.getId());
+            Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
             if (existingCategory != null){
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
             }
@@ -178,7 +171,7 @@ public class CategoryService implements ICategoryService {
         Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
-        List<Category> categories = categoryRepository.findCategoriesByClinicId(currClinic.getId());
+        List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(currClinic.getClinicId());
 
         if (!categories.contains(deletedCategory)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");

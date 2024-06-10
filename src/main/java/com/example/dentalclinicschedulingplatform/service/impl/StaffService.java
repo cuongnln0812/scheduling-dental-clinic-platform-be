@@ -262,7 +262,7 @@ public class StaffService implements IStaffService {
             if(iClinicBranchRepository.findByBranchIdAndOwnerId(branchId, clinicOwner.get().getId()).isEmpty())
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
 
-            Page<ClinicStaff> staffs = iStaffRepository.findAllByClinicBranch_Id(branchId, pageRequest);
+            Page<ClinicStaff> staffs = iStaffRepository.findAllByClinicBranch_BranchId(branchId, pageRequest);
             for (ClinicStaff clinicStaff : staffs) {
                 staffSummaryResponses.add(new StaffSummaryResponse(clinicStaff));
             }
