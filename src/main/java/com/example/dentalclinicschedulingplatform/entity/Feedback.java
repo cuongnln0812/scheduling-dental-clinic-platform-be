@@ -26,7 +26,7 @@ public class Feedback {
     private LocalDateTime createdDateTime;
 
     @ManyToOne
-    @JoinColumn(name = "class_id")
+    @JoinColumn(name = "customer_id")
     private Customer customer;
     @ManyToOne
     @JoinColumn(name = "branch_id")
