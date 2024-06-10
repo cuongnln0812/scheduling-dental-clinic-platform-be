@@ -21,5 +21,6 @@ public class UserInformationRes {
     private String phone;
     private LocalDate dob;
     private String address;
+    private String avatar;
     private String role;
 }
