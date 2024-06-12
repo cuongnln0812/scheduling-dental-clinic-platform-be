@@ -6,10 +6,17 @@ import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewListResponse;
+import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
+import com.example.dentalclinicschedulingplatform.service.IDentalService;
 import com.example.dentalclinicschedulingplatform.service.impl.AuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.impl.DentalService;
+import com.example.dentalclinicschedulingplatform.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +27,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/service")
 @SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
+@Slf4j
+@Tag(name = "Service Controller")
 public class ServiceController {
-    @Autowired
-    private DentalService dentalService;
 
-    @Autowired
-    private AuthenticateService authenticationService;
+    private final IDentalService dentalService;
+    private final IAuthenticateService authenticationService;
 
-    @GetMapping("/list")
+    @Operation(
+            summary = "View all services (clinicId is null) / View services by clinic"
+    )
+    @GetMapping
     public ResponseEntity<ApiResponse<List<ServiceViewListResponse>>> viewCategoryListByClinic
             (@RequestParam(required = false) Long clinicId,
-             @RequestParam int page,
-             @RequestParam int size){
+             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
         ApiResponse<List<ServiceViewListResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get categories successfully",
@@ -39,6 +50,9 @@ public class ServiceController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Create service"
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> createNewService
             (@Valid @RequestBody ServiceCreateRequest request){
@@ -50,6 +64,9 @@ public class ServiceController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Update service"
+    )
     @PutMapping
     public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> updateService
             (@Valid @RequestBody ServiceUpdateRequest request){
@@ -61,6 +78,9 @@ public class ServiceController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Delete service by Id"
+    )
     @DeleteMapping("/{serviceId}")
     public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> deleteService
             (@PathVariable("serviceId") Long serviceId){

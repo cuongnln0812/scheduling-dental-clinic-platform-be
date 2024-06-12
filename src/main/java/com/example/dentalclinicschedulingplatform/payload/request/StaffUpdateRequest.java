@@ -1,7 +1,5 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -14,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-public class UpdateStaffRequest {
+public class StaffUpdateRequest {
     @NotNull(message = "Staff Id can not be null")
     private Long id;
 
