@@ -1,24 +1,17 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
-import com.example.dentalclinicschedulingplatform.entity.Blog;
-import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
-
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
 
 @Getter
 @Setter
 @ToString
-public class CreateStaffRequest {
+public class StaffCreateRequest {
 
     @NotBlank(message="Name can not be blank")
     private String fullName;
@@ -30,10 +23,10 @@ public class CreateStaffRequest {
     @NotBlank(message = "User name can not be blank")
     private String username;
 
-    @NotBlank(message="Password can not be blank")
-    @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
-            message="Password must be at least 6 characters long, containing at least one uppercase letter and one digit")
-    private String password;
+//    @NotBlank(message="Password can not be blank")
+//    @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
+//            message="Password must be at least 6 characters long, containing at least one uppercase letter and one digit")
+//    private String password;
 
     @NotBlank(message="Phone number can not be blank")
     @Pattern(regexp="^[0-9]{10,12}$", message="Invalid phone number")

@@ -1,12 +1,10 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
-import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.payload.request.CreateStaffRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.UpdateStaffRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.StaffCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.StaffUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IStaffService;
 import com.example.dentalclinicschedulingplatform.service.impl.AuthenticateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,13 +13,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -34,17 +31,16 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class StaffController {
 
-    @Autowired
-    private IStaffService iStaffService;
+    private final IStaffService iStaffService;
 
-    @Autowired
-    private AuthenticateService authenticateService;
+    private final AuthenticateService authenticateService;
 
 
     @Operation(
             summary = "View detail staff"
     )
-    @GetMapping("/view/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>> viewStaff(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         StaffResponse newStaff = iStaffService.viewStaff(id);
@@ -57,8 +53,9 @@ public class StaffController {
     @Operation(
             summary = "Create staff"
     )
-    @PostMapping("/create")
-    public ResponseEntity<ApiResponse<StaffResponse>> createStaff(@Valid @RequestBody CreateStaffRequest request) {
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @PostMapping()
+    public ResponseEntity<ApiResponse<StaffResponse>> createStaff(@Valid @RequestBody StaffCreateRequest request) {
         log.info("Has request with data: {}", request.toString());
         StaffResponse newStaff = iStaffService.createStaff(authenticateService.getUserInfo(), request);
         ApiResponse<StaffResponse> response = new ApiResponse<>(
@@ -71,8 +68,9 @@ public class StaffController {
     @Operation(
             summary = "Update staff"
     )
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse<StaffResponse>> updateStaff(@Valid @RequestBody UpdateStaffRequest request) {
+    @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
+    @PutMapping()
+    public ResponseEntity<ApiResponse<StaffResponse>> updateStaff(@Valid @RequestBody StaffUpdateRequest request) {
         log.info("Has request with data: {}", request.toString());
         StaffResponse staffResponse = iStaffService.updateStaff(authenticateService.getUserInfo(), request);
         ApiResponse<StaffResponse> response = new ApiResponse<>(
@@ -85,7 +83,8 @@ public class StaffController {
     @Operation(
             summary = "Delete staff"
     )
-    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>> deleteStaff(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         StaffResponse staffResponse = iStaffService.deleteStaff(authenticateService.getUserInfo(), id);
@@ -99,6 +98,7 @@ public class StaffController {
     @Operation(
             summary = "View all staff by clinic owner"
     )
+    @PreAuthorize("hasAnyRole('OWNER')")
     @GetMapping("/all/owner")
     public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaffByOwner(@RequestParam int page,
                                                                                 @RequestParam int size) {
@@ -113,6 +113,7 @@ public class StaffController {
     @Operation(
             summary = "View all staff by clinic branch"
     )
+    @PreAuthorize("hasAnyRole('OWNER')")
     @GetMapping("/all/{branchId}")
     public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaffByBranch(@PathVariable("branchId") Long branchId,
                                                                                 @RequestParam int page,
@@ -128,6 +129,7 @@ public class StaffController {
     @Operation(
             summary = "View all staffs"
     )
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaff(@RequestParam int page,
                                                                                 @RequestParam int size) {
@@ -136,6 +138,20 @@ public class StaffController {
                 HttpStatus.OK,
                 "Get all staffs successfully",
                 staffSummaryResponses);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Approve new staff"
+    )
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/approval/{staffId}")
+    public ResponseEntity<ApiResponse<StaffResponse>> approveNewStaff(@PathVariable("staffId") Long id,
+                                                                      @RequestParam boolean isApproved){
+        ApiResponse<StaffResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Approve staff successfully!",
+                iStaffService.approveStaff(id, isApproved));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
