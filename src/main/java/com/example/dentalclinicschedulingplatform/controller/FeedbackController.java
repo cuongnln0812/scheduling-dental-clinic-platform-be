@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class FeedbackController {
     @Operation(
             summary = "Create Feedback"
     )
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @PostMapping()
     public ResponseEntity<ApiResponse<SendFeedbackResponse>> createFeedback(@Valid @RequestBody SendFeedbackRequest request) {
         ApiResponse<SendFeedbackResponse> response = new ApiResponse<>(
@@ -37,6 +39,7 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Get Feedback by Clinic Branch ID")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/branch/{branchId}")
     public ResponseEntity<ApiResponse<List<SendFeedbackResponse>>> getFeedbackByBranchId(@PathVariable Long branchId) {
         List<SendFeedbackResponse> feedbackResponses = feedbackService.getFeedbackByBranchId(branchId);
@@ -48,6 +51,7 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Get All Feedback")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<SendFeedbackResponse>>> getAllFeedback() {
         List<SendFeedbackResponse> feedbackResponses = feedbackService.getAllFeedback();
