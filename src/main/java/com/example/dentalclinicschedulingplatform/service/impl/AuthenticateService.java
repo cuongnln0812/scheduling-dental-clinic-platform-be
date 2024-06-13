@@ -4,8 +4,10 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.RefreshTokenResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
@@ -20,12 +22,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +47,7 @@ public class AuthenticateService implements IAuthenticateService {
     private final DentistRepository dentistRepository;
     private final StaffRepository staffRepository;
     private final OwnerRepository ownerRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public AuthenticationResponse authenticateAccount(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -48,8 +56,11 @@ public class AuthenticateService implements IAuthenticateService {
                         request.getPassword()));
 
         var jwtToken = jwtService.generateToken(authentication);
+        var refreshToken = generateRefreshToken(authentication);
+
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setToken(jwtToken);
+        authenticationResponse.setRefreshToken(refreshToken.getRefreshToken());
         return authenticationResponse;
     }
 
@@ -130,5 +141,49 @@ public class AuthenticateService implements IAuthenticateService {
                 staffRepository.existsByEmailOrUsername(username, email) ||
                 ownerRepository.existsByEmailOrUsername(username, email);
     }
+
+    private RefreshToken generateRefreshToken(Authentication authentication) {
+        String name = authentication.getName();
+        Customer customer = customerRepository.findByUsernameOrEmail(name, name)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setRefreshToken(UUID.randomUUID().toString());
+        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+        refreshToken.setCustomer(customer);
+        refreshTokenRepository.save(refreshToken);
+        return refreshToken;
+    }
+
+    @Override
+    @Transactional
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Refresh token not found"));
+
+        if (refreshToken.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Refresh token has expired");
+        }
+
+        Customer customer = refreshToken.getCustomer();
+        if (customer == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Customer not found");
+        }
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                customer.getUsername(),
+                null,
+                authorities);
+        String jwtToken = jwtService.generateToken(authentication);
+        refreshToken.setRefreshToken(UUID.randomUUID().toString());
+        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+        refreshTokenRepository.save(refreshToken);
+        RefreshTokenResponse response = new RefreshTokenResponse();
+        response.setToken(jwtToken);
+        response.setRefreshToken(refreshToken.getRefreshToken());
+        return response;
+    }
+
 
 }
