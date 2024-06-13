@@ -4,6 +4,8 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.UserInfoUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -124,6 +126,54 @@ public class AuthenticateService implements IAuthenticateService {
     }
 
     @Override
+    public UserInformationRes updateUserInfo(UserInfoUpdateRequest request) {
+
+    }
+
+    @Override
+    public String changePassword(PasswordChangeRequest request) {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        String role = SecurityUtils.getRoleName();
+        if(role.equals("ROLE_" + UserType.CUSTOMER)){
+            var user = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                customerRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.DENTIST)){
+            var user = dentistRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                dentistRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.STAFF)){
+            var user = staffRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                staffRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.OWNER)){
+            var user = ownerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                ownerRepository.save(user);
+            }
+        } else if (role.equals("ROLE_" + UserType.ADMIN)) {
+            var user = systemAdminRepository.findByUsername(name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                systemAdminRepository.save(user);
+            }
+        }
+        return "Password changed successfully";
+    }
+
+    @Override
     public boolean isUsernameOrEmailExisted(String username, String email) {
         return customerRepository.existsByUsernameOrEmail(username, email) ||
                 dentistRepository.existsByEmailOrUsername(username, email) ||
@@ -131,4 +181,11 @@ public class AuthenticateService implements IAuthenticateService {
                 ownerRepository.existsByEmailOrUsername(username, email);
     }
 
+    @Override
+    public boolean checkPasswordChange(String requestOldPass, String requestNewPass, String userPass){
+        if (!passwordEncoder.matches(requestOldPass, userPass)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Old password does not match!");
+        }
+        return true;
+    }
 }
