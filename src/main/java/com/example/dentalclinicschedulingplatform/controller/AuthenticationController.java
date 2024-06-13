@@ -61,4 +61,14 @@ public class AuthenticationController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(@RequestBody RefreshTokenRequest request) {
+        authenticationService.logout(request);
+        ApiResponse<String> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Logged out successfully!",
+                "Success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

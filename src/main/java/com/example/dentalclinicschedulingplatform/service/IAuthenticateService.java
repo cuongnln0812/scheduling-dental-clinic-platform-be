@@ -14,4 +14,6 @@ public interface IAuthenticateService {
     UserInformationRes getUserInfo();
     boolean isUsernameOrEmailExisted(String username, String email);
     RefreshTokenResponse refreshToken(RefreshTokenRequest request);
+    void logout(RefreshTokenRequest refreshToken);
+
 }
