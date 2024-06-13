@@ -47,8 +47,9 @@ public class SecurityConfiguration {
                                                                 "/webjars/**",
                                                                 "/swagger-ui/**",
                                                         "/api/v1/staff/**",
-                                                        "/api/v1/service/list",
-                                                        "api/v1/category/list")
+                                                        "/api/v1/service",
+                                                        "api/v1/category",
+                                                        "/api/v1/auth/refresh-token")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",

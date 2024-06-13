@@ -47,7 +47,7 @@ public class FeedbackService implements IFeedbackService {
 
     @Override
     public List<SendFeedbackResponse> getFeedbackByBranchId(Long branchId) {
-        List<Feedback> feedbackList = feedbackRepository.findByClinicBranchId(branchId);
+        List<Feedback> feedbackList = feedbackRepository.findByClinicBranch_BranchId(branchId);
         return feedbackList.stream()
                 .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
                 .collect(Collectors.toList());

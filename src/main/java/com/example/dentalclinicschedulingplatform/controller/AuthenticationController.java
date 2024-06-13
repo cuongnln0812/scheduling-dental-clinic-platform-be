@@ -2,10 +2,8 @@ package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
+import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -51,6 +49,15 @@ public class AuthenticationController {
                 HttpStatus.OK,
                 "Get user information successfully",
                 authenticationService.getUserInfo());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        ApiResponse<RefreshTokenResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Refresh token successfully!",
+                authenticationService.refreshToken(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
