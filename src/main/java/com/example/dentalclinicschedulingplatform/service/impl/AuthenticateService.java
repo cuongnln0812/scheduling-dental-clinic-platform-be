@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
+import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
@@ -127,6 +128,59 @@ public class AuthenticateService implements IAuthenticateService {
 
     @Override
     public UserInformationRes updateUserInfo(UserInfoUpdateRequest request) {
+        String role = SecurityUtils.getRoleName();
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(role.equals("ROLE_" + UserType.CUSTOMER)){
+            var existingUser = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = customerRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.DENTIST)){
+            var existingUser = dentistRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = dentistRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.STAFF)){
+            var existingUser = staffRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = staffRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.OWNER)){
+            var existingUser = ownerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = ownerRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        } else {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Invalid role!");
+        }
 
     }
 
