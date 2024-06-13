@@ -185,5 +185,14 @@ public class AuthenticateService implements IAuthenticateService {
         return response;
     }
 
+    @Override
+    @Transactional
+    public void logout(RefreshTokenRequest request) {
+        RefreshToken token = refreshTokenRepository.findByRefreshToken(request.getRefreshToken()).orElse (null);
+        if (token != null) {
+            refreshTokenRepository.delete(token);
+        }
+    }
+
 
 }
