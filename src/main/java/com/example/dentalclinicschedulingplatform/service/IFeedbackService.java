@@ -9,4 +9,5 @@ public interface IFeedbackService {
     SendFeedbackResponse sendFeedback(SendFeedbackRequest request);
     List<SendFeedbackResponse> getFeedbackByBranchId(Long branchId);
     List<SendFeedbackResponse> getAllFeedback();
+    void deleteFeedback(Long feedbackId);
 }
