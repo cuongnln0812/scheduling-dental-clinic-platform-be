@@ -2,8 +2,11 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
+import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.UserInfoUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
@@ -135,6 +138,107 @@ public class AuthenticateService implements IAuthenticateService {
     }
 
     @Override
+    public UserInformationRes updateUserInfo(UserInfoUpdateRequest request) {
+        String role = SecurityUtils.getRoleName();
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(role.equals("ROLE_" + UserType.CUSTOMER)){
+            var existingUser = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = customerRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.DENTIST)){
+            var existingUser = dentistRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = dentistRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.STAFF)){
+            var existingUser = staffRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = staffRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        }else if(role.equals("ROLE_" + UserType.OWNER)){
+            var existingUser = ownerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(!existingUser.getUsername().equals(request.getUsername()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
+            if(!existingUser.getEmail().equals(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+            if(request.getDob().isAfter(LocalDate.now()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            modelMapper.map(request, existingUser);
+            var updated = ownerRepository.save(existingUser);
+            return modelMapper.map(updated, UserInformationRes.class);
+        } else {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Invalid role!");
+        }
+
+    }
+
+    @Override
+    public String changePassword(PasswordChangeRequest request) {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        String role = SecurityUtils.getRoleName();
+        if(role.equals("ROLE_" + UserType.CUSTOMER)){
+            var user = customerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                customerRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.DENTIST)){
+            var user = dentistRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                dentistRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.STAFF)){
+            var user = staffRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                staffRepository.save(user);
+            }
+        }else if(role.equals("ROLE_" + UserType.OWNER)){
+            var user = ownerRepository.findByUsernameOrEmail(name, name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                ownerRepository.save(user);
+            }
+        } else if (role.equals("ROLE_" + UserType.ADMIN)) {
+            var user = systemAdminRepository.findByUsername(name)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            if(checkPasswordChange(request.getOldPassword(), request.getNewPassword(), user.getPassword())){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                systemAdminRepository.save(user);
+            }
+        }
+        return "Password changed successfully";
+    }
+
+    @Override
     public boolean isUsernameOrEmailExisted(String username, String email) {
         return customerRepository.existsByUsernameOrEmail(username, email) ||
                 dentistRepository.existsByEmailOrUsername(username, email) ||
@@ -142,6 +246,13 @@ public class AuthenticateService implements IAuthenticateService {
                 ownerRepository.existsByEmailOrUsername(username, email);
     }
 
+    @Override
+    public boolean checkPasswordChange(String requestOldPass, String requestNewPass, String userPass){
+        if (!passwordEncoder.matches(requestOldPass, userPass)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Old password does not match!");
+        }
+        return true;
+    }
     private RefreshToken generateRefreshToken(Authentication authentication) {
         String name = authentication.getName();
         Customer customer = customerRepository.findByUsernameOrEmail(name, name)
