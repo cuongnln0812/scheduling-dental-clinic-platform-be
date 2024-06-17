@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
+import com.example.dentalclinicschedulingplatform.payload.request.DeleteFeedbackRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.SendFeedbackRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.SendFeedbackResponse;
@@ -61,4 +62,15 @@ public class FeedbackController {
                 feedbackResponses);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Delete Feedback")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/{feedbackId}")
+    public ResponseEntity<ApiResponse<Void>> deleteFeedback(DeleteFeedbackRequest feedbackId) {
+        feedbackService.deleteFeedback(feedbackId.getFeedbackID ());
+        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK, "Feedback deleted successfully!", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 }

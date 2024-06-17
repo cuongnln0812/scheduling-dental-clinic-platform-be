@@ -60,4 +60,11 @@ public class FeedbackService implements IFeedbackService {
                 .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteFeedback(Long feedbackId) {
+        Feedback feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Feedback not found"));
+        feedbackRepository.delete(feedback);
+    }
 }
