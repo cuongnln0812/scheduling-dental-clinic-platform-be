@@ -4,6 +4,12 @@ import com.example.dentalclinicschedulingplatform.payload.request.Authentication
 import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
+import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.UserInfoUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -37,11 +43,20 @@ public class AuthenticationController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-//    @PostMapping("/change-password")
-//    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeReq request) {
-//        authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
-//        return ResponseUtils.ok("Password changed successfully", HttpStatus.OK);
-//    }
+    @PostMapping("/password-change")
+    public ResponseEntity<ApiResponse<String>> changePassword(@Valid @RequestBody PasswordChangeRequest request) {
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, authenticationService.changePassword(request));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/user-information")
+    public ResponseEntity<ApiResponse<UserInformationRes>> updateUserInfo(@Valid @RequestBody UserInfoUpdateRequest request){
+        ApiResponse<UserInformationRes> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Update information successfully!",
+                authenticationService.updateUserInfo(request));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/user-information")
     public ResponseEntity<ApiResponse<UserInformationRes>> getUserInfo() {
