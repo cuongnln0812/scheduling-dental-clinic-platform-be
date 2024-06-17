@@ -7,6 +7,7 @@ import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
 import com.example.dentalclinicschedulingplatform.service.IStaffService;
 import com.example.dentalclinicschedulingplatform.service.impl.AuthenticateService;
+import com.example.dentalclinicschedulingplatform.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -100,8 +101,8 @@ public class StaffController {
     )
     @PreAuthorize("hasAnyRole('OWNER')")
     @GetMapping("/all/owner")
-    public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaffByOwner(@RequestParam int page,
-                                                                                @RequestParam int size) {
+    public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaffByOwner(@RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+                                                                                       @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
         List<StaffSummaryResponse> staffSummaryResponses = iStaffService.viewAllStaffByOwner(authenticateService.getUserInfo(), page, size);
         ApiResponse<List<StaffSummaryResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
@@ -116,8 +117,8 @@ public class StaffController {
     @PreAuthorize("hasAnyRole('OWNER')")
     @GetMapping("/all/{branchId}")
     public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaffByBranch(@PathVariable("branchId") Long branchId,
-                                                                                @RequestParam int page,
-                                                                                @RequestParam int size) {
+                                                                                        @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+                                                                                        @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
         List<StaffSummaryResponse> staffSummaryResponses = iStaffService.viewAllStaffByClinicBranch(authenticateService.getUserInfo(), branchId, page, size);
         ApiResponse<List<StaffSummaryResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
@@ -131,8 +132,8 @@ public class StaffController {
     )
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaff(@RequestParam int page,
-                                                                                @RequestParam int size) {
+    public ResponseEntity<ApiResponse<List<StaffSummaryResponse>>> viewAllStaff(@RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+                                                                                @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
         List<StaffSummaryResponse> staffSummaryResponses = iStaffService.viewAll(page, size);
         ApiResponse<List<StaffSummaryResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
