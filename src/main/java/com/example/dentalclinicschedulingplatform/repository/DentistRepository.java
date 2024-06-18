@@ -14,4 +14,6 @@ public interface DentistRepository extends JpaRepository<Dentist, Long> {
     Page<Dentist> findAllByStatus(Status status, Pageable pageRequest);
 
     boolean existsByEmailOrUsername(String username, String email);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

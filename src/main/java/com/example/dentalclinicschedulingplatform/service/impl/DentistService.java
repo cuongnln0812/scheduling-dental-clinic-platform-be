@@ -43,8 +43,7 @@ public class DentistService implements IDentistService {
     @Override
     public Page<DentistListResponse> getDentistListByBranch(Long branchId, int page, int size, String dir, String by) {
         Sort sort = dir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(by).ascending() : Sort.by(by).descending();
-        Pageable pageRequest = PageRequest.of(page, size, sort);
-        Page<Dentist> dentistList;
+        Pageable pageRequest = PageRequest.of(page, size, sort);        Page<Dentist> dentistList;
         if(branchId != null){
             dentistList = dentistRepository.findAllByClinicBranch_BranchId(branchId, pageRequest);
         }else dentistList = dentistRepository.findAll(pageRequest);
@@ -104,8 +103,10 @@ public class DentistService implements IDentistService {
     @Override
     @Transactional
     public DentistDetailResponse createDentist(DentistCreateRequest request) {
-        if(authenticateService.isUsernameOrEmailExisted(request.getUsername(), request.getEmail()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Username/Email is already used");
+        if(authenticateService.isUsernameExisted(request.getUsername()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Username is already used");
+        if(dentistRepository.existsByEmail(request.getEmail()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
         ClinicBranch branch = branchRepository.findById(request.getBranchId())

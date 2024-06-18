@@ -247,6 +247,15 @@ public class AuthenticateService implements IAuthenticateService {
     }
 
     @Override
+    public boolean isUsernameExisted(String username) {
+        return customerRepository.existsByUsername(username) ||
+                dentistRepository.existsByUsername(username) ||
+                staffRepository.existsByUsername(username) ||
+                ownerRepository.existsByUsername(username) ||
+                systemAdminRepository.existsByUsername(username);
+    }
+
+    @Override
     public boolean checkPasswordChange(String requestOldPass, String requestNewPass, String userPass){
         if (!passwordEncoder.matches(requestOldPass, userPass)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Old password does not match!");
