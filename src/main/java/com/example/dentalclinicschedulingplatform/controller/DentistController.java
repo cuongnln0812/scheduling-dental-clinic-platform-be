@@ -28,8 +28,8 @@ public class DentistController {
     private final IDentistService dentistService;
 
     @Operation(summary = "Create dentist account", description = "Create dentist account but only set status as PENDING. " +
-    "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF')")
+    "Only Clinic Owner can perform this request!")
+    @PreAuthorize("hasAnyRole('OWNER')")
     @PostMapping()
     public ResponseEntity<ApiResponse<DentistDetailResponse>> createDentistAccount(
             @Valid @RequestBody DentistCreateRequest request){
@@ -101,7 +101,7 @@ public class DentistController {
     @Operation(summary = "Update dentist account", description = "Update dentist account information, " +
             " the status can only be updated between ACTIVE and INACTIVE. If status is PENDING, it will throw error. " +
             "Only System Admin, Dentist, Clinic Owner, Clinic Staff can perform this request!")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DENTIST', 'OWNER', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DENTIST')")
     @PutMapping()
     public ResponseEntity<ApiResponse<DentistDetailResponse>> updateDentist(
             @Valid @RequestBody DentistUpdateRequest request){
@@ -114,7 +114,7 @@ public class DentistController {
 
     @Operation(summary = "Remove dentist account (SOFT DELETE)", description = "Remove dentist account by change the status to INACTIVE. " +
             "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER')")
     @DeleteMapping("/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> removeDentist(
             @PathVariable("dentistId") Long dentistId){
