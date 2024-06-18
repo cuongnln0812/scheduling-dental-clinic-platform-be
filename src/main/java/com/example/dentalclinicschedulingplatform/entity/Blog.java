@@ -32,6 +32,7 @@ public class Blog {
     private String thumbnail;
     @Column(name = "publish_date")
     private LocalDate publishDate;
+    @Enumerated(EnumType.STRING)
     private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
