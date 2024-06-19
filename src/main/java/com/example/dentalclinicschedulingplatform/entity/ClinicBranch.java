@@ -33,11 +33,10 @@ public class ClinicBranch {
     private String address;
     private String city;
     private String phone;
-    @Column(unique = true)
-    private String email;
     private Float totalRating;
     @Column(name = "is_main")
     private boolean isMain;
+    private Status status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
