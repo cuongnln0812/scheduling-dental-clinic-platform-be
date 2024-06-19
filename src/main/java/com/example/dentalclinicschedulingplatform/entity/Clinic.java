@@ -40,6 +40,10 @@ public class Clinic {
     @Column(name = "website_url")
     private String websiteUrl;
     private String logo;
+    @Column(name = "clinic_registration")
+    private String clinicRegistration;
+    @Column(name = "clinic_image")
+    private String clinicImage;
     @Column(name = "total_rating")
     private Float totalRating;
     @Enumerated(EnumType.STRING)
