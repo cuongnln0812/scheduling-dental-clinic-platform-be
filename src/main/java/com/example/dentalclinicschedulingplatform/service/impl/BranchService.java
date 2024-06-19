@@ -16,7 +16,7 @@ public class BranchService implements IBranchService {
 
 
     @Override
-    public void createMainBranch(Clinic clinic) {
+    public ClinicBranch createMainBranch(Clinic clinic) {
         ClinicBranch branch = new ClinicBranch();
         branch.setBranchName(clinic.getClinicName());
         branch.setAddress(clinic.getAddress());
@@ -25,6 +25,6 @@ public class BranchService implements IBranchService {
         branch.setMain(true);
         branch.setClinic(clinic);
         branch.setStatus(Status.APPROVED);
-        branchRepository.save(branch);
+        return branchRepository.save(branch);
     }
 }
