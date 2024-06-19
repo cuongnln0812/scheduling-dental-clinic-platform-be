@@ -5,5 +5,5 @@ import com.example.dentalclinicschedulingplatform.payload.request.OwnerRegisterR
 
 public interface IOwnerService {
     ClinicOwner registerOwnerFromRequest(OwnerRegisterRequest request);
-    ClinicOwner approveOwnerAccount(Long ownerId);
+    ClinicOwner approveOwnerAccount(Long ownerId, String password);
 }

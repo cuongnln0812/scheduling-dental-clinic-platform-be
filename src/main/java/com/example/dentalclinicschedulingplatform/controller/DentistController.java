@@ -40,7 +40,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Approve dentist account", description = "Approve dentist account by set the status as ACTIVE and " +
+    @Operation(summary = "Approve dentist account", description = "Approve dentist account by set the isApproved as true and " +
             "send a confirmation email to the dentist's Email with providing account username/pass. " +
             "Only System Admin can perform this request!")
     @PreAuthorize("hasAnyRole('ADMIN')")
