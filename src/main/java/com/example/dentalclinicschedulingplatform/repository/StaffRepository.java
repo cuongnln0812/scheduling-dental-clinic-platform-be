@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
+import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     Optional<ClinicStaff> findByUsernameOrEmail(String username, String email);
+    Optional<ClinicStaff> findByUsername(String username);
     Optional<ClinicStaff> findById(Long id);
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
