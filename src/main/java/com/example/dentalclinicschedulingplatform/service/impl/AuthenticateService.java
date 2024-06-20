@@ -266,13 +266,15 @@ public class AuthenticateService implements IAuthenticateService {
     }
     private RefreshToken generateRefreshToken(Authentication authentication) {
         String name = authentication.getName();
-        Customer customer = customerRepository.findByUsernameOrEmail(name, name)
+        Customer customer = customerRepository.findByUsername(name)
                 .orElse(null);
-        ClinicOwner owner = ownerRepository.findByUsernameOrEmail(name, name)
+        ClinicOwner owner = ownerRepository.findByUsername(name)
                 .orElse(null);
-        ClinicStaff staff = staffRepository.findByUsernameOrEmail(name, name)
+        ClinicStaff staff = staffRepository.findByUsername(name)
                 .orElse(null);
-        Dentist dentist = dentistRepository.findByUsernameOrEmail(name, name)
+        Dentist dentist = dentistRepository.findByUsername(name)
+                .orElse(null);
+        SystemAdmin admin = systemAdminRepository.findByUsername(name)
                 .orElse(null);
 
         RefreshToken refreshToken = new RefreshToken();
@@ -301,7 +303,13 @@ public class AuthenticateService implements IAuthenticateService {
             refreshToken.setDentist(dentist);
             refreshTokenRepository.save(refreshToken);
             return refreshToken;
-        }else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+        }else if (admin != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setAdmin(admin);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        } else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
     }
 
     @Override
@@ -318,6 +326,7 @@ public class AuthenticateService implements IAuthenticateService {
         ClinicOwner owner = refreshToken.getOwner();
         ClinicStaff staff = refreshToken.getStaff();
         Dentist dentist = refreshToken.getDentist();
+        SystemAdmin admin = refreshToken.getAdmin();
 
         if (customer != null) {
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + UserType.CUSTOMER));
@@ -369,6 +378,21 @@ public class AuthenticateService implements IAuthenticateService {
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     dentist.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (admin != null){
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.ADMIN));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    admin.getUsername(),
                     null,
                     authorities);
             String jwtToken = jwtService.generateToken(authentication);
