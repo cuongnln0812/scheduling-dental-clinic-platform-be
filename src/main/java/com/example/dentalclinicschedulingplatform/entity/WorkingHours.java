@@ -35,20 +35,14 @@ public class WorkingHours {
     @Column(name = "end_time")
     private LocalTime endTime;
     private boolean status;
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
-    private String createdBy;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;
-    @LastModifiedBy
-    @Column(name = "modified_by", insertable = false)
-    private String modifiedBy;
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
 
     @ManyToOne
-    @JoinColumn(name = "branch_id")
-    private ClinicBranch clinicBranch;
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
 }

@@ -52,10 +52,6 @@ public class ClinicBranch {
     private List<Dentist> dentists;
     @OneToMany(mappedBy = "clinicBranch", fetch = FetchType.LAZY)
     private List<ClinicStaff> staffs;
-    @OneToMany(mappedBy = "clinicBranch")
-    private List<WorkingHours> workingHours;
-    @OneToMany(mappedBy = "clinicBranch")
-    private List<Slot> slots;
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;

@@ -64,4 +64,8 @@ public class Clinic {
     private List<Category> categories;
     @OneToMany(mappedBy = "clinic")
     private List<Service> services;
+    @OneToMany(mappedBy = "clinic")
+    private List<WorkingHours> workingHours;
+    @OneToMany(mappedBy = "clinic")
+    private List<Slot> slots;
 }
