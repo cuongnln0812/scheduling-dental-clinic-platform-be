@@ -37,7 +37,7 @@ public class ClinicController {
     }
 
     @Operation(summary = "Approve clinic request", description = "Approve clinic request by set the isApproved as true and " +
-            "send a confirmation email to the owner's Email with providing account username/pass. Or if rejected, syste m will" +
+            "send a confirmation email to the owner's Email with providing account username/pass. Or if rejected, system will" +
             "send a rejected email. " +
             "Only System Admin can perform this request!")
     @PreAuthorize("hasAnyRole('ADMIN')")

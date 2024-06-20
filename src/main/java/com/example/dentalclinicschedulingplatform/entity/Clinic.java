@@ -48,15 +48,9 @@ public class Clinic {
     private Float totalRating;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
-    private String createdBy;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;
-    @LastModifiedBy
-    @Column(name = "modified_by", insertable = false)
-    private String modifiedBy;
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;

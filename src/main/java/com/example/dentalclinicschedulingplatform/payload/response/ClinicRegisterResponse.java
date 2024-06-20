@@ -19,8 +19,8 @@ public class ClinicRegisterResponse {
     private String clinicRegistration;
     private String websiteUrl;
     private String clinicImage;
+    private Status clinicStatus;
     private String fullName;
     private String email;
     private String phone;
-    private Status status;
 }

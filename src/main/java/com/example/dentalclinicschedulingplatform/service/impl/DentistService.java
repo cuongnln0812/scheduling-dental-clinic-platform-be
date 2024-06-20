@@ -13,6 +13,7 @@ import com.example.dentalclinicschedulingplatform.repository.ClinicBranchReposit
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
+import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -33,11 +34,11 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class DentistService implements IDentistService {
 
-    private final JavaMailSender mailSender;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final DentistRepository dentistRepository;
     private final ClinicBranchRepository branchRepository;
+    private final IMailService mailService;
     private final IAuthenticateService authenticateService;
 
     @Override
@@ -69,21 +70,10 @@ public class DentistService implements IDentistService {
         if(isApproved) {
             dentist.setStatus(Status.ACTIVE);
             String randomPassword = AutomaticGeneratedPassword.generateRandomPassword();
+            dentist.setUsername("dentist" + dentist.getId());
             dentist.setPassword(passwordEncoder.encode(randomPassword));
             dentist = dentistRepository.save(dentist);
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-            message.setTo(dentist.getEmail());
-            // Set a meaningful message
-            message.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
-            message.setText("Hi, " + dentist.getFullName() + ",\n\n" +
-                    "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
-                    "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
-                    "• Username: " + dentist.getUsername() + "\n" +
-                    "• Password: " + randomPassword + "\n" + // Placeholder for the password
-                    "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
-            // Send the email (assuming you have a mailSender bean configured)
-            mailSender.send(message);
+            mailService.sendDentistRequestApprovalMail(dentist, randomPassword);
             return modelMapper.map(dentist, DentistDetailResponse.class);
         }else {
             dentist.setStatus(Status.DENIED);
@@ -103,8 +93,6 @@ public class DentistService implements IDentistService {
     @Override
     @Transactional
     public DentistDetailResponse createDentist(DentistCreateRequest request) {
-        if(authenticateService.isUsernameExisted(request.getUsername()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Username is already used");
         if(dentistRepository.existsByEmail(request.getEmail()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))

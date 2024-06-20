@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ClinicListResponse {
     private Long clinicId;
-    private Long clinicName;
+    private String clinicName;
     private String address;
     private String city;
     private String phone;
