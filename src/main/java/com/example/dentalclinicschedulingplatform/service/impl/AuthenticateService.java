@@ -56,7 +56,7 @@ public class AuthenticateService implements IAuthenticateService {
     public AuthenticationResponse authenticateAccount(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsernameOrEmail(),
+                        request.getUsername(),
                         request.getPassword()));
 
         var jwtToken = jwtService.generateToken(authentication);
@@ -267,14 +267,41 @@ public class AuthenticateService implements IAuthenticateService {
     private RefreshToken generateRefreshToken(Authentication authentication) {
         String name = authentication.getName();
         Customer customer = customerRepository.findByUsernameOrEmail(name, name)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElse(null);
+        ClinicOwner owner = ownerRepository.findByUsernameOrEmail(name, name)
+                .orElse(null);
+        ClinicStaff staff = staffRepository.findByUsernameOrEmail(name, name)
+                .orElse(null);
+        Dentist dentist = dentistRepository.findByUsernameOrEmail(name, name)
+                .orElse(null);
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setRefreshToken(UUID.randomUUID().toString());
-        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
-        refreshToken.setCustomer(customer);
-        refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+
+        if (customer != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setCustomer(customer);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (owner != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setOwner(owner);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (staff != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setStaff(staff);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (dentist != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setDentist(dentist);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
     }
 
     @Override
@@ -288,23 +315,71 @@ public class AuthenticateService implements IAuthenticateService {
         }
 
         Customer customer = refreshToken.getCustomer();
-        if (customer == null) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Customer not found");
-        }
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        ClinicOwner owner = refreshToken.getOwner();
+        ClinicStaff staff = refreshToken.getStaff();
+        Dentist dentist = refreshToken.getDentist();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                customer.getUsername(),
-                null,
-                authorities);
-        String jwtToken = jwtService.generateToken(authentication);
-        refreshToken.setRefreshToken(UUID.randomUUID().toString());
-        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
-        refreshTokenRepository.save(refreshToken);
-        RefreshTokenResponse response = new RefreshTokenResponse();
-        response.setToken(jwtToken);
-        response.setRefreshToken(refreshToken.getRefreshToken());
-        return response;
+        if (customer != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + UserType.CUSTOMER));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    customer.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (owner != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.ADMIN));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    owner.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (staff != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.STAFF));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    staff.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (dentist != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.DENTIST));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    dentist.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
     }
 
     @Override

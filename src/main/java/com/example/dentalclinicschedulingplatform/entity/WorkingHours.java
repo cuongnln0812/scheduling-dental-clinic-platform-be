@@ -28,6 +28,7 @@ public class WorkingHours {
     private Long id;
     @Enumerated(EnumType.STRING)
     private DayInWeek day;
+    @Enumerated(EnumType.STRING)
     private Shift shift;
     @Column(name = "start_time")
     private LocalTime startTime;
