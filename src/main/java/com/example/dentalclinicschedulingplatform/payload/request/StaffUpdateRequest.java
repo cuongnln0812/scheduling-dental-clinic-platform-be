@@ -18,7 +18,7 @@ public class StaffUpdateRequest {
 
     private String fullName;
 
-    private String username;
+//    private String username;
 
     @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
             message="Password must be at least 6 characters long, containing at least one uppercase letter and one digit")
