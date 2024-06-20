@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
 import com.example.dentalclinicschedulingplatform.entity.Customer;
+import com.example.dentalclinicschedulingplatform.entity.Dentist;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -103,4 +104,24 @@ public class MailService implements IMailService {
         // Send the email (assuming you have a mailSender bean configured)
         mailSender.send(message);
     }
+
+    @Async
+    @Override
+    public void sendDentistRequestApprovalMail(Dentist dentist, String password) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(dentist.getEmail());
+        // Set a meaningful message
+        message.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
+        message.setText("Hi, " + dentist.getFullName() + ",\n\n" +
+                "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
+                "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
+                "• Username: " + dentist.getUsername() + "\n" +
+                "• Password: " + password + "\n" + // Placeholder for the password
+                "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
+
+
 }

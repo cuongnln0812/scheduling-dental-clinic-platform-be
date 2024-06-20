@@ -1,8 +1,15 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
 import com.example.dentalclinicschedulingplatform.entity.Status;
-import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApprovedBranchResponse {
     private String branchName;
     private String address;

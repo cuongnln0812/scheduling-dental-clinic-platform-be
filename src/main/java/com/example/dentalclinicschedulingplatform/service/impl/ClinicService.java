@@ -87,12 +87,14 @@ public class ClinicService implements IClinicService {
     private ClinicRegisterResponse getClinicRegisterResponse(Clinic tmpClinic, ClinicOwner tmpOwner) {
         ClinicRegisterResponse response = new ClinicRegisterResponse();
         response.setClinicId(tmpClinic.getClinicId());
+        response.setClinicName(tmpClinic.getClinicName());
         response.setAddress(tmpClinic.getAddress());
         response.setCity(tmpClinic.getCity());
         response.setPhone(tmpClinic.getPhone());
         response.setClinicRegistration(tmpClinic.getClinicRegistration());
         response.setWebsiteUrl(tmpClinic.getWebsiteUrl());
         response.setClinicImage(tmpClinic.getClinicImage());
+        response.setClinicStatus(tmpClinic.getStatus());
         response.setFullName(tmpOwner.getFullName());
         response.setEmail(tmpOwner.getEmail());
         response.setClinicPhone(tmpOwner.getPhone());

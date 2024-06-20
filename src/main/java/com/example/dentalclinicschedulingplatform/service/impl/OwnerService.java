@@ -28,13 +28,6 @@ public class OwnerService implements IOwnerService {
         ClinicOwner owner = new ClinicOwner();
         if(ownerRepository.existsByEmail(request.getEmail()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used!");
-        int no = 1;
-        String username = request.getEmail().substring(0, request.getEmail().indexOf('@'));
-        while(ownerRepository.existsByUsername(username)){
-            username = username + no;
-            no++;
-        }
-        owner.setUsername(username);
         owner.setFullName(request.getFullName());
         owner.setEmail(request.getEmail());
         owner.setPhone(request.getPhone());
@@ -47,6 +40,7 @@ public class OwnerService implements IOwnerService {
         ClinicOwner owner = ownerRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner", "id", ownerId));
         owner.setStatus(Status.ACTIVE);
+        owner.setUsername("owner" + owner.getId());
         owner.setPassword(passwordEncoder.encode(randomPassword));
         return ownerRepository.save(owner);
     }
