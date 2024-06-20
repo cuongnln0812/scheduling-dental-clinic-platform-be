@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum Status {
     PENDING("PENDING"),
     DENIED("DENIED"),
+    APPROVED("APPROVED"),
     ACTIVE("ACTIVE"),
     INACTIVE("INACTIVE");
 

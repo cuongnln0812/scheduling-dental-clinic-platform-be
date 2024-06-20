@@ -37,28 +37,28 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new User(systemAdmin.getUsername(), systemAdmin.getPassword(), getAuthorities(UserType.ADMIN));
         }
 
-        Optional<Customer> optionalCustomer = customerRepository.findByUsernameOrEmail(user, user);
+        Optional<Customer> optionalCustomer = customerRepository.findByUsername(user);
         if (optionalCustomer.isPresent()) {
             Customer customer = optionalCustomer.get();
             if(!customer.isStatus()) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(customer.getUsername(), customer.getPassword(), getAuthorities(UserType.CUSTOMER));
         }
 
-        Optional<Dentist> optionalDentist = dentistRepository.findByUsernameOrEmail(user, user);
+        Optional<Dentist> optionalDentist = dentistRepository.findByUsername(user);
         if (optionalDentist.isPresent()) {
             Dentist dentist = optionalDentist.get();
             if(!dentist.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(dentist.getUsername(), dentist.getPassword(), getAuthorities(UserType.DENTIST));
         }
 
-        Optional<ClinicStaff> optionalStaff = staffRepository.findByUsernameOrEmail(user, user);
+        Optional<ClinicStaff> optionalStaff = staffRepository.findByUsername(user);
         if (optionalStaff.isPresent()) {
             ClinicStaff staff = optionalStaff.get();
             if(!staff.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(staff.getUsername(), staff.getPassword(), getAuthorities(UserType.STAFF));
         }
 
-        Optional<ClinicOwner> optionalOwner = ownerRepository.findByUsernameOrEmail(user, user);
+        Optional<ClinicOwner> optionalOwner = ownerRepository.findByUsername(user);
         if (optionalOwner.isPresent()) {
             ClinicOwner owner = optionalOwner.get();
             if(!owner.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
