@@ -11,6 +11,7 @@ import com.example.dentalclinicschedulingplatform.payload.response.UserInformati
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
 import com.example.dentalclinicschedulingplatform.repository.StaffRepository;
+import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.service.IStaffService;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
 import jakarta.transaction.Transactional;
@@ -45,6 +46,7 @@ public class StaffService implements IStaffService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticateService authenticateService;
+    private final IMailService mailService;
 
 
     @Override
@@ -69,6 +71,12 @@ public class StaffService implements IStaffService {
             if(!userInformationRes.getRole().equals(UserType.OWNER.toString())){
                 throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
             }
+
+            ClinicStaff clinicStaffCheckByPhone = iStaffRepository.findByPhone(request.getPhone())
+                                              .orElseThrow(() -> {
+                                                 throw new ApiException(HttpStatus.CONFLICT, "Phone is existed");
+                                              });
+
             Optional<ClinicOwner> clinicOwner = Optional.ofNullable(iOwnerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic owner not found");
@@ -81,14 +89,17 @@ public class StaffService implements IStaffService {
 //            log.info("id branch {}", request.getClinicBranchId().toString());
 //            log.info("id owner {}", clinicOwner.get().getId());
             if(!iClinicBranchRepository.findByBranchIdAndOwnerId(request.getClinicBranchId(), clinicOwner.get().getId()).isPresent())
+            {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
-            if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), request.getEmail())) {
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Email or user name is existed");
-            } else {
+            }
+//            if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), request.getEmail())) {
+//                throw new ApiException(HttpStatus.BAD_REQUEST, "Email or user name is existed");
+//            }
+            else {
                 ClinicStaff clinicStaff = new ClinicStaff();
                 clinicStaff.setFullName(request.getFullName());
                 clinicStaff.setEmail(request.getEmail());
-                clinicStaff.setUsername(request.getUsername());
+                //clinicStaff.setUsername("staff" + clinicStaff.getId());
                 //clinicStaff.setPassword(passwordEncoder.encode(request.getPassword()));
                 clinicStaff.setPhone(request.getPhone());
                 clinicStaff.setDob(request.getDob());
@@ -143,12 +154,12 @@ public class StaffService implements IStaffService {
             if(StringUtils.isNotBlank(request.getFullName())){
                 clinicStaff.setFullName(request.getFullName());
             }
-            if(StringUtils.isNotBlank(request.getUsername())) {
-                if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), clinicStaff.getEmail())) {
-                    throw new ApiException(HttpStatus.BAD_REQUEST, "Username is existed");
-                }
-                clinicStaff.setUsername(request.getUsername());
-            }
+//            if(StringUtils.isNotBlank(request.getUsername())) {
+//                if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), clinicStaff.getEmail())) {
+//                    throw new ApiException(HttpStatus.BAD_REQUEST, "Username is existed");
+//                }
+//                clinicStaff.setUsername(request.getUsername());
+//            }
             if(StringUtils.isNotBlank(request.getPassword())) {
                 clinicStaff.setPassword(passwordEncoder.encode(request.getPassword()));
             }
@@ -292,35 +303,33 @@ public class StaffService implements IStaffService {
     @Override
     public StaffResponse approveStaff(Long staffId, boolean isApproved) {
 
+
         ClinicStaff clinicStaff = iStaffRepository.findById(staffId)
                 .orElseThrow(() -> {
                     throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not found");
                 });
+        ClinicStaff clinicStaffDenied = clinicStaff;
 
         if(!clinicStaff.getStatus().equals(Status.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic staff not pending");
 
+        ClinicBranch clinicBranch = iClinicBranchRepository.findById(clinicStaff.getClinicBranch().getBranchId())
+                .orElseThrow(() -> {
+                   throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found");
+                });
+
         if(isApproved){
             clinicStaff.setStatus(Status.ACTIVE);
+            clinicStaff.setUsername("staff" + clinicStaff.getId());
             String randomPassword = AutomaticGeneratedPassword.generateRandomPassword();
             clinicStaff.setPassword(passwordEncoder.encode(randomPassword));
             clinicStaff = iStaffRepository.save(clinicStaff);
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-            message.setTo(clinicStaff.getEmail());
-            // Set a meaningful message
-            message.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
-            message.setText("Hi, " + clinicStaff.getFullName() + ",\n\n" +
-                            "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
-                            "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
-                            "• Username: " + clinicStaff.getUsername() + "\n" +
-                            "• Password: " + randomPassword + "\n" + // Placeholder for the password
-                            "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
-            // Send the email (assuming you have a mailSender bean configured)
-            mailSender.send(message);
+            mailService.sendStaffRequestApprovalMail(clinicStaff, clinicBranch.getBranchName(), randomPassword);
             return new StaffResponse(clinicStaff);
         } else {
+            clinicStaffDenied.setStatus(Status.DENIED);
+            mailService.sendStaffRequestRejectionMail(clinicStaffDenied, clinicBranch.getBranchName());
             iStaffRepository.delete(clinicStaff);
+            return new StaffResponse(clinicStaffDenied);
         }
-        return new StaffResponse(clinicStaff);
     }
 }
