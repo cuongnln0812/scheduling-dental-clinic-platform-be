@@ -36,4 +36,8 @@ public class RefreshToken {
     @ManyToOne
     @JoinColumn(name = "dentist_id")
     private Dentist dentist;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private SystemAdmin admin;
 }
