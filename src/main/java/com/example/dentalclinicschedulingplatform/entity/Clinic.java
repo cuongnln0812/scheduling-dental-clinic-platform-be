@@ -40,19 +40,17 @@ public class Clinic {
     @Column(name = "website_url")
     private String websiteUrl;
     private String logo;
+    @Column(name = "clinic_registration")
+    private String clinicRegistration;
+    @Column(name = "clinic_image")
+    private String clinicImage;
     @Column(name = "total_rating")
     private Float totalRating;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
-    private String createdBy;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;
-    @LastModifiedBy
-    @Column(name = "modified_by", insertable = false)
-    private String modifiedBy;
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
@@ -66,4 +64,8 @@ public class Clinic {
     private List<Category> categories;
     @OneToMany(mappedBy = "clinic")
     private List<Service> services;
+    @OneToMany(mappedBy = "clinic")
+    private List<WorkingHours> workingHours;
+    @OneToMany(mappedBy = "clinic")
+    private List<Slot> slots;
 }

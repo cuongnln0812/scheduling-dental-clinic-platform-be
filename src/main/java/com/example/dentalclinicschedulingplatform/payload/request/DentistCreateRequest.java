@@ -22,8 +22,6 @@ import static com.example.dentalclinicschedulingplatform.utils.AppConstants.EMAI
 public class DentistCreateRequest {
     @NotBlank(message = "Name must not be blank")
     private String fullName;
-    @NotBlank(message = "Username must not be blank")
-    private String username;
     @NotBlank(message = "Email must not be blank")
     @Pattern(regexp = EMAIL_REGEX, message = "Email is not valid")
     private String email;

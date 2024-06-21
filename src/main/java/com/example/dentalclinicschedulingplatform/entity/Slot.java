@@ -49,6 +49,6 @@ public class Slot {
     @OneToOne(mappedBy = "slot")
     private Appointment appointment;
     @ManyToOne
-    @JoinColumn(name = "branch_id")
-    private ClinicBranch clinicBranch;
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
 }
