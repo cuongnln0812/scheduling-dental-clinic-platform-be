@@ -17,6 +17,7 @@ public interface IAuthenticateService {
     UserInformationRes updateUserInfo(UserInfoUpdateRequest request);
     String changePassword(PasswordChangeRequest request);
     boolean isUsernameOrEmailExisted(String username, String email);
+    boolean isUsernameExisted(String username);
     boolean checkPasswordChange(String oldPass, String newPass, String userPass);
     RefreshTokenResponse refreshToken(RefreshTokenRequest request);
     void logout(RefreshTokenRequest refreshToken);

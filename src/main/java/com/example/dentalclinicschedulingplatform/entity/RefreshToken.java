@@ -24,4 +24,20 @@ public class RefreshToken {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private ClinicOwner owner;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private ClinicStaff staff;
+
+    @ManyToOne
+    @JoinColumn(name = "dentist_id")
+    private Dentist dentist;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private SystemAdmin admin;
 }

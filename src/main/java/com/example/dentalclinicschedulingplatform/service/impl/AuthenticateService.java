@@ -15,6 +15,7 @@ import com.example.dentalclinicschedulingplatform.payload.response.UserInformati
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
+import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -43,7 +44,6 @@ public class AuthenticateService implements IAuthenticateService {
     private final JwtService jwtService;
     private final PasswordEncoder  passwordEncoder;
     private final ModelMapper modelMapper;
-    private final JavaMailSender mailSender;
     private final AuthenticationManager authenticationManager;
     private final SystemAdminRepository systemAdminRepository;
     private final CustomerRepository customerRepository;
@@ -51,11 +51,12 @@ public class AuthenticateService implements IAuthenticateService {
     private final StaffRepository staffRepository;
     private final OwnerRepository ownerRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final IMailService mailService;
 
     public AuthenticationResponse authenticateAccount(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsernameOrEmail(),
+                        request.getUsername(),
                         request.getPassword()));
 
         var jwtToken = jwtService.generateToken(authentication);
@@ -80,26 +81,27 @@ public class AuthenticateService implements IAuthenticateService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(true);
         user = customerRepository.save(user);
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-        message.setTo(user.getEmail());
-        // Set a meaningful message
-        message.setSubject("[F-Dental] - Tài khoản được tạo thành công");
-        String body = "Kính gửi " + user.getUsername() + ",\n\n" +
-                "Cảm ơn bạn đã tạo tài khoản trên " + "F-Dental" + "! Chúng tôi rất vui mừng được chào đón bạn đến với cộng đồng của mình và hỗ trợ bạn đạt được mục tiêu sức khỏe răng miệng.\n\n" +
-                "Để bắt đầu:\n\n" +
-                "1. Hoàn thành hồ sơ của bạn: Truy cập cài đặt tài khoản để thêm thông tin cá nhân, bao gồm chi tiết bảo hiểm nha khoa của bạn. Điều này sẽ giúp chúng tôi đơn giản hóa quy trình đặt lịch hẹn của bạn.\n\n" +
-                "2. Đặt lịch hẹn đầu tiên: Duyệt qua danh sách nha sĩ có sẵn và tìm thời gian phù hợp với lịch trình của bạn. Bạn có thể dễ dàng đặt lịch hẹn trực tuyến hoặc bằng cách gọi điện đến trung tâm chăm sóc khách hàng của chúng tôi.\n\n" +
-                "3. Khám phá các nguồn tài nguyên của chúng tôi: Chúng tôi cung cấp nhiều nguồn tài nguyên hữu ích để hỗ trợ hành trình sức khỏe răng miệng của bạn, bao gồm các bài viết, video và mẹo về cách duy trì vệ sinh răng miệng tốt.\n\n" +
-                "Chúng tôi luôn sẵn sàng hỗ trợ:\n\n" +
-                "Nếu bạn có bất kỳ câu hỏi nào hoặc cần trợ giúp về tài khoản của mình, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
-                "Cảm ơn bạn đã chọn " + "F-Dental" + "!\n\n" +
-                "Trân trọng,\n\n" +
-                "Đội ngũ F-Dental";
-        message.setText(body);
-
-        // Send the email (assuming you have a mailSender bean configured)
-        mailSender.send(message);
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+//        message.setTo(user.getEmail());
+//        // Set a meaningful message
+//        message.setSubject("[F-Dental] - Tài khoản được tạo thành công");
+//        String body = "Kính gửi " + user.getUsername() + ",\n\n" +
+//                "Cảm ơn bạn đã tạo tài khoản trên " + "F-Dental" + "! Chúng tôi rất vui mừng được chào đón bạn đến với cộng đồng của mình và hỗ trợ bạn đạt được mục tiêu sức khỏe răng miệng.\n\n" +
+//                "Để bắt đầu:\n\n" +
+//                "1. Hoàn thành hồ sơ của bạn: Truy cập cài đặt tài khoản để thêm thông tin cá nhân, bao gồm chi tiết bảo hiểm nha khoa của bạn. Điều này sẽ giúp chúng tôi đơn giản hóa quy trình đặt lịch hẹn của bạn.\n\n" +
+//                "2. Đặt lịch hẹn đầu tiên: Duyệt qua danh sách nha sĩ có sẵn và tìm thời gian phù hợp với lịch trình của bạn. Bạn có thể dễ dàng đặt lịch hẹn trực tuyến hoặc bằng cách gọi điện đến trung tâm chăm sóc khách hàng của chúng tôi.\n\n" +
+//                "3. Khám phá các nguồn tài nguyên của chúng tôi: Chúng tôi cung cấp nhiều nguồn tài nguyên hữu ích để hỗ trợ hành trình sức khỏe răng miệng của bạn, bao gồm các bài viết, video và mẹo về cách duy trì vệ sinh răng miệng tốt.\n\n" +
+//                "Chúng tôi luôn sẵn sàng hỗ trợ:\n\n" +
+//                "Nếu bạn có bất kỳ câu hỏi nào hoặc cần trợ giúp về tài khoản của mình, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
+//                "Cảm ơn bạn đã chọn " + "F-Dental" + "!\n\n" +
+//                "Trân trọng,\n\n" +
+//                "Đội ngũ F-Dental";
+//        message.setText(body);
+//
+//        // Send the email (assuming you have a mailSender bean configured)
+//        mailSender.send(message);
+        mailService.sendCustomerRegistrationMail(user);
         return modelMapper.map(user, CustomerRegisterResponse.class);
     }
 
@@ -247,6 +249,15 @@ public class AuthenticateService implements IAuthenticateService {
     }
 
     @Override
+    public boolean isUsernameExisted(String username) {
+        return customerRepository.existsByUsername(username) ||
+                dentistRepository.existsByUsername(username) ||
+                staffRepository.existsByUsername(username) ||
+                ownerRepository.existsByUsername(username) ||
+                systemAdminRepository.existsByUsername(username);
+    }
+
+    @Override
     public boolean checkPasswordChange(String requestOldPass, String requestNewPass, String userPass){
         if (!passwordEncoder.matches(requestOldPass, userPass)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Old password does not match!");
@@ -255,15 +266,50 @@ public class AuthenticateService implements IAuthenticateService {
     }
     private RefreshToken generateRefreshToken(Authentication authentication) {
         String name = authentication.getName();
-        Customer customer = customerRepository.findByUsernameOrEmail(name, name)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+        Customer customer = customerRepository.findByUsername(name)
+                .orElse(null);
+        ClinicOwner owner = ownerRepository.findByUsername(name)
+                .orElse(null);
+        ClinicStaff staff = staffRepository.findByUsername(name)
+                .orElse(null);
+        Dentist dentist = dentistRepository.findByUsername(name)
+                .orElse(null);
+        SystemAdmin admin = systemAdminRepository.findByUsername(name)
+                .orElse(null);
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setRefreshToken(UUID.randomUUID().toString());
-        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
-        refreshToken.setCustomer(customer);
-        refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+
+        if (customer != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setCustomer(customer);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (owner != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setOwner(owner);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (staff != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setStaff(staff);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (dentist != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setDentist(dentist);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        }else if (admin != null) {
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshToken.setAdmin(admin);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken;
+        } else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
     }
 
     @Override
@@ -277,23 +323,87 @@ public class AuthenticateService implements IAuthenticateService {
         }
 
         Customer customer = refreshToken.getCustomer();
-        if (customer == null) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Customer not found");
-        }
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        ClinicOwner owner = refreshToken.getOwner();
+        ClinicStaff staff = refreshToken.getStaff();
+        Dentist dentist = refreshToken.getDentist();
+        SystemAdmin admin = refreshToken.getAdmin();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                customer.getUsername(),
-                null,
-                authorities);
-        String jwtToken = jwtService.generateToken(authentication);
-        refreshToken.setRefreshToken(UUID.randomUUID().toString());
-        refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
-        refreshTokenRepository.save(refreshToken);
-        RefreshTokenResponse response = new RefreshTokenResponse();
-        response.setToken(jwtToken);
-        response.setRefreshToken(refreshToken.getRefreshToken());
-        return response;
+        if (customer != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + UserType.CUSTOMER));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    customer.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (owner != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.ADMIN));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    owner.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (staff != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.STAFF));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    staff.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (dentist != null) {
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.DENTIST));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    dentist.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else if (admin != null){
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" +UserType.ADMIN));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    admin.getUsername(),
+                    null,
+                    authorities);
+            String jwtToken = jwtService.generateToken(authentication);
+            refreshToken.setRefreshToken(UUID.randomUUID().toString());
+            refreshToken.setExpiredAt(LocalDateTime.now().plusDays(1));
+            refreshTokenRepository.save(refreshToken);
+            RefreshTokenResponse response = new RefreshTokenResponse();
+            response.setToken(jwtToken);
+            response.setRefreshToken(refreshToken.getRefreshToken());
+            return response;
+        }else throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
     }
 
     @Override

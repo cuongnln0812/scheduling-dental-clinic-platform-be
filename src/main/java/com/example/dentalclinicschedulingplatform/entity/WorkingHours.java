@@ -28,26 +28,21 @@ public class WorkingHours {
     private Long id;
     @Enumerated(EnumType.STRING)
     private DayInWeek day;
+    @Enumerated(EnumType.STRING)
     private Shift shift;
     @Column(name = "start_time")
     private LocalTime startTime;
     @Column(name = "end_time")
     private LocalTime endTime;
     private boolean status;
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
-    private String createdBy;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;
-    @LastModifiedBy
-    @Column(name = "modified_by", insertable = false)
-    private String modifiedBy;
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
 
     @ManyToOne
-    @JoinColumn(name = "branch_id")
-    private ClinicBranch clinicBranch;
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
 }
