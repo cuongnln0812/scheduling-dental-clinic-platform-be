@@ -113,7 +113,7 @@ public class DentalService implements IDentalService {
         newService.setMaximumPrice(request.getMaximumPrice());
         newService.setDuration(request.getDuration());
         newService.setServiceType(request.getServiceType());
-        newService.setStatus(Status.PENDING);
+        newService.setStatus(Status.ACTIVE);
         newService.setCreatedBy(owner.getEmail());
         newService.setCreatedDate(LocalDateTime.now());
         newService.setCategory(currCategory);
@@ -163,7 +163,7 @@ public class DentalService implements IDentalService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
             }
 
-            if (!updatedService.getServiceName().equals(request.getServiceName())){
+            if (!updatedService.getServiceName().equalsIgnoreCase(request.getServiceName())){
                 Service existingService = serviceRepository.findByServiceNameAndClinic_ClinicId(request.getServiceName(), clinicId);
                 if (existingService != null) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");
@@ -177,7 +177,7 @@ public class DentalService implements IDentalService {
             updatedService.setMaximumPrice(request.getMaximumPrice());
             updatedService.setDuration(request.getDuration());
             updatedService.setServiceType(request.getServiceType());
-            updatedService.setStatus(Status.PENDING);
+            updatedService.setStatus(Status.ACTIVE);
             updatedService.setModifiedBy(staff.getEmail());
             updatedService.setModifiedDate(LocalDateTime.now());
             updatedService.setCategory(currCategory);
@@ -206,7 +206,7 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
         }
 
-        if (!updatedService.getServiceName().equals(request.getServiceName())){
+        if (!updatedService.getServiceName().equalsIgnoreCase(request.getServiceName())){
             Service existingService = serviceRepository.findByServiceNameAndClinic_ClinicId(request.getServiceName(), clinic.getClinicId());
             if (existingService != null) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Service name is already existed");

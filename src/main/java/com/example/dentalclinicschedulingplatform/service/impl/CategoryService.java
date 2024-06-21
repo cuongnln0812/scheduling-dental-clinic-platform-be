@@ -114,7 +114,7 @@ public class CategoryService implements ICategoryService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
             }
 
-            if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
+            if (!updateCategory.getCategoryName().equalsIgnoreCase(request.getCategoryName())) {
                 Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
                 if (existingCategory != null){
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
@@ -139,7 +139,7 @@ public class CategoryService implements ICategoryService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
         }
 
-        if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
+        if (!updateCategory.getCategoryName().equalsIgnoreCase(request.getCategoryName())) {
             Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
             if (existingCategory != null){
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
