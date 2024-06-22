@@ -1,11 +1,7 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
-import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.*;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
-import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.UserInfoUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
@@ -86,4 +82,12 @@ public class AuthenticationController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/login-google")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> loginGoogle(@Valid @RequestBody LoginGoogleRequest request) {
+        ApiResponse<AuthenticationResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Google login successfully!",
+                authenticationService.loginWithGoogle(request));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

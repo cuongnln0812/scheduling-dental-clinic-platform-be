@@ -3,11 +3,7 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
-import com.example.dentalclinicschedulingplatform.payload.request.AuthenticationRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.CustomerRegisterRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.PasswordChangeRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.UserInfoUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.request.RefreshTokenRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.*;
 import com.example.dentalclinicschedulingplatform.payload.response.AuthenticationResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CustomerRegisterResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.RefreshTokenResponse;
@@ -19,6 +15,8 @@ import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,10 +31,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -415,5 +420,67 @@ public class AuthenticateService implements IAuthenticateService {
         }
     }
 
+    @Override
+    @Transactional
+    public AuthenticationResponse loginWithGoogle(LoginGoogleRequest request) {
+        String token = request.getToken();
+        try {
+            URL url = new URL ("https://www.googleapis.com/oauth2/v3/userinfo");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection ();
+            connection.setRequestMethod ("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            int responseCode = connection.getResponseCode ();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader (connection.getInputStream ()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close ();
+                JsonParser jsonParser = JsonParserFactory.getJsonParser();
+                Map<String, Object> jsonData = jsonParser.parseMap(response.toString());
+                String email = (String) jsonData.get("email");
+                String givenName = (String) jsonData.get("given_name");
+                String picture = (String) jsonData.get("picture");
+                Optional<Customer> customerOpt = customerRepository.findByUsernameOrEmail (email, email);
+                Customer customer;
+                if (customerOpt.isPresent()) {
+                    customer = customerOpt.get();
+                }
+                else
+                {
+                    customer = new Customer();
+                    customer.setEmail(email);
+                    customer.setUsername(email);
+                    customer.setFullName (givenName);
+                    customer.setAvatar (picture);
+                    customer.setGender ("Male");
+                    customer.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                    customer.setStatus(true);
+                    customerRepository.save(customer);
+                }
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        customer.getUsername(),
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_" + UserType.CUSTOMER)));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                String jwtToken = jwtService.generateToken(authentication);
+                RefreshToken refreshToken = generateRefreshToken(authentication);
+
+                AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+                authenticationResponse.setToken(jwtToken);
+                authenticationResponse.setRefreshToken(refreshToken.getRefreshToken());
+                return authenticationResponse;
+            }
+            else
+            {
+                throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid Google token");
+            }
+        } catch (Exception e) {
+            throw new ApiException (HttpStatus.INTERNAL_SERVER_ERROR, "Google login failed");
+        }
+    }
 
 }
