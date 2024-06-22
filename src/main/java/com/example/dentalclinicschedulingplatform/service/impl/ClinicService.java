@@ -45,6 +45,7 @@ public class ClinicService implements IClinicService {
         ClinicOwner tmpOwner = ownerService.registerOwnerFromRequest(request.getOwnerInformation());
         clinic.setClinicOwner(tmpOwner);
         Clinic tmpClinic = clinicRepository.save(clinic);
+        mailService.sendClinicRequestConfirmationMail(tmpOwner.getFullName(), tmpOwner.getEmail());
         return getClinicRegisterResponse(tmpClinic, tmpOwner);
     }
 

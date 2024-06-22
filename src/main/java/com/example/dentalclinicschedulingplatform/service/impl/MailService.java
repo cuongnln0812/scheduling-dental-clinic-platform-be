@@ -51,7 +51,6 @@ public class MailService implements IMailService {
         message.setSubject("[F-Dental] - Đơn đăng kí làm đối tác của bạn đã được tiếp nhận");
         String body = "Kính gửi " + fullName + ",\n\n" +
                 "Chúng tôi đã nhận được đơn đăng kí làm đối tác của bạn tại F-Dental. Đơn đăng kí của bạn hiện đang được xem xét và chúng tôi sẽ thông báo cho bạn khi có kết quả.\n\n" +
-                "Bạn không cần phải thực hiện bất kỳ thay đổi nào vào lúc này. Vui lòng chờ chúng tôi xử lý đơn đăng kí của bạn.\n\n" +
                 "Chúng tôi sẽ cố gắng hoàn thành quá trình duyệt đơn trong thời gian sớm nhất. Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ với đội ngũ dịch vụ khách hàng của chúng tôi qua email hoặc điện thoại.\n\n" +
                 "Cảm ơn bạn đã chọn F-Dental và hy vọng sẽ sớm được hợp tác cùng bạn!\n\n" +
                 "Trân trọng,\n\n" +
