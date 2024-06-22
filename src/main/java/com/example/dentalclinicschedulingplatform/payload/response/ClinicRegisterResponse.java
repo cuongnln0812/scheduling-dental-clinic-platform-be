@@ -15,12 +15,10 @@ public class ClinicRegisterResponse {
     private String clinicName;
     private String address;
     private String city;
-    private String clinicPhone;
+    private String phone;
     private String clinicRegistration;
     private String websiteUrl;
     private String clinicImage;
     private Status clinicStatus;
-    private String fullName;
-    private String email;
-    private String phone;
+    private OwnerRegisterResponse ownerDetail;
 }
