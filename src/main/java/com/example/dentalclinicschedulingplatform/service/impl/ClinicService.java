@@ -45,6 +45,7 @@ public class ClinicService implements IClinicService {
         ClinicOwner tmpOwner = ownerService.registerOwnerFromRequest(request.getOwnerInformation());
         clinic.setClinicOwner(tmpOwner);
         Clinic tmpClinic = clinicRepository.save(clinic);
+        mailService.sendClinicRequestConfirmationMail(tmpOwner.getFullName(), tmpOwner.getEmail());
         return getClinicRegisterResponse(tmpClinic, tmpOwner);
     }
 
@@ -77,11 +78,19 @@ public class ClinicService implements IClinicService {
     }
 
     @Override
-    public Page<ClinicListResponse> getClinicPendingList(int page, int size) {
+    public Page<PendingClinicListResponse> getClinicPendingList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Clinic> clinics;
         clinics = clinicRepository.findAllByStatus(Status.PENDING, pageRequest);
-        return clinics.map(clinic -> modelMapper.map(clinic,ClinicListResponse.class));
+        return clinics.map(clinic -> new PendingClinicListResponse(clinic.getClinicId(),
+                clinic.getClinicName(), clinic.getClinicOwner().getFullName()));
+    }
+
+    @Override
+    public ClinicRegisterResponse getPendingClinicDetail(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
+        return getClinicRegisterResponse(clinic, clinic.getClinicOwner());
     }
 
     private ClinicRegisterResponse getClinicRegisterResponse(Clinic tmpClinic, ClinicOwner tmpOwner) {
@@ -95,9 +104,7 @@ public class ClinicService implements IClinicService {
         response.setWebsiteUrl(tmpClinic.getWebsiteUrl());
         response.setClinicImage(tmpClinic.getClinicImage());
         response.setClinicStatus(tmpClinic.getStatus());
-        response.setFullName(tmpOwner.getFullName());
-        response.setEmail(tmpOwner.getEmail());
-        response.setClinicPhone(tmpOwner.getPhone());
+        response.setOwnerDetail(modelMapper.map(tmpOwner, OwnerRegisterResponse.class));
         return response;
     }
 }

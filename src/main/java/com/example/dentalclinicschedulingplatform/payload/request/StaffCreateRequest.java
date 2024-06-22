@@ -20,8 +20,8 @@ public class StaffCreateRequest {
     @Email(message="Invalid email address")
     private String email;
 
-    @NotBlank(message = "User name can not be blank")
-    private String username;
+//    @NotBlank(message = "User name can not be blank")
+//    private String username;
 
 //    @NotBlank(message="Password can not be blank")
 //    @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
