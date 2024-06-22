@@ -29,5 +29,4 @@ public enum DayInWeek {
         }
         throw new ApiException(HttpStatus.BAD_REQUEST, "Day is not valid");
     }
-
 }

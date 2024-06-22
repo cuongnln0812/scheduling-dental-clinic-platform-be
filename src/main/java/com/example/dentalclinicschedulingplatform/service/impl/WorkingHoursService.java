@@ -57,7 +57,7 @@ public class WorkingHoursService implements IWorkingHoursService {
         for (WorkingHoursCreateRequest workingHour: workingHours) {
 
             Clinic currClinic = clinicRepository.findById(workingHour.getClinicId())
-                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch does not exist"));
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
 
             if (currClinic != clinic) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Clinic does not belong to current owner");

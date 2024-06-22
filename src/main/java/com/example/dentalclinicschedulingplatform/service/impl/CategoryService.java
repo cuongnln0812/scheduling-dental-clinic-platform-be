@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -190,5 +191,20 @@ public class CategoryService implements ICategoryService {
 
         return new CategoryViewResponse(deletedCategory.getId(), deletedCategory.getCategoryName(),
                 deletedCategory.isStatus(), dentalService.viewServicesByCategoryId(deletedCategory.getId()));
+    }
+
+    @Override
+    public List<CategoryViewListResponse> viewAllCategory(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Category> categoryList = categoryRepository.findAll(pageable);
+
+        List<CategoryViewListResponse> categoryViewListResponses = new ArrayList<>();
+
+        for (Category category: categoryList) {
+            categoryViewListResponses.add(modelMapper.map(category, CategoryViewListResponse.class));
+        }
+
+        return categoryViewListResponses;
     }
 }

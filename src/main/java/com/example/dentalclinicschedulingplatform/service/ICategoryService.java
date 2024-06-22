@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.service;
 
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 
@@ -12,4 +13,5 @@ public interface ICategoryService {
     CategoryViewResponse createNewCategory(UserInformationRes userInformation, CategoryCreateRequest request);
     CategoryViewResponse updateCategory(UserInformationRes userInformation, CategoryUpdateRequest request);
     CategoryViewResponse deleteCategory(UserInformationRes userInformation, Long categoryId);
+    List<CategoryViewListResponse> viewAllCategory(int page, int size);
 }

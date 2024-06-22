@@ -3,6 +3,7 @@ package com.example.dentalclinicschedulingplatform.controller;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.ICategoryService;
@@ -83,6 +84,21 @@ public class CategoryController {
                 HttpStatus.OK,
                 "Updated category successfully",
                 deleteCategory);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "View list categories"
+    )
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<CategoryViewListResponse>>>
+    viewCategories(@RequestParam (required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                   @RequestParam (required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size){
+        List<CategoryViewListResponse> categories = categoryService.viewAllCategory(page, size);
+        ApiResponse<List<CategoryViewListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get categories successfully",
+                categories);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
