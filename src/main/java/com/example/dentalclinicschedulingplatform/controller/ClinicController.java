@@ -55,13 +55,27 @@ public class ClinicController {
             "Only System Admin can perform this request!")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/pending")
-    public ResponseEntity<ApiResponse<Page<ClinicListResponse>>> getPendingList(
+    public ResponseEntity<ApiResponse<Page<PendingClinicListResponse>>> getPendingList(
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
-        ApiResponse<Page<ClinicListResponse>> response = new ApiResponse<>(
+        ApiResponse<Page<PendingClinicListResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get pending clinics list successfully!",
                 clinicService.getClinicPendingList(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get pending clinic detail", description = "Get pending clinic detail for the approval action. " +
+            "Only System Admin can perform this request!")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/pending/{clinicId}")
+    public ResponseEntity<ApiResponse<ClinicRegisterResponse>> getPendingClinicDetail(
+            @PathVariable("clinicId") Long clinicId)
+    {
+        ApiResponse<ClinicRegisterResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get pending clinic detail successfully!",
+                clinicService.getPendingClinicDetail(clinicId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
