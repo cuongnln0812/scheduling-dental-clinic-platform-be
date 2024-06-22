@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
 import com.example.dentalclinicschedulingplatform.entity.Customer;
 import com.example.dentalclinicschedulingplatform.entity.Dentist;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
@@ -50,7 +51,6 @@ public class MailService implements IMailService {
         message.setSubject("[F-Dental] - Đơn đăng kí làm đối tác của bạn đã được tiếp nhận");
         String body = "Kính gửi " + fullName + ",\n\n" +
                 "Chúng tôi đã nhận được đơn đăng kí làm đối tác của bạn tại F-Dental. Đơn đăng kí của bạn hiện đang được xem xét và chúng tôi sẽ thông báo cho bạn khi có kết quả.\n\n" +
-                "Bạn không cần phải thực hiện bất kỳ thay đổi nào vào lúc này. Vui lòng chờ chúng tôi xử lý đơn đăng kí của bạn.\n\n" +
                 "Chúng tôi sẽ cố gắng hoàn thành quá trình duyệt đơn trong thời gian sớm nhất. Nếu bạn có bất kỳ câu hỏi nào, xin vui lòng liên hệ với đội ngũ dịch vụ khách hàng của chúng tôi qua email hoặc điện thoại.\n\n" +
                 "Cảm ơn bạn đã chọn F-Dental và hy vọng sẽ sớm được hợp tác cùng bạn!\n\n" +
                 "Trân trọng,\n\n" +
@@ -100,6 +100,48 @@ public class MailService implements IMailService {
                 "Cảm ơn bạn đã quan tâm đến việc trở thành đối tác của F-Dental. Chúng tôi hy vọng sẽ có cơ hội hợp tác cùng bạn trong tương lai.\n\n" +
                 "Trân trọng,\n\n" +
                 "Đội ngũ F-Dental";
+        message.setText(body);
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
+
+    @Async
+    @Override
+    public void sendStaffRequestApprovalMail(ClinicStaff staff, String branchName, String password) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(staff.getEmail());
+        // Set a meaningful message
+        message.setSubject("[F-Dental] - Đơn đăng kí làm nhân viên của bạn đã được XÁC NHẬN");
+        String body = "Kính gửi " + staff.getFullName() + ",\n\n" +
+                      "Chúng tôi rất vui mừng thông báo rằng đơn đăng kí làm nhân viên của bạn tại " + branchName + " đã được XÁC NHẬN.\n\n" +
+                      "Dưới đây là thông tin tài khoản để bạn đăng nhập vào hệ thống:\n\n" +
+                      "Tên đăng nhập: " + staff.getUsername() + "\n" +
+                      "Mật khẩu tạm thời: " + password + "\n\n" +
+                      "Để bảo mật tài khoản của bạn, vui lòng đăng nhập và đổi mật khẩu ngay sau khi nhận được email này.\n\n" +
+                      "Nếu bạn có bất kỳ câu hỏi nào hoặc cần trợ giúp, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
+                      "Cảm ơn bạn đã chọn F-Dental và chúng tôi rất mong được hợp tác cùng bạn!\n\n" +
+                      "Trân trọng,\n\n" +
+                      "Đội ngũ F-Dental";
+        message.setText(body);
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
+
+    @Async
+    @Override
+    public void sendStaffRequestRejectionMail(ClinicStaff staff, String branchName) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(staff.getEmail());
+        // Set a meaningful message
+        message.setSubject("[F-Dental] - Đơn đăng kí làm nhân viên của bạn đã bị TỪ CHỐI");
+        String body = "Kính gửi " + staff.getFullName() + ",\n\n" +
+                      "Chúng tôi rất tiếc phải thông báo rằng đơn đăng kí làm nhân viên của bạn tại " + branchName + " đã bị từ chối sau khi xem xét kỹ lưỡng.\n\n" +
+                      "Chúng tôi hiểu rằng đây không phải là tin tức mà bạn mong đợi và xin chân thành xin lỗi vì sự bất tiện này. Đơn đăng kí của bạn không đáp ứng được một số tiêu chí mà chúng tôi đã đặt ra.\n\n" +
+                      "Nếu bạn có bất kỳ câu hỏi nào về lý do từ chối hoặc cần thêm thông tin, xin vui lòng liên hệ với đội ngũ dịch vụ khách hàng của chúng tôi qua email hoặc điện thoại. Chúng tôi sẵn sàng giải đáp mọi thắc mắc và hỗ trợ bạn trong quá trình này.\n\n" +
+                      "Trân trọng,\n\n" +
+                      "Đội ngũ F-Dental";
         message.setText(body);
         // Send the email (assuming you have a mailSender bean configured)
         mailSender.send(message);
