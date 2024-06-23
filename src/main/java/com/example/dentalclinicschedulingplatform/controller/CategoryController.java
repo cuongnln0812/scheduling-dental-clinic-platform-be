@@ -1,8 +1,10 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
+import com.example.dentalclinicschedulingplatform.payload.request.CategoryChangeStatusRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.ICategoryService;
@@ -21,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/category")
@@ -36,11 +40,11 @@ public class CategoryController {
             summary = "View categories by clinic"
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CategoryViewResponse>>> viewCategoryListByClinic
-            (@RequestParam Long clinicId,
+    public ResponseEntity<ApiResponse<Map<String, Object>>> viewCategoryListByClinic
+            (@RequestParam (required = false) Long clinicId,
              @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
              @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
-        ApiResponse<List<CategoryViewResponse>> response = new ApiResponse<>(
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get categories successfully",
                 categoryService.viewListCategoryByClinic(clinicId, page, size));
@@ -82,6 +86,21 @@ public class CategoryController {
         ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Updated category successfully",
+                deleteCategory);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Change status of category"
+    )
+    @PutMapping("/change-status")
+    public ResponseEntity<ApiResponse<CategoryViewResponse>> changeStatusOfCategory(
+            @RequestBody CategoryChangeStatusRequest request){
+        CategoryViewResponse deleteCategory = categoryService.changeCategoryStatus(
+                authenticationService.getUserInfo(), request.getCategoryId(), request.isCategoryStatus());
+        ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Change status category successfully",
                 deleteCategory);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

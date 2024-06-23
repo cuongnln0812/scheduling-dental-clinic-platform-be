@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -20,9 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -37,22 +36,38 @@ public class CategoryService implements ICategoryService {
     private final ClinicBranchRepository clinicBranchRepository;
     private final ModelMapper modelMapper;
     @Override
-    public List<CategoryViewResponse> viewListCategoryByClinic(Long clinicId, int page, int size) {
+    public Map<String, Object> viewListCategoryByClinic(Long clinicId, int page, int size) {
 
         Pageable pageRequest = PageRequest.of(page, size);
-        List<CategoryViewResponse> categoryViewResponseList = new ArrayList<>();
+        List<CategoryViewResponse> categoriesByClinic = new ArrayList<>();
+        List<CategoryViewListResponse> allCategories = new ArrayList<>();
+        Map<String, Object> result = new HashMap<>();
 
-        Clinic clinic = clinicRepository.findById(clinicId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+        if (clinicId == null) {
+            Page<Category> categories = categoryRepository.findAll(pageRequest);
+            for (Category categoryItem : categories) {
+                allCategories.add(modelMapper.map(categoryItem, CategoryViewListResponse.class));
+            }
+            allCategories.sort(Comparator.comparing(CategoryViewListResponse::getId));
 
-        Page<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId(), pageRequest);
-        for (Category categoryItem : categories) {
-            List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = dentalService.viewServicesByCategoryId(categoryItem.getId());
-            categoryViewResponseList.add(new CategoryViewResponse(categoryItem.getId(), categoryItem.getCategoryName(),
-                    categoryItem.isStatus(), serviceViewDetailsResponseList));
+            result.put("Categories", allCategories);
+            return result;
+
+        }else {
+            Clinic clinic = clinicRepository.findById(clinicId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+            Page<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId(), pageRequest);
+            for (Category categoryItem : categories) {
+                List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = dentalService.viewServicesByCategoryId(categoryItem.getId());
+                categoriesByClinic.add(new CategoryViewResponse(categoryItem.getId(), categoryItem.getCategoryName(),
+                        categoryItem.isStatus(), serviceViewDetailsResponseList));
+            }
+            categoriesByClinic.sort(Comparator.comparing(CategoryViewResponse::getId));
+
+            result.put("Categories by clinic", categoriesByClinic);
+            return result;
         }
-        categoryViewResponseList.sort(Comparator.comparing(CategoryViewResponse::getId));
-        return categoryViewResponseList;
     }
 
     @Override
@@ -74,7 +89,7 @@ public class CategoryService implements ICategoryService {
 
         Category newCategory = new Category();
         newCategory.setCategoryName(request.getCategoryName());
-        newCategory.setCreatedBy(userInformation.getEmail());
+        newCategory.setCreatedBy(userInformation.getUsername());
         newCategory.setCreatedDate(LocalDateTime.now());
         newCategory.setStatus(true);
         newCategory.setClinic(clinic);
@@ -114,7 +129,7 @@ public class CategoryService implements ICategoryService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
             }
 
-            if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
+            if (!updateCategory.getCategoryName().equalsIgnoreCase(request.getCategoryName())) {
                 Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
                 if (existingCategory != null){
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
@@ -122,7 +137,7 @@ public class CategoryService implements ICategoryService {
             }
 
             updateCategory.setCategoryName(request.getCategoryName());
-            updateCategory.setModifiedBy(staff.getEmail());
+            updateCategory.setModifiedBy(staff.getUsername());
             updateCategory.setModifiedDate(LocalDateTime.now());
             updateCategory.setStatus(request.categoryStatus);
 
@@ -139,7 +154,7 @@ public class CategoryService implements ICategoryService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
         }
 
-        if (!updateCategory.getCategoryName().equals(request.getCategoryName())) {
+        if (!updateCategory.getCategoryName().equalsIgnoreCase(request.getCategoryName())) {
             Category existingCategory = categoryRepository.findByCategoryNameAndClinic_ClinicId(request.getCategoryName(), currClinic.getClinicId());
             if (existingCategory != null){
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Category name is already existed");
@@ -147,7 +162,7 @@ public class CategoryService implements ICategoryService {
         }
 
         updateCategory.setCategoryName(request.getCategoryName());
-        updateCategory.setModifiedBy(owner.getEmail());
+        updateCategory.setModifiedBy(owner.getUsername());
         updateCategory.setModifiedDate(LocalDateTime.now());
         updateCategory.setStatus(request.categoryStatus);
 
@@ -159,7 +174,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryViewResponse deleteCategory(UserInformationRes userInformation, Long categoryId) {
         if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Do not have permission");
         }
 
         Category deletedCategory = categoryRepository.findById(categoryId)
@@ -184,11 +199,48 @@ public class CategoryService implements ICategoryService {
         }
 
         deletedCategory.setModifiedDate(LocalDateTime.now());
-        deletedCategory.setModifiedBy(owner.getEmail());
+        deletedCategory.setModifiedBy(owner.getUsername());
 
         categoryRepository.save(deletedCategory);
 
         return new CategoryViewResponse(deletedCategory.getId(), deletedCategory.getCategoryName(),
                 deletedCategory.isStatus(), dentalService.viewServicesByCategoryId(deletedCategory.getId()));
+    }
+
+    @Override
+    public CategoryViewResponse changeCategoryStatus(UserInformationRes userInformation, Long categoryId, boolean status) {
+
+        if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Do not have permission");
+        }
+
+        Category currCategory  = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category not found"));
+
+        ClinicOwner owner = ownerRepository.findByUsername(userInformation.getUsername())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
+
+        Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        List<Category> categories = categoryRepository.findCategoriesByClinic_ClinicId(clinic.getClinicId());
+
+        if (!categories.contains(currCategory)){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Category does not belong to current clinic");
+        }
+
+        if (currCategory.isStatus() && status) {
+            throw new ApiException(HttpStatus.CONFLICT, "The category status is already ACTIVE");
+        }else if (!currCategory.isStatus() && !status){
+            throw new ApiException(HttpStatus.CONFLICT, "The category status is already INACTIVE");
+        }
+
+        currCategory.setStatus(status);
+        currCategory.setModifiedBy(owner.getUsername());
+        currCategory.setModifiedDate(LocalDateTime.now());
+        categoryRepository.save(currCategory);
+
+        return new CategoryViewResponse(currCategory.getId(), currCategory.getCategoryName(),
+                currCategory.isStatus(), dentalService.viewServicesByCategoryId(currCategory.getId()));
     }
 }

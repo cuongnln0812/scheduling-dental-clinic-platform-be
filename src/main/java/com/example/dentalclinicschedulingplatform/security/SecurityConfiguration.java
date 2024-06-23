@@ -50,6 +50,9 @@ public class SecurityConfiguration {
                                                         "/api/v1/staff/**",
                                                         "/api/v1/service",
                                                         "api/v1/category",
+                                                        "/api/v1/slot",
+                                                        "/api/v1/slot/available",
+                                                        "/api/v1/slot/available-by-date",
                                                         "/api/v1/auth/refresh-token",
                                                         "/api/v1/auth/logout",
                                                         "/api/v1/auth/login-google")
