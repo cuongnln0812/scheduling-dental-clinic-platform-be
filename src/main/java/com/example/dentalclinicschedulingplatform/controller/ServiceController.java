@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
+import com.example.dentalclinicschedulingplatform.payload.request.ServiceChangeStatusRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ServiceUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
@@ -89,6 +90,20 @@ public class ServiceController {
                 HttpStatus.OK,
                 "Updated service successfully",
                 deletedService);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Change status of service"
+    )
+    @PutMapping("/change-status")
+    public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> changeServiceStatus
+            (@RequestBody ServiceChangeStatusRequest request){
+        ServiceViewDetailsResponse currService = dentalService.changeServiceStatus(authenticationService.getUserInfo(), request.getServiceId(), request.getServiceStatus());
+        ApiResponse<ServiceViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Change service status successfully",
+                currService);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
