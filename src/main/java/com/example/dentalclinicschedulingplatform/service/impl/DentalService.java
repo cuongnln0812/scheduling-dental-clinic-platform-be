@@ -114,7 +114,7 @@ public class DentalService implements IDentalService {
         newService.setDuration(request.getDuration());
         newService.setServiceType(request.getServiceType());
         newService.setStatus(Status.ACTIVE);
-        newService.setCreatedBy(owner.getEmail());
+        newService.setCreatedBy(owner.getUsername());
         newService.setCreatedDate(LocalDateTime.now());
         newService.setCategory(currCategory);
         newService.setClinic(clinic);
@@ -178,7 +178,7 @@ public class DentalService implements IDentalService {
             updatedService.setDuration(request.getDuration());
             updatedService.setServiceType(request.getServiceType());
             updatedService.setStatus(Status.ACTIVE);
-            updatedService.setModifiedBy(staff.getEmail());
+            updatedService.setModifiedBy(staff.getUsername());
             updatedService.setModifiedDate(LocalDateTime.now());
             updatedService.setCategory(currCategory);
             updatedService.setStatus(request.getStatus());
@@ -221,7 +221,7 @@ public class DentalService implements IDentalService {
         updatedService.setDuration(request.getDuration());
         updatedService.setServiceType(request.getServiceType());
         updatedService.setStatus(request.getStatus());
-        updatedService.setModifiedBy(owner.getEmail());
+        updatedService.setModifiedBy(owner.getUsername());
         updatedService.setModifiedDate(LocalDateTime.now());
         updatedService.setCategory(currCategory);
 
@@ -258,11 +258,53 @@ public class DentalService implements IDentalService {
         }
 
         deletedService.setModifiedDate(LocalDateTime.now());
-        deletedService.setModifiedBy(owner.getEmail());
+        deletedService.setModifiedBy(owner.getUsername());
 
         serviceRepository.save(deletedService);
 
         return new ServiceViewDetailsResponse(deletedService.getId(), deletedService.getServiceName(), deletedService.getDescription(),
                 deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice(), deletedService.getDuration(), deletedService.getServiceType(), deletedService.getStatus());
+    }
+
+    @Override
+    public ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, Status status) {
+        if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        Service currService = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service does not exist"));
+
+        ClinicOwner owner = ownerRepository.findByUsernameOrEmail(userInformation.getUsername(), userInformation.getEmail())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner does not exist"));
+
+        Clinic currClinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic does not exist"));
+
+        List<Service> services = serviceRepository.findServicesByClinic_ClinicId(currClinic.getClinicId());
+
+        if (!services.contains(currService)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
+        }
+
+        Status.isValid(status);
+
+        if (!status.equals(Status.ACTIVE) && !status.equals(Status.INACTIVE)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Input only ACTIVE or INACTIVE for service status");
+        }
+
+        if (currService.getStatus().equals(Status.ACTIVE) && status.equals(Status.ACTIVE)) {
+            throw new ApiException(HttpStatus.CONFLICT, "The service status is already ACTIVE");
+        }else if (currService.getStatus().equals(Status.INACTIVE) && status.equals(Status.INACTIVE)){
+            throw new ApiException(HttpStatus.CONFLICT, "The service status is already INACTIVE");
+        }
+
+        currService.setStatus(status);
+        currService.setModifiedBy(owner.getUsername());
+        currService.setModifiedDate(LocalDateTime.now());
+        serviceRepository.save(currService);
+
+        return new ServiceViewDetailsResponse(currService.getId(), currService.getServiceName(), currService.getDescription(), currService.getUnitOfPrice(), currService.getMinimumPrice(), currService.getMaximumPrice(),
+                currService.getDuration(), currService.getServiceType(), currService.getStatus());
     }
 }
