@@ -51,7 +51,8 @@ public class SecurityConfiguration {
                                                         "/api/v1/service",
                                                         "api/v1/category",
                                                         "/api/v1/auth/refresh-token",
-                                                        "/api/v1/auth/logout")
+                                                        "/api/v1/auth/logout",
+                                                        "/api/v1/auth/login-google")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",

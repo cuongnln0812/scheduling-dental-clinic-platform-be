@@ -479,7 +479,7 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid Google token");
             }
         } catch (Exception e) {
-            throw new ApiException (HttpStatus.INTERNAL_SERVER_ERROR, "Google login failed");
+            throw new ApiException (HttpStatus.INTERNAL_SERVER_ERROR, "Login google failed");
         }
     }
 
