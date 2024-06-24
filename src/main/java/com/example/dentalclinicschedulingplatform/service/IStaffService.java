@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.StaffUpdateReq
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public interface IStaffService {
     List<StaffSummaryResponse> viewAllStaffByClinicBranch(UserInformationRes userInformationRes, Long branchId, int page, int size);
     List<StaffSummaryResponse> viewAll(int page, int size);
     StaffResponse approveStaff(Long id, boolean isApproved);
+    Page<StaffSummaryResponse> getStaffPendingList(int page, int size);
 
 
 

@@ -1,9 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service;
 
-import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
-import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.entity.Customer;
-import com.example.dentalclinicschedulingplatform.entity.Dentist;
+import com.example.dentalclinicschedulingplatform.entity.*;
 
 public interface IMailService {
     void sendCustomerRegistrationMail(Customer customer);
@@ -13,4 +10,6 @@ public interface IMailService {
     void sendStaffRequestApprovalMail(ClinicStaff staff, String branchName, String password);
     void sendStaffRequestRejectionMail(ClinicStaff staff, String branchName);
     void sendDentistRequestApprovalMail(Dentist dentist, String password);
+    void sendBranchRequestApprovalMail(ClinicOwner owner);
+    void sendBranchRequestRejectionMail(ClinicOwner owner);
 }

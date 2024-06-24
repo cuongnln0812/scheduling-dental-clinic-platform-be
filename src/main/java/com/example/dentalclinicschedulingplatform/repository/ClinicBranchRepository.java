@@ -1,7 +1,11 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
+import com.example.dentalclinicschedulingplatform.entity.Clinic;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.Customer;
+import com.example.dentalclinicschedulingplatform.entity.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,13 +18,16 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
     @Override
     Optional<ClinicBranch> findById(Long id);
 
+    List<ClinicBranch> findAllByClinic_ClinicId(Long id);
+
     @Query(value = "SELECT cb.* FROM public.clinic_branch cb " +
                    "WHERE cb.clinic_id = " +
                    "(SELECT c.clinic_id FROM public.clinic c WHERE c.owner_id = :ownerId) " +
                    "AND cb.branch_id = :branchId", nativeQuery = true)
     Optional<ClinicBranch> findByBranchIdAndOwnerId(@Param("branchId") Long branchId,
                                                     @Param("ownerId") Long ownerId);
+    ClinicBranch findByPhone(String phone);
 
-
+    Page<ClinicBranch> findAllByStatusAndIsMain(Status status, boolean isMain, Pageable pageable);
 
 }
