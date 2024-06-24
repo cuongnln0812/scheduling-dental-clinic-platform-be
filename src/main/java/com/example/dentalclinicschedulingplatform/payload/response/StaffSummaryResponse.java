@@ -9,10 +9,10 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class StaffSummaryResponse {
     private Long id;
     private String fullName;

@@ -1,7 +1,6 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
-import com.example.dentalclinicschedulingplatform.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

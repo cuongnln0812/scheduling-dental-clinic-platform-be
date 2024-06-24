@@ -36,6 +36,7 @@ public class ClinicBranch {
     private Float totalRating;
     @Column(name = "is_main")
     private boolean isMain;
+//    @Enumerated(EnumType.STRING)
     private Status status;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)

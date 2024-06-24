@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.BranchSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -56,7 +57,6 @@ public class StaffService implements IStaffService {
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Staff not found");
                     });
-            //return modelMapper.map(clinicStaff, StaffResponse.class);
             return new StaffResponse(clinicStaff);
         } catch (Exception e) {
             throw e;
@@ -67,7 +67,6 @@ public class StaffService implements IStaffService {
     @Override
     public StaffResponse createStaff(UserInformationRes userInformationRes, StaffCreateRequest request) {
         try {
-            //log.info("role: {}", userInformationRes.getRole());
             if(!userInformationRes.getRole().equals(UserType.OWNER.toString())){
                 throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
             }
@@ -85,22 +84,14 @@ public class StaffService implements IStaffService {
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found");
                     });
-
-//            log.info("id branch {}", request.getClinicBranchId().toString());
-//            log.info("id owner {}", clinicOwner.get().getId());
             if(!iClinicBranchRepository.findByBranchIdAndOwnerId(request.getClinicBranchId(), clinicOwner.get().getId()).isPresent())
             {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
             }
-//            if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), request.getEmail())) {
-//                throw new ApiException(HttpStatus.BAD_REQUEST, "Email or user name is existed");
-//            }
             else {
                 ClinicStaff clinicStaff = new ClinicStaff();
                 clinicStaff.setFullName(request.getFullName());
                 clinicStaff.setEmail(request.getEmail());
-                //clinicStaff.setUsername("staff" + clinicStaff.getId());
-                //clinicStaff.setPassword(passwordEncoder.encode(request.getPassword()));
                 clinicStaff.setPhone(request.getPhone());
                 clinicStaff.setDob(request.getDob());
                 clinicStaff.setAddress(request.getAddress());
@@ -110,7 +101,6 @@ public class StaffService implements IStaffService {
                 clinicStaff.setStatus(Status.PENDING);
 
                 iStaffRepository.save(clinicStaff);
-
                 return new StaffResponse(clinicStaff);
             }
         }  catch (Exception e) {
@@ -123,16 +113,13 @@ public class StaffService implements IStaffService {
     public StaffResponse updateStaff(UserInformationRes userInformationRes, StaffUpdateRequest request) {
         try {
             String role = userInformationRes.getRole();
-            //log.info("role {}", role.toString());
             if(!role.equals(UserType.OWNER.toString()) && !role.equals(UserType.STAFF.toString())){
                 throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
             }
-
             Optional<ClinicOwner> clinicOwner = Optional.ofNullable(iOwnerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic owner not found");
                     }));
-
             ClinicStaff clinicStaff = iStaffRepository.findById(request.getId())
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not found");
@@ -154,12 +141,6 @@ public class StaffService implements IStaffService {
             if(StringUtils.isNotBlank(request.getFullName())){
                 clinicStaff.setFullName(request.getFullName());
             }
-//            if(StringUtils.isNotBlank(request.getUsername())) {
-//                if (authenticateService.isUsernameOrEmailExisted(request.getUsername(), clinicStaff.getEmail())) {
-//                    throw new ApiException(HttpStatus.BAD_REQUEST, "Username is existed");
-//                }
-//                clinicStaff.setUsername(request.getUsername());
-//            }
             if(StringUtils.isNotBlank(request.getPassword())) {
                 clinicStaff.setPassword(passwordEncoder.encode(request.getPassword()));
             }
@@ -331,5 +312,16 @@ public class StaffService implements IStaffService {
             iStaffRepository.delete(clinicStaff);
             return new StaffResponse(clinicStaffDenied);
         }
+    }
+
+    @Override
+    public Page<StaffSummaryResponse> getStaffPendingList(int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        Page<ClinicStaff> clinicStaffs;
+        clinicStaffs = iStaffRepository.findAllStaffByStatus(Status.PENDING, pageRequest);
+        return clinicStaffs.map(staff ->
+                new StaffSummaryResponse(staff.getId(),
+                staff.getFullName(), staff.getPhone(), staff.getGender(),
+                            staff.getClinicBranch().getBranchName(), staff.getStatus()));
     }
 }

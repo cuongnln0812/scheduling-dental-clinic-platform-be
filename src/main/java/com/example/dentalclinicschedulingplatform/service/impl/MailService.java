@@ -165,5 +165,43 @@ public class MailService implements IMailService {
         mailSender.send(message);
     }
 
+    @Async
+    @Override
+    public void sendBranchRequestApprovalMail(ClinicOwner owner) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(owner.getEmail());
+        // Set a meaningful message
+        message.setSubject("[F-Dental] - Đơn đăng kí chi nhánh mới của bạn đã được XÁC NHẬN");
+        String body = "Kính gửi " + owner.getFullName() + ",\n\n" +
+                      "Chúng tôi rất vui mừng thông báo rằng đơn đăng kí chi nhánh mới của bạn tại F-Dental đã được XÁC NHẬN.\n\n" +
+                      "Vui lòng cập nhật đầy đủ thông tin của chi nhánh mới và chi tiết bảo hiểm nha khoa của chi nhánh mới. Điều này sẽ giúp chúng tôi hoàn tất quá trình đưa chi nhánh của bạn lên nền tảng.\n\n" +
+                      "Chúng tôi luôn sẵn sàng hỗ trợ:\n\n" +
+                      "Nếu bạn có bất kỳ câu hỏi nào hoặc cần trợ giúp, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
+                      "Cảm ơn bạn đã chọn F-Dental và chúng tôi rất mong được hợp tác cùng bạn!\n\n" +
+                      "Trân trọng,\n\n" +
+                      "Đội ngũ F-Dental";
+        message.setText(body);
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
 
+    @Async
+    @Override
+    public void sendBranchRequestRejectionMail(ClinicOwner owner) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(owner.getEmail());
+        // Set a meaningful message
+        message.setSubject("[F-Dental] - Đơn đăng kí chi nhánh mới của bạn đã bị TỪ CHỐI");
+        String body = "Kính gửi " + owner.getFullName() + ",\n\n" +
+                      "Chúng tôi rất tiếc phải thông báo rằng đơn đăng kí chi nhánh mới của bạn tại F-Dental đã bị từ chối sau khi xem xét kỹ lưỡng.\n\n" +
+                      "Chúng tôi hiểu rằng đây không phải là tin tức mà bạn mong đợi và xin chân thành xin lỗi vì sự bất tiện này. Đơn đăng kí của bạn không đáp ứng được một số tiêu chí mà chúng tôi đặt ra cho đối tác của mình.\n\n" +
+                      "Nếu bạn có bất kỳ câu hỏi nào về lý do từ chối hoặc cần thêm thông tin, xin vui lòng liên hệ với đội ngũ dịch vụ khách hàng của chúng tôi qua email hoặc điện thoại. Chúng tôi sẵn sàng giải đáp mọi thắc mắc và hỗ trợ bạn trong quá trình này.\n\n" +
+                      "Trân trọng,\n\n" +
+                      "Đội ngũ F-Dental";
+        message.setText(body);
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
 }

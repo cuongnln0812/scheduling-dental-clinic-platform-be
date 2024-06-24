@@ -3,6 +3,7 @@ package com.example.dentalclinicschedulingplatform.controller;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.BranchSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
 import com.example.dentalclinicschedulingplatform.service.IStaffService;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,11 +46,11 @@ public class StaffController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>> viewStaff(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
-        StaffResponse newStaff = iStaffService.viewStaff(id);
+        StaffResponse staffResponse = iStaffService.viewStaff(id);
         ApiResponse<StaffResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "View staff successfully",
-                newStaff);
+                staffResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @Operation(
@@ -153,6 +155,21 @@ public class StaffController {
                 HttpStatus.OK,
                 "Approve staff successfully!",
                 iStaffService.approveStaff(id, isApproved));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get pending staff list"
+    )
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse<Page<StaffSummaryResponse>>> getPendingStaffList(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
+        ApiResponse<Page<StaffSummaryResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get pending staff list successfully!",
+                iStaffService.getStaffPendingList(page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
