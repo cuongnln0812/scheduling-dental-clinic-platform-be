@@ -40,7 +40,7 @@ public class Appointment {
     private LocalDate appointmentDate;
     @Column(name = "service_duration")
     private int duration;
-    private String status;
+    private Status status;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;
