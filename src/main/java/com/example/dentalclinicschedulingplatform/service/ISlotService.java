@@ -13,4 +13,6 @@ public interface ISlotService {
     List<WorkingHoursDetailsResponse> viewAvailableSlotsByClinicBranch(LocalDate startDate, LocalDate endDate, Long clinicBranchId);
 
     WorkingHoursDetailsResponse viewAvailableSlotsByDateByClinicBranch(LocalDate date, Long clinicBranchId);
+
+    void generateSlotForUpdatingWorkingHoursDentalClinic(Long workingHourId);
 }

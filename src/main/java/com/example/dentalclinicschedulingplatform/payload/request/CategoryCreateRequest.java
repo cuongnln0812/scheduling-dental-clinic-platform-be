@@ -14,4 +14,7 @@ import lombok.Setter;
 public class CategoryCreateRequest {
     @NotBlank(message = "Category name can not be null")
     public String categoryName;
+
+    @NotBlank(message = "Category image can not be null")
+    private String categoryImage;
 }

@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -104,6 +105,20 @@ public class ServiceController {
                 HttpStatus.OK,
                 "Change service status successfully",
                 currService);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "View details service by serviceId"
+    )
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> viewDetailsService(@PathVariable("serviceId") Long serviceId){
+        ServiceViewDetailsResponse category = dentalService.viewDetailsService(authenticationService.getUserInfo(), serviceId);
+        ApiResponse<ServiceViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "View details service successfully",
+                category);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

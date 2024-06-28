@@ -41,36 +41,7 @@ public class SlotService implements ISlotService {
         WorkingHours workingHours = workingHourRepository.findById(workingHourId)
                 .orElseThrow( () -> new ApiException(HttpStatus.BAD_REQUEST, "Working hour does not exist"));
 
-        LocalTime slotStartTime = workingHours.getStartTime();
-
-        int slotNo = 1;
-
-        while (slotStartTime.isBefore(workingHours.getEndTime())) {
-
-            LocalTime slotEndTime = slotStartTime.plusHours(1);
-
-            if (slotEndTime.isAfter(workingHours.getEndTime())){
-                break;
-            }
-
-            if (slotStartTime.equals(LocalTime.of(12, 0))){
-                slotStartTime = LocalTime.of(12, 0).plusHours(1);
-                continue;
-            }
-
-            Slot newSlot = new Slot();
-            newSlot.setSlotNo(slotNo);
-            newSlot.setStartTime(slotStartTime);
-            newSlot.setEndTime(slotEndTime);
-            newSlot.setStatus(true);
-            newSlot.setCreatedDate(LocalDateTime.now());
-            newSlot.setClinic(workingHours.getClinic());
-            newSlot.setWorkingHours(workingHours);
-
-            slotRepository.save(newSlot);
-            slotNo++;
-            slotStartTime = slotEndTime;
-        }
+        generateSlots(workingHours);
     }
 
     @Override
@@ -171,6 +142,22 @@ public class SlotService implements ISlotService {
         return new WorkingHoursDetailsResponse(date.getDayOfWeek().toString(), slotDetailResponses);
     }
 
+    @Override
+    public void generateSlotForUpdatingWorkingHoursDentalClinic(Long workingHourId) {
+        WorkingHours workingHours = workingHourRepository.findById(workingHourId)
+                .orElseThrow( () -> new ApiException(HttpStatus.BAD_REQUEST, "Working hour does not exist"));
+
+        List<Slot> slots = slotRepository.findByClinicAndDay(workingHours.getDay().name(), workingHours.getClinic().getClinicId());
+
+        for (Slot slot: slots) {
+            slot.setStatus(false);
+            slot.setModifiedDate(LocalDateTime.now());
+            slotRepository.save(slot);
+        }
+
+        generateSlots(workingHours);
+    }
+
     public List<String> getDaysBetween(LocalDate startDate, LocalDate endDate) {
         LocalDate start = startDate;
         List<String> days = new ArrayList<>();
@@ -181,5 +168,38 @@ public class SlotService implements ISlotService {
         }
 
         return days;
+    }
+
+    public void generateSlots(WorkingHours workingHours) {
+        LocalTime slotStartTime = workingHours.getStartTime();
+
+        int slotNo = 1;
+
+        while (slotStartTime.isBefore(workingHours.getEndTime())) {
+
+            LocalTime slotEndTime = slotStartTime.plusHours(1);
+
+            if (slotEndTime.isAfter(workingHours.getEndTime())){
+                break;
+            }
+
+            if (slotStartTime.equals(LocalTime.of(12, 0))){
+                slotStartTime = LocalTime.of(12, 0).plusHours(1);
+                continue;
+            }
+
+            Slot newSlot = new Slot();
+            newSlot.setSlotNo(slotNo);
+            newSlot.setStartTime(slotStartTime);
+            newSlot.setEndTime(slotEndTime);
+            newSlot.setStatus(true);
+            newSlot.setCreatedDate(LocalDateTime.now());
+            newSlot.setClinic(workingHours.getClinic());
+            newSlot.setWorkingHours(workingHours);
+
+            slotRepository.save(newSlot);
+            slotNo++;
+            slotStartTime = slotEndTime;
+        }
     }
 }
