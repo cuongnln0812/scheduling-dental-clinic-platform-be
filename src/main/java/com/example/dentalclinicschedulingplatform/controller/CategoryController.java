@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -85,7 +86,7 @@ public class CategoryController {
         CategoryViewResponse deleteCategory = categoryService.deleteCategory(authenticationService.getUserInfo(), categoryId);
         ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Updated category successfully",
+                "Deleted category successfully",
                 deleteCategory);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -102,6 +103,20 @@ public class CategoryController {
                 HttpStatus.OK,
                 "Change status category successfully",
                 deleteCategory);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "View details category by categoryId"
+    )
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ApiResponse<CategoryViewResponse>> viewDetailsCategory(@PathVariable("categoryId") Long categoryId){
+        CategoryViewResponse category = categoryService.viewDetailsCategory(authenticationService.getUserInfo(), categoryId);
+        ApiResponse<CategoryViewResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "View details category successfully",
+                category);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

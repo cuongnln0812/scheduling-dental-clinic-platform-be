@@ -17,4 +17,5 @@ public interface ICategoryService {
     CategoryViewResponse updateCategory(UserInformationRes userInformation, CategoryUpdateRequest request);
     CategoryViewResponse deleteCategory(UserInformationRes userInformation, Long categoryId);
     CategoryViewResponse changeCategoryStatus(UserInformationRes userInformation, Long categoryId, boolean status);
+    CategoryViewResponse viewDetailsCategory(UserInformationRes userInformation, long categoryId);
 }
