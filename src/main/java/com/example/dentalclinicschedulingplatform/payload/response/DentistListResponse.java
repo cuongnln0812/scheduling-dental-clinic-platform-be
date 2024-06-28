@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +21,5 @@ public class DentistListResponse {
     private LocalDate dob;
     private String gender;
     private String branchName;
-    private Status status;
+    private ClinicStatus status;
 }

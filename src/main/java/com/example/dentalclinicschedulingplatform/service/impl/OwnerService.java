@@ -1,7 +1,7 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.OwnerRegisterRequest;
@@ -31,7 +31,7 @@ public class OwnerService implements IOwnerService {
         owner.setFullName(request.getFullName());
         owner.setEmail(request.getEmail());
         owner.setPhone(request.getPhone());
-        owner.setStatus(Status.PENDING);
+        owner.setStatus(ClinicStatus.PENDING);
         return ownerRepository.save(owner);
     }
 
@@ -39,7 +39,7 @@ public class OwnerService implements IOwnerService {
     public ClinicOwner approveOwnerAccount(Long ownerId, String randomPassword) {
         ClinicOwner owner = ownerRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner", "id", ownerId));
-        owner.setStatus(Status.ACTIVE);
+        owner.setStatus(ClinicStatus.ACTIVE);
         owner.setUsername("owner" + owner.getId());
         owner.setPassword(passwordEncoder.encode(randomPassword));
         return ownerRepository.save(owner);

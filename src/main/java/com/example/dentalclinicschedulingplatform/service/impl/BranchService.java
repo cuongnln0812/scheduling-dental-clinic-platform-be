@@ -11,7 +11,6 @@ import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IBranchService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,13 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +48,7 @@ public class BranchService implements IBranchService {
         branch.setPhone(clinic.getPhone());
         branch.setMain(true);
         branch.setClinic(clinic);
-        branch.setStatus(Status.APPROVED);
+        branch.setStatus(ClinicStatus.APPROVED);
         return branchRepository.save(branch);
     }
 
@@ -81,7 +76,7 @@ public class BranchService implements IBranchService {
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner does not exist"));
             Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
-//            if(!clinic.getStatus().equals(Status.ACTIVE) || !clinic.getStatus().equals(Status.APPROVED))
+//            if(!clinic.getStatus().equals(ClinicStatus.ACTIVE) || !clinic.getStatus().equals(ClinicStatus.APPROVED))
 //                throw new ApiException(HttpStatus.CONFLICT, "Clinic is not active or approved");
 
             ClinicBranch clinicBranch = branchRepository.findByPhone(request.getPhone());
@@ -89,7 +84,7 @@ public class BranchService implements IBranchService {
 
             ClinicBranch branch = new ClinicBranch();
             modelMapper.map(request, branch);
-            branch.setStatus(Status.PENDING);
+            branch.setStatus(ClinicStatus.PENDING);
             branch.setClinic(clinic);
             branch.setMain(false);
 
@@ -112,15 +107,15 @@ public class BranchService implements IBranchService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
         ClinicOwner owner = ownerRepository.findById(clinic.getClinicOwner().getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));;
-        if (!clinicBranch.getStatus().equals(Status.PENDING))
+        if (!clinicBranch.getStatus().equals(ClinicStatus.PENDING))
             throw new ApiException(HttpStatus.CONFLICT, "Branch status must be pending to be approved");
         if(isApproved) {
-            clinicBranch.setStatus(Status.ACTIVE);
+            clinicBranch.setStatus(ClinicStatus.ACTIVE);
             branchRepository.save(clinicBranch);
             mailService.sendBranchRequestApprovalMail(owner);
             return modelMapper.map(clinicBranch, BranchDetailResponse.class);
         }else {
-            clinicBranch.setStatus(Status.DENIED);
+            clinicBranch.setStatus(ClinicStatus.DENIED);
             ClinicBranch branchDenied = clinicBranch;
             branchRepository.delete(clinicBranch);
             mailService.sendBranchRequestRejectionMail(owner);
@@ -132,7 +127,7 @@ public class BranchService implements IBranchService {
     public Page<BranchSummaryResponse> getBranchPendingList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<ClinicBranch> clinicBranches;
-        clinicBranches = branchRepository.findAllByStatusAndIsMain(Status.PENDING,false, pageRequest);
+        clinicBranches = branchRepository.findAllByStatusAndIsMain(ClinicStatus.PENDING,false, pageRequest);
         //log.info("list:{}", clinicBranches.toList());
         return clinicBranches.map(branch ->
                 new BranchSummaryResponse(branch.getBranchId(),
@@ -145,7 +140,7 @@ public class BranchService implements IBranchService {
         ClinicBranch clinicBranch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
         if(clinicBranch.isMain()) throw new ApiException(HttpStatus.CONFLICT, "This is main clinic not branch");
-        if(!clinicBranch.getStatus().equals(Status.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not pending");
+        if(!clinicBranch.getStatus().equals(ClinicStatus.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not pending");
         return modelMapper.map(clinicBranch, BranchSummaryResponse.class);
     }
 
@@ -164,7 +159,7 @@ public class BranchService implements IBranchService {
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
             ClinicBranch clinicBranch = branchRepository.findById(request.getId())
                                                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
-            if(!clinicBranch.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not active");
+            if(!clinicBranch.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not active");
 
             List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
             boolean branchExists = false;
@@ -211,7 +206,7 @@ public class BranchService implements IBranchService {
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
             ClinicBranch clinicBranch = branchRepository.findById(branchId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
-            if(!clinicBranch.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not active");
+            if(!clinicBranch.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not active");
 
             List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
             boolean branchExists = false;
@@ -225,7 +220,7 @@ public class BranchService implements IBranchService {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to owner");
             }
 
-            clinicBranch.setStatus(Status.INACTIVE);
+            clinicBranch.setStatus(ClinicStatus.INACTIVE);
             clinicBranch.setModifiedDate(LocalDateTime.now());
             branchRepository.save(clinicBranch);
             return modelMapper.map(clinicBranch, BranchSummaryResponse.class);

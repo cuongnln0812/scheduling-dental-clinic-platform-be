@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +19,5 @@ public class ServiceViewDetailsResponse {
     private Float maximumPrice;
     private int duration;
     private String serviceType;
-    private Status status;
+    private ClinicStatus status;
 }

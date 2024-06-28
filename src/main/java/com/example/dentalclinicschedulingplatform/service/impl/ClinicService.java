@@ -41,7 +41,7 @@ public class ClinicService implements IClinicService {
         clinic.setClinicRegistration(request.getClinicRegistration());
         clinic.setWebsiteUrl(clinic.getWebsiteUrl());
         clinic.setClinicImage(clinic.getClinicImage());
-        clinic.setStatus(Status.PENDING);
+        clinic.setStatus(ClinicStatus.PENDING);
         ClinicOwner tmpOwner = ownerService.registerOwnerFromRequest(request.getOwnerInformation());
         clinic.setClinicOwner(tmpOwner);
         Clinic tmpClinic = clinicRepository.save(clinic);
@@ -54,7 +54,7 @@ public class ClinicService implements IClinicService {
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
         if(isApproved) {
-            clinic.setStatus(Status.APPROVED);
+            clinic.setStatus(ClinicStatus.APPROVED);
             Clinic savedClinic = clinicRepository.save(clinic);
             ClinicBranch approvedBranch = branchService.createMainBranch(savedClinic);
             if (savedClinic.getClinicOwner() == null)
@@ -70,7 +70,7 @@ public class ClinicService implements IClinicService {
             clinicResponse.setBranchDetail(branchResponse);
             return clinicResponse;
         }else {
-            clinic.setStatus(Status.DENIED);
+            clinic.setStatus(ClinicStatus.DENIED);
             mailService.sendClinicRequestRejectionMail(clinic.getClinicOwner().getFullName(), clinic.getClinicOwner().getEmail());
             clinicRepository.delete(clinic);
             return modelMapper.map(clinic, ApprovedClinicResponse.class);
@@ -81,7 +81,7 @@ public class ClinicService implements IClinicService {
     public Page<PendingClinicListResponse> getClinicPendingList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Clinic> clinics;
-        clinics = clinicRepository.findAllByStatus(Status.PENDING, pageRequest);
+        clinics = clinicRepository.findAllByStatus(ClinicStatus.PENDING, pageRequest);
         return clinics.map(clinic -> new PendingClinicListResponse(clinic.getClinicId(),
                 clinic.getClinicName(), clinic.getClinicOwner().getFullName()));
     }

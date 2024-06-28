@@ -1,8 +1,8 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import com.example.dentalclinicschedulingplatform.entity.Dentist;
-import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateRequest;
@@ -22,8 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +54,7 @@ public class DentistService implements IDentistService {
     public Page<DentistListResponse> getPendingDentistList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Dentist> dentistList;
-        dentistList = dentistRepository.findAllByStatus(Status.PENDING, pageRequest);
+        dentistList = dentistRepository.findAllByStatus(ClinicStatus.PENDING, pageRequest);
         return dentistList.map(dentist -> modelMapper.map(dentist,DentistListResponse.class));
     }
 
@@ -65,10 +63,10 @@ public class DentistService implements IDentistService {
     public DentistDetailResponse approveDentistAccount(Long id, boolean isApproved) {
         Dentist dentist = dentistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));
-        if (!dentist.getStatus().equals(Status.PENDING))
+        if (!dentist.getStatus().equals(ClinicStatus.PENDING))
             throw new ApiException(HttpStatus.CONFLICT, "Dentist status must be pending to be approved");
         if(isApproved) {
-            dentist.setStatus(Status.ACTIVE);
+            dentist.setStatus(ClinicStatus.ACTIVE);
             String randomPassword = AutomaticGeneratedPassword.generateRandomPassword();
             dentist.setUsername("dentist" + dentist.getId());
             dentist.setPassword(passwordEncoder.encode(randomPassword));
@@ -76,7 +74,7 @@ public class DentistService implements IDentistService {
             mailService.sendDentistRequestApprovalMail(dentist, randomPassword);
             return modelMapper.map(dentist, DentistDetailResponse.class);
         }else {
-            dentist.setStatus(Status.DENIED);
+            dentist.setStatus(ClinicStatus.DENIED);
             dentistRepository.delete(dentist);
             return modelMapper.map(dentist, DentistDetailResponse.class);
         }
@@ -101,7 +99,7 @@ public class DentistService implements IDentistService {
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic Branch", "id", request.getBranchId()));
         Dentist dentist = new Dentist();
         modelMapper.map(request, dentist);
-        dentist.setStatus(Status.PENDING);
+        dentist.setStatus(ClinicStatus.PENDING);
         dentist.setClinicBranch(branch);
         dentist = dentistRepository.save(dentist);
         return modelMapper.map(dentist, DentistDetailResponse.class);
@@ -118,9 +116,9 @@ public class DentistService implements IDentistService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
         if(request.getDob().isAfter(LocalDate.now()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
-        Status.isValid(request.getStatus());
-        if(existingDentist.getStatus().equals(Status.PENDING) || existingDentist.getStatus().equals(Status.DENIED))
-            throw new ApiException(HttpStatus.CONFLICT, "Status cannot be changed");
+        ClinicStatus.isValid(request.getStatus());
+        if(existingDentist.getStatus().equals(ClinicStatus.PENDING) || existingDentist.getStatus().equals(ClinicStatus.DENIED))
+            throw new ApiException(HttpStatus.CONFLICT, "ClinicStatus cannot be changed");
         ClinicBranch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic Branch", "id", request.getBranchId()));
         modelMapper.map(request, existingDentist);
@@ -134,8 +132,8 @@ public class DentistService implements IDentistService {
     public DentistDetailResponse removeDentist(Long id) {
         Dentist existingDentist = dentistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));
-        if(existingDentist.getStatus().equals(Status.ACTIVE)) {
-            existingDentist.setStatus(Status.INACTIVE);
+        if(existingDentist.getStatus().equals(ClinicStatus.ACTIVE)) {
+            existingDentist.setStatus(ClinicStatus.INACTIVE);
         }else throw new ApiException(HttpStatus.CONFLICT, "Account is not able to remove because it may in INACTIVE or PENDING status");
         Dentist updatedDentist = dentistRepository.save(existingDentist);
         return modelMapper.map(updatedDentist, DentistDetailResponse.class);

@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,5 +16,5 @@ public class ServiceChangeStatusRequest {
     public Long serviceId;
 
     @NotNull(message = "Category status can not be null")
-    public Status serviceStatus;
+    public ClinicStatus serviceStatus;
 }

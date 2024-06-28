@@ -44,7 +44,7 @@ public class DentalService implements IDentalService {
         List<Service> serviceList = serviceRepository.findServicesByCategoryId(categoryId);
         List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = new ArrayList<>();
         for (Service serviceItem : serviceList) {
-            if (serviceItem.getStatus().equals(Status.ACTIVE)){
+            if (serviceItem.getStatus().equals(ClinicStatus.ACTIVE)){
                 serviceViewDetailsResponseList.add(new ServiceViewDetailsResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.getDescription(),
                         serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.getStatus()));
             }
@@ -113,7 +113,7 @@ public class DentalService implements IDentalService {
         newService.setMaximumPrice(request.getMaximumPrice());
         newService.setDuration(request.getDuration());
         newService.setServiceType(request.getServiceType());
-        newService.setStatus(Status.ACTIVE);
+        newService.setStatus(ClinicStatus.ACTIVE);
         newService.setCreatedBy(owner.getUsername());
         newService.setCreatedDate(LocalDateTime.now());
         newService.setCategory(currCategory);
@@ -130,9 +130,9 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
         }
 
-        if (Arrays.stream(Status.values())
+        if (Arrays.stream(ClinicStatus.values())
                 .noneMatch(e -> e.equals(request.getStatus()))) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Only Status (ACTIVE, INACTIVE, PENDING)");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only ClinicStatus (ACTIVE, INACTIVE, PENDING)");
         }
 
         ClinicOwner owner = ownerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
@@ -177,7 +177,7 @@ public class DentalService implements IDentalService {
             updatedService.setMaximumPrice(request.getMaximumPrice());
             updatedService.setDuration(request.getDuration());
             updatedService.setServiceType(request.getServiceType());
-            updatedService.setStatus(Status.ACTIVE);
+            updatedService.setStatus(ClinicStatus.ACTIVE);
             updatedService.setModifiedBy(staff.getUsername());
             updatedService.setModifiedDate(LocalDateTime.now());
             updatedService.setCategory(currCategory);
@@ -251,8 +251,8 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
         }
 
-        if (deletedService.getStatus().equals(Status.ACTIVE)) {
-            deletedService.setStatus(Status.INACTIVE);
+        if (deletedService.getStatus().equals(ClinicStatus.ACTIVE)) {
+            deletedService.setStatus(ClinicStatus.INACTIVE);
         }else {
             throw new ApiException(HttpStatus.CONFLICT, "The service is already been deactivated or is pending");
         }
@@ -267,7 +267,7 @@ public class DentalService implements IDentalService {
     }
 
     @Override
-    public ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, Status status) {
+    public ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, ClinicStatus status) {
         if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
         }
@@ -287,15 +287,15 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
         }
 
-        Status.isValid(status);
+        ClinicStatus.isValid(status);
 
-        if (!status.equals(Status.ACTIVE) && !status.equals(Status.INACTIVE)) {
+        if (!status.equals(ClinicStatus.ACTIVE) && !status.equals(ClinicStatus.INACTIVE)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Input only ACTIVE or INACTIVE for service status");
         }
 
-        if (currService.getStatus().equals(Status.ACTIVE) && status.equals(Status.ACTIVE)) {
+        if (currService.getStatus().equals(ClinicStatus.ACTIVE) && status.equals(ClinicStatus.ACTIVE)) {
             throw new ApiException(HttpStatus.CONFLICT, "The service status is already ACTIVE");
-        }else if (currService.getStatus().equals(Status.INACTIVE) && status.equals(Status.INACTIVE)){
+        }else if (currService.getStatus().equals(ClinicStatus.INACTIVE) && status.equals(ClinicStatus.INACTIVE)){
             throw new ApiException(HttpStatus.CONFLICT, "The service status is already INACTIVE");
         }
 

@@ -1,9 +1,7 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
-import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
-import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,7 +36,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
                    "JOIN clinic_owner co ON c.owner_id = co.owner_id " +
                    "WHERE co.owner_id = :ownerId", nativeQuery = true)
     Page<ClinicStaff> findAllStaffByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
-    Page<ClinicStaff> findAllStaffByStatus(Status status, Pageable pageable);
+    Page<ClinicStaff> findAllStaffByStatus(ClinicStatus status, Pageable pageable);
 
     Page<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId, Pageable pageable);
     Page<ClinicStaff> findAll(Pageable pageable);

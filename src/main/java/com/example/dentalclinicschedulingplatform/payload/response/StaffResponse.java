@@ -1,19 +1,15 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Blog;
-import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Setter
 @Getter
@@ -31,7 +27,7 @@ public class StaffResponse {
     private LocalDate dob;
     private String gender;
     private String avatar;
-    private Status status;
+    private ClinicStatus status;
     private String clinicBranchName;
 
 

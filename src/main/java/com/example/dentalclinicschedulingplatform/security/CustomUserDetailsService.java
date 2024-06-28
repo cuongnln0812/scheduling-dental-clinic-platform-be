@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,21 +46,21 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<Dentist> optionalDentist = dentistRepository.findByUsername(user);
         if (optionalDentist.isPresent()) {
             Dentist dentist = optionalDentist.get();
-            if(!dentist.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
+            if(!dentist.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(dentist.getUsername(), dentist.getPassword(), getAuthorities(UserType.DENTIST));
         }
 
         Optional<ClinicStaff> optionalStaff = staffRepository.findByUsername(user);
         if (optionalStaff.isPresent()) {
             ClinicStaff staff = optionalStaff.get();
-            if(!staff.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
+            if(!staff.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(staff.getUsername(), staff.getPassword(), getAuthorities(UserType.STAFF));
         }
 
         Optional<ClinicOwner> optionalOwner = ownerRepository.findByUsername(user);
         if (optionalOwner.isPresent()) {
             ClinicOwner owner = optionalOwner.get();
-            if(!owner.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
+            if(!owner.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.FORBIDDEN, "Account is not available!");
             return new User(owner.getUsername(), owner.getPassword(), getAuthorities(UserType.OWNER));
         }
         throw new UsernameNotFoundException("Account is not found!");

@@ -1,13 +1,11 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -19,7 +17,7 @@ public class StaffSummaryResponse {
     private String phone;
     private String gender;
     private String clinicBranchName;
-    private Status status;
+    private ClinicStatus status;
 
 
     public StaffSummaryResponse(ClinicStaff clinicStaff) {

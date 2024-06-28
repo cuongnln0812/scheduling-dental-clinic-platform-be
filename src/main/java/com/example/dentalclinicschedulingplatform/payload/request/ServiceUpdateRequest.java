@@ -1,8 +1,7 @@
 package com.example.dentalclinicschedulingplatform.payload.request;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import jakarta.persistence.Column;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -49,6 +48,6 @@ public class ServiceUpdateRequest {
     @NotNull(message = "Category Id cannot be null")
     private Long categoryId;
 
-    @NotNull(message = "Status cannot be null")
-    private Status status;
+    @NotNull(message = "ClinicStatus cannot be null")
+    private ClinicStatus status;
 }

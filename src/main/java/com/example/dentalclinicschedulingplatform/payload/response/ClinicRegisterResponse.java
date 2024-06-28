@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +19,6 @@ public class ClinicRegisterResponse {
     private String clinicRegistration;
     private String websiteUrl;
     private String clinicImage;
-    private Status clinicStatus;
+    private ClinicStatus clinicStatus;
     private OwnerRegisterResponse ownerDetail;
 }
