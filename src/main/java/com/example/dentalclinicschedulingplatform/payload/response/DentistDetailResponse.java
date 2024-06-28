@@ -1,12 +1,8 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Length;
 
 import java.time.LocalDate;
 
@@ -26,5 +22,5 @@ public class DentistDetailResponse {
     private String experience;
     private String avatar;
     private String branchName;
-    private Status status;
+    private ClinicStatus status;
 }

@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +20,7 @@ public class ApprovedClinicResponse {
     private String logo;
     private String clinicRegistration;
     private String clinicImage;
-    private Status status;
+    private ClinicStatus status;
     private ApprovedBranchResponse branchDetail;
     private ApprovedOwnerResponse ownerDetail;
 }

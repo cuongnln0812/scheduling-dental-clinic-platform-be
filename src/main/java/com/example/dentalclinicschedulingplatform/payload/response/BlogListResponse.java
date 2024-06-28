@@ -1,7 +1,7 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class BlogListResponse {
     private String content;
     private String thumbnail;
     private LocalDate publishDate;
-    private Status status;
+    private ClinicStatus status;
     private String createdBy;
     private LocalDateTime createdDate;
     private String modifiedBy;

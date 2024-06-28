@@ -1,6 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
+import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +13,6 @@ import lombok.Setter;
 public class ServiceViewListResponse {
     private Long id;
     private String serviceName;
-    private Status status;
+    private ClinicStatus status;
     private Long clinicId;
 }

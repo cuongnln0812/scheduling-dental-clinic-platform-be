@@ -5,17 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Getter
 @Setter
@@ -42,7 +33,7 @@ public class ClinicOwner{
     private String gender;
     private String avatar;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private ClinicStatus status;
 
     @OneToOne(mappedBy = "clinicOwner")
     private Clinic clinic;

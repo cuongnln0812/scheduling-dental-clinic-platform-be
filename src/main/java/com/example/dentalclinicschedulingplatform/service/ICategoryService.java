@@ -1,14 +1,10 @@
 package com.example.dentalclinicschedulingplatform.service;
 
-import com.example.dentalclinicschedulingplatform.entity.Status;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.CategoryUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public interface ICategoryService {

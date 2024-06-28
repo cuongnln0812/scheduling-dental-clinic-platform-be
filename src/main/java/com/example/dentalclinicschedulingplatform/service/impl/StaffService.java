@@ -5,7 +5,6 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.StaffUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.BranchSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.StaffSummaryResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -98,7 +96,7 @@ public class StaffService implements IStaffService {
                 clinicStaff.setGender(request.getGender());
                 clinicStaff.setAvatar(request.getAvatar());
                 clinicStaff.setClinicBranch(clinicBranch);
-                clinicStaff.setStatus(Status.PENDING);
+                clinicStaff.setStatus(ClinicStatus.PENDING);
 
                 iStaffRepository.save(clinicStaff);
                 return new StaffResponse(clinicStaff);
@@ -124,7 +122,7 @@ public class StaffService implements IStaffService {
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not found");
                     });
-            if(!clinicStaff.getStatus().equals(Status.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic staff not active");
+            if(!clinicStaff.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic staff not active");
 
             List<ClinicStaff> staffList = iStaffRepository.findAllStaffByOwnerId(clinicOwner.get().getId());
             boolean staffExists = false;
@@ -204,10 +202,10 @@ public class StaffService implements IStaffService {
             if (!staffExists) {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not belong to owner");
             }
-            if(!clinicStaff.getStatus().equals(Status.ACTIVE) && !clinicStaff.getStatus().equals(Status.PENDING)){
+            if(!clinicStaff.getStatus().equals(ClinicStatus.ACTIVE) && !clinicStaff.getStatus().equals(ClinicStatus.PENDING)){
                 throw new ApiException(HttpStatus.CONFLICT, "Clinic staff is already been deactivated");
             } else {
-                clinicStaff.setStatus(Status.INACTIVE);
+                clinicStaff.setStatus(ClinicStatus.INACTIVE);
             }
 
             iStaffRepository.save(clinicStaff);
@@ -291,7 +289,7 @@ public class StaffService implements IStaffService {
                 });
         ClinicStaff clinicStaffDenied = clinicStaff;
 
-        if(!clinicStaff.getStatus().equals(Status.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic staff not pending");
+        if(!clinicStaff.getStatus().equals(ClinicStatus.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic staff not pending");
 
         ClinicBranch clinicBranch = iClinicBranchRepository.findById(clinicStaff.getClinicBranch().getBranchId())
                 .orElseThrow(() -> {
@@ -299,7 +297,7 @@ public class StaffService implements IStaffService {
                 });
 
         if(isApproved){
-            clinicStaff.setStatus(Status.ACTIVE);
+            clinicStaff.setStatus(ClinicStatus.ACTIVE);
             clinicStaff.setUsername("staff" + clinicStaff.getId());
             String randomPassword = AutomaticGeneratedPassword.generateRandomPassword();
             clinicStaff.setPassword(passwordEncoder.encode(randomPassword));
@@ -307,7 +305,7 @@ public class StaffService implements IStaffService {
             mailService.sendStaffRequestApprovalMail(clinicStaff, clinicBranch.getBranchName(), randomPassword);
             return new StaffResponse(clinicStaff);
         } else {
-            clinicStaffDenied.setStatus(Status.DENIED);
+            clinicStaffDenied.setStatus(ClinicStatus.DENIED);
             mailService.sendStaffRequestRejectionMail(clinicStaffDenied, clinicBranch.getBranchName());
             iStaffRepository.delete(clinicStaff);
             return new StaffResponse(clinicStaffDenied);
@@ -318,7 +316,7 @@ public class StaffService implements IStaffService {
     public Page<StaffSummaryResponse> getStaffPendingList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<ClinicStaff> clinicStaffs;
-        clinicStaffs = iStaffRepository.findAllStaffByStatus(Status.PENDING, pageRequest);
+        clinicStaffs = iStaffRepository.findAllStaffByStatus(ClinicStatus.PENDING, pageRequest);
         return clinicStaffs.map(staff ->
                 new StaffSummaryResponse(staff.getId(),
                 staff.getFullName(), staff.getPhone(), staff.getGender(),

@@ -33,7 +33,7 @@ public class Blog {
     @Column(name = "publish_date")
     private LocalDate publishDate;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private ClinicStatus status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
