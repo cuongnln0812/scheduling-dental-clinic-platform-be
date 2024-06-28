@@ -51,6 +51,18 @@ public class FeedbackController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get Feedback by Clinic ID")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
+    @GetMapping("/clinic/{clinicId}")
+    public ResponseEntity<ApiResponse<List<SendFeedbackResponse>>> getFeedbackByClinicId(@PathVariable Long clinicId) {
+        List<SendFeedbackResponse> feedbackResponses = feedbackService.getFeedbackByClinicId(clinicId);
+        ApiResponse<List<SendFeedbackResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Feedback by clinic",
+                feedbackResponses);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @Operation(summary = "Get All Feedback")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/all")

@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
+import com.example.dentalclinicschedulingplatform.entity.Clinic;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.Customer;
 import com.example.dentalclinicschedulingplatform.entity.Feedback;
@@ -7,6 +8,7 @@ import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.SendFeedbackRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.SendFeedbackResponse;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
+import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.FeedbackRepository;
 import com.example.dentalclinicschedulingplatform.service.IFeedbackService;
@@ -26,6 +28,7 @@ public class FeedbackService implements IFeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final CustomerRepository customerRepository;
     private final ClinicBranchRepository clinicBranchRepository;
+    private final ClinicRepository clinicRepository;
 
     @Override
     public SendFeedbackResponse sendFeedback(SendFeedbackRequest request) {
@@ -48,6 +51,18 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public List<SendFeedbackResponse> getFeedbackByBranchId(Long branchId) {
         List<Feedback> feedbackList = feedbackRepository.findByClinicBranch_BranchId(branchId);
+        return feedbackList.stream()
+                .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SendFeedbackResponse> getFeedbackByClinicId(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+        List<Feedback> feedbackList = clinic.getClinicBranch().stream()
+                .flatMap(branch -> branch.getFeedbacks().stream())
+                .collect(Collectors.toList());
         return feedbackList.stream()
                 .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
                 .collect(Collectors.toList());
