@@ -11,6 +11,8 @@ public enum Status {
     PENDING("PENDING"),
     DENIED("DENIED"),
     APPROVED("APPROVED"),
+    CANCELED("CANCELED"),
+    DONE("DONE"),
     ACTIVE("ACTIVE"),
     INACTIVE("INACTIVE");
 
