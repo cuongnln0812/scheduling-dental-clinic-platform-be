@@ -8,7 +8,7 @@ public enum ReportReason {
     INAPPROPRIATE_CONTENT("Inappropriate content"),
     ABUSIVE_BEHAVIOR ("Abusive behavior"),
     FALSE_INFORMATION ("False information"),
-    HARASSMENT("Harrassment"),
+    HARASSMENT("Harassment"),
     DISCRIMINATION("Discrimination"),
     VIOLATION_OF_TERMS("Violation of term");
     private final String reason;
