@@ -3,6 +3,7 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursResponse;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -101,6 +103,61 @@ public class WorkingHoursService implements IWorkingHoursService {
             workingHoursResponseList.add(modelMapper.map(newWorkingHour, WorkingHoursResponse.class));
         }
         return workingHoursResponseList;
+    }
+
+    @Override
+    public WorkingHoursResponse updateWorkingHour(WorkingHoursUpdateRequest workingHours) {
+
+        if (!authenticateService.getUserInfo().getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        ClinicOwner owner = ownerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
+
+        Clinic ownerClinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        Clinic currClinic = clinicRepository.findById(workingHours.getClinicId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Inputted Clinic not found"));
+
+        if (ownerClinic != currClinic) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Clinic does not belong to current owner");
+        }
+
+        DayInWeek.isValid(workingHours.getDay());
+
+        if (workingHours.getStartTime().isBefore(LocalTime.of(7, 0)) || workingHours.getEndTime().isAfter(LocalTime.of(21, 0))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Start time must be between 07:00 AM and 21:00 PM");
+        }
+
+        if (workingHours.getStartTime().equals(workingHours.getEndTime())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Start time must different from end time");
+        }
+
+        if (workingHours.getStartTime().isAfter(workingHours.getEndTime())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Start time must be before end time");
+        }
+
+
+        WorkingHours updateWorkingHours = workingHourRepository.findByDayAndClinic(workingHours.getDay(), currClinic)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Working hour does not exist"));
+
+        if (workingHours.getStartTime().equals(updateWorkingHours.getStartTime()) && workingHours.getEndTime().equals(updateWorkingHours.getEndTime())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "New start time and end time is the same with old start time and end time");
+        }
+
+        updateWorkingHours.setStartTime(workingHours.getStartTime());
+        updateWorkingHours.setEndTime(workingHours.getEndTime());
+        updateWorkingHours.setShift(determineShift(workingHours.getStartTime(), workingHours.getEndTime()));
+        updateWorkingHours.setModifiedDate(LocalDateTime.now());
+
+        workingHourRepository.save(updateWorkingHours);
+
+        slotService.generateSlotForUpdatingWorkingHoursDentalClinic(updateWorkingHours.getId());
+
+        return modelMapper.map(updateWorkingHours, WorkingHoursResponse.class);
+
     }
 
     private Shift determineShift(LocalTime startTime, LocalTime endTime) {

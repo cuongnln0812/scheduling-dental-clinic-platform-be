@@ -16,5 +16,6 @@ public interface IDentalService {
     ServiceViewDetailsResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request);
     ServiceViewDetailsResponse deleteService(UserInformationRes userInformation, Long serviceId);
     ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, ClinicStatus status);
+    ServiceViewDetailsResponse viewDetailsService(UserInformationRes userInformationRes, Long serviceId);
 //    List<ServiceViewListResponse>
 }

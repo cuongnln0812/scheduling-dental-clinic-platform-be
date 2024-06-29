@@ -13,6 +13,6 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
     Optional<Slot> findById(Long slotId);
 
     @Query(value = "SELECT s.* FROM slot s join working_hours wh on s.working_hours_id = wh.working_hours_id" +
-            " where s.clinic_Id = :clinicId and wh.day = :day", nativeQuery = true)
+            " where s.clinic_Id = :clinicId and wh.day = :day and s.status = true", nativeQuery = true)
     List<Slot> findByClinicAndDay(String day, Long clinicId);
 }

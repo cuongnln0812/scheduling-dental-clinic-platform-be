@@ -307,4 +307,29 @@ public class DentalService implements IDentalService {
         return new ServiceViewDetailsResponse(currService.getId(), currService.getServiceName(), currService.getDescription(), currService.getUnitOfPrice(), currService.getMinimumPrice(), currService.getMaximumPrice(),
                 currService.getDuration(), currService.getServiceType(), currService.getStatus());
     }
+
+    @Override
+    public ServiceViewDetailsResponse viewDetailsService(UserInformationRes userInformationRes, Long serviceId) {
+
+        if (!userInformationRes.getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permisson");
+        }
+
+        ClinicOwner owner = ownerRepository.findByUsername(userInformationRes.getUsername())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
+
+        Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        Service currService = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service not found"));
+
+        List<Service> services = serviceRepository.findServicesByClinic_ClinicId(clinic.getClinicId());
+
+        if (!services.contains(currService)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Current service does not belong to the clinic of owner");
+        }
+
+        return modelMapper.map(currService, ServiceViewDetailsResponse.class);
+    }
 }

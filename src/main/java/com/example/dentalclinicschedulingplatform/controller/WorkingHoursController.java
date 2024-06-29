@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursResponse;
 import com.example.dentalclinicschedulingplatform.service.impl.WorkingHoursService;
@@ -13,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/v1/working-hours")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-public class WorkingHourseController {
+public class WorkingHoursController {
     private final WorkingHoursService workingHourService;
 
     @Operation(summary = "Create new working hours for Clinic")
@@ -40,5 +38,18 @@ public class WorkingHourseController {
                 "Created working hours successfully",
                 workingHoursResponseList);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Update start time and end of working hour for Clinic")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @PutMapping
+    public ResponseEntity<ApiResponse<WorkingHoursResponse>> updateWorkingHours
+            (@Valid @RequestBody WorkingHoursUpdateRequest request){
+        WorkingHoursResponse updateWorkingHoursResponse = workingHourService.updateWorkingHour(request);
+        ApiResponse<WorkingHoursResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Updated working hours successfully",
+                updateWorkingHoursResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
