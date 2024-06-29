@@ -42,6 +42,9 @@ public class Category {
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
 
+    @Column(name = "category_image")
+    private String categoryImage;
+
     @OneToMany(mappedBy = "category")
     private List<Service> services;
     @ManyToOne

@@ -12,5 +12,6 @@ import lombok.Setter;
 public class CategoryViewListResponse {
     private Long id;
     private String categoryName;
+    private String categoryImage;
     private boolean status;
 }

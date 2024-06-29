@@ -14,6 +14,7 @@ import java.util.List;
 public class CategoryViewResponse {
     private Long id;
     private String categoryName;
+    private String categoryImage;
     private boolean status;
     private List<ServiceViewDetailsResponse> services;
 }
