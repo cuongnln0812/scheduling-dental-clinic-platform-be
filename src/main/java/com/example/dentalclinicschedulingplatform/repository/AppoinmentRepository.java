@@ -16,5 +16,5 @@ public interface AppoinmentRepository extends JpaRepository<Appointment, Long> {
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +
             "and branch_id = :clinicBranchId ", nativeQuery = true)
     List<Appointment> findByDateOfClinicBranch(LocalDate date, Long clinicBranchId);
-
+    List<Appointment> findAppointmentsByCustomerId(Long customerId);
 }

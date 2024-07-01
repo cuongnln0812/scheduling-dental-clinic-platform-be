@@ -13,6 +13,6 @@ import lombok.Setter;
 public class ServiceViewListResponse {
     private Long id;
     private String serviceName;
-    private ClinicStatus status;
+    private boolean status;
     private Long clinicId;
 }

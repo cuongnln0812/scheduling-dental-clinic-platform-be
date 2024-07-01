@@ -19,5 +19,5 @@ public class ServiceViewDetailsResponse {
     private Float maximumPrice;
     private int duration;
     private String serviceType;
-    private ClinicStatus status;
+    private boolean status;
 }
