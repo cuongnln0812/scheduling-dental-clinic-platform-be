@@ -89,7 +89,7 @@ public class ServiceController {
         ServiceViewDetailsResponse deletedService = dentalService.deleteService(authenticationService.getUserInfo(), serviceId);
         ApiResponse<ServiceViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Updated service successfully",
+                "Deleted service successfully",
                 deletedService);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -100,7 +100,7 @@ public class ServiceController {
     @PutMapping("/change-status")
     public ResponseEntity<ApiResponse<ServiceViewDetailsResponse>> changeServiceStatus
             (@RequestBody ServiceChangeStatusRequest request){
-        ServiceViewDetailsResponse currService = dentalService.changeServiceStatus(authenticationService.getUserInfo(), request.getServiceId(), request.getServiceStatus());
+        ServiceViewDetailsResponse currService = dentalService.changeServiceStatus(authenticationService.getUserInfo(), request.getServiceId(), request.isServiceStatus());
         ApiResponse<ServiceViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Change service status successfully",

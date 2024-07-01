@@ -44,9 +44,9 @@ public class DentalService implements IDentalService {
         List<Service> serviceList = serviceRepository.findServicesByCategoryId(categoryId);
         List<ServiceViewDetailsResponse> serviceViewDetailsResponseList = new ArrayList<>();
         for (Service serviceItem : serviceList) {
-            if (serviceItem.getStatus().equals(ClinicStatus.ACTIVE)){
+            if (serviceItem.isStatus()){
                 serviceViewDetailsResponseList.add(new ServiceViewDetailsResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.getDescription(),
-                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.getStatus()));
+                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.isStatus()));
             }
         }
         return serviceViewDetailsResponseList;
@@ -113,7 +113,7 @@ public class DentalService implements IDentalService {
         newService.setMaximumPrice(request.getMaximumPrice());
         newService.setDuration(request.getDuration());
         newService.setServiceType(request.getServiceType());
-        newService.setStatus(ClinicStatus.ACTIVE);
+        newService.setStatus(true);
         newService.setCreatedBy(owner.getUsername());
         newService.setCreatedDate(LocalDateTime.now());
         newService.setCategory(currCategory);
@@ -128,11 +128,6 @@ public class DentalService implements IDentalService {
     public ServiceViewDetailsResponse updateService(UserInformationRes userInformationRes, ServiceUpdateRequest request) {
         if (!userInformationRes.getRole().equals(UserType.OWNER.toString()) && !userInformationRes.getRole().equals(UserType.STAFF.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
-        }
-
-        if (Arrays.stream(ClinicStatus.values())
-                .noneMatch(e -> e.equals(request.getStatus()))) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Only ClinicStatus (ACTIVE, INACTIVE, PENDING)");
         }
 
         ClinicOwner owner = ownerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
@@ -177,15 +172,14 @@ public class DentalService implements IDentalService {
             updatedService.setMaximumPrice(request.getMaximumPrice());
             updatedService.setDuration(request.getDuration());
             updatedService.setServiceType(request.getServiceType());
-            updatedService.setStatus(ClinicStatus.ACTIVE);
             updatedService.setModifiedBy(staff.getUsername());
             updatedService.setModifiedDate(LocalDateTime.now());
             updatedService.setCategory(currCategory);
-            updatedService.setStatus(request.getStatus());
+            updatedService.setStatus(request.isStatus());
 
             serviceRepository.save(updatedService);
             return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
-                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(), updatedService.getServiceType(), updatedService.getStatus());
+                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(), updatedService.getServiceType(), updatedService.isStatus());
         }
 
         Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
@@ -220,14 +214,14 @@ public class DentalService implements IDentalService {
         updatedService.setMaximumPrice(request.getMaximumPrice());
         updatedService.setDuration(request.getDuration());
         updatedService.setServiceType(request.getServiceType());
-        updatedService.setStatus(request.getStatus());
+        updatedService.setStatus(request.isStatus());
         updatedService.setModifiedBy(owner.getUsername());
         updatedService.setModifiedDate(LocalDateTime.now());
         updatedService.setCategory(currCategory);
 
         serviceRepository.save(updatedService);
         return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
-                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(),updatedService.getServiceType(), updatedService.getStatus());
+                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(),updatedService.getServiceType(), updatedService.isStatus());
     }
 
     @Override
@@ -251,8 +245,8 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
         }
 
-        if (deletedService.getStatus().equals(ClinicStatus.ACTIVE)) {
-            deletedService.setStatus(ClinicStatus.INACTIVE);
+        if (deletedService.isStatus()) {
+            deletedService.setStatus(false);
         }else {
             throw new ApiException(HttpStatus.CONFLICT, "The service is already been deactivated or is pending");
         }
@@ -263,11 +257,11 @@ public class DentalService implements IDentalService {
         serviceRepository.save(deletedService);
 
         return new ServiceViewDetailsResponse(deletedService.getId(), deletedService.getServiceName(), deletedService.getDescription(),
-                deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice(), deletedService.getDuration(), deletedService.getServiceType(), deletedService.getStatus());
+                deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice(), deletedService.getDuration(), deletedService.getServiceType(), deletedService.isStatus());
     }
 
     @Override
-    public ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, ClinicStatus status) {
+    public ServiceViewDetailsResponse changeServiceStatus(UserInformationRes userInformation, Long serviceId, boolean status) {
         if (!userInformation.getRole().equals(UserType.OWNER.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
         }
@@ -287,15 +281,9 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
         }
 
-        ClinicStatus.isValid(status);
-
-        if (!status.equals(ClinicStatus.ACTIVE) && !status.equals(ClinicStatus.INACTIVE)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Input only ACTIVE or INACTIVE for service status");
-        }
-
-        if (currService.getStatus().equals(ClinicStatus.ACTIVE) && status.equals(ClinicStatus.ACTIVE)) {
+        if (currService.isStatus() && status) {
             throw new ApiException(HttpStatus.CONFLICT, "The service status is already ACTIVE");
-        }else if (currService.getStatus().equals(ClinicStatus.INACTIVE) && status.equals(ClinicStatus.INACTIVE)){
+        }else if (!currService.isStatus() && !status){
             throw new ApiException(HttpStatus.CONFLICT, "The service status is already INACTIVE");
         }
 
@@ -305,7 +293,7 @@ public class DentalService implements IDentalService {
         serviceRepository.save(currService);
 
         return new ServiceViewDetailsResponse(currService.getId(), currService.getServiceName(), currService.getDescription(), currService.getUnitOfPrice(), currService.getMinimumPrice(), currService.getMaximumPrice(),
-                currService.getDuration(), currService.getServiceType(), currService.getStatus());
+                currService.getDuration(), currService.getServiceType(), currService.isStatus());
     }
 
     @Override

@@ -17,4 +17,5 @@ public class SlotDetailsResponse {
     public int slotNo;
     public LocalTime startTime;
     public LocalTime endTime;
+    public boolean status;
 }
