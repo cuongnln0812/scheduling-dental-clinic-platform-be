@@ -17,14 +17,14 @@ public enum Shift {
 
     public static void isValid(Shift shift) {
         if (shift == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "ClinicStatus is not valid");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Shift is not valid");
         }
         for (Shift s : Shift.values()) {
             if (s.shift.equals(shift.name())) {
                 return;
             }
         }
-        throw new ApiException(HttpStatus.BAD_REQUEST, "ClinicStatus is not valid");
+        throw new ApiException(HttpStatus.BAD_REQUEST, "Shift is not valid");
     }
 
 }

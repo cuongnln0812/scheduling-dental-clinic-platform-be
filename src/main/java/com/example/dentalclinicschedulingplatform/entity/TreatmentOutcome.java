@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -29,7 +30,7 @@ public class TreatmentOutcome {
     private String treatmentPlan;
     private String prescription;
     private String recommendations;
-    private String followUpDate;
+    private LocalDate followUpDate;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;

@@ -35,8 +35,6 @@ public class ClinicStaff{
     private String avatar;
     @Enumerated(EnumType.STRING)
     private ClinicStatus status;
-    @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
-    private List<Blog> blogs;
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private ClinicBranch clinicBranch;

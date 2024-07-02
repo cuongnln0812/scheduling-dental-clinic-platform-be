@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -21,7 +22,8 @@ public class Feedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedbackId;
     private String comment;
-    private Integer rating;
+    private int rating;
+    @CreatedDate
     @Column(name = "created_date_time", updatable = false)
     private LocalDateTime createdDateTime;
 
@@ -32,7 +34,4 @@ public class Feedback {
     @JoinColumn(name = "branch_id")
     private ClinicBranch clinicBranch;
 
-    public void setCreatedDateTime(){
-        createdDateTime = LocalDateTime.now();
-    }
 }

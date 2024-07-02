@@ -35,7 +35,6 @@ public class FeedbackService implements IFeedbackService {
         Feedback feedback = new Feedback();
         feedback.setComment(request.getComment());
         feedback.setRating(request.getRating());
-        feedback.setCreatedDateTime();
         Customer customer = customerRepository.findById(request.getUserID())
                 .orElseThrow(() -> new ApiException ( HttpStatus.NOT_FOUND ,"Customer not found" ));
         feedback.setCustomer(customer);

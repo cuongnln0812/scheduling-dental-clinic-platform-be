@@ -1,8 +1,12 @@
 package com.example.dentalclinicschedulingplatform.entity;
 
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+@RequiredArgsConstructor
+@ToString
 public enum ReportReason {
     SPAM("Spam"),
     INAPPROPRIATE_CONTENT("Inappropriate content"),
@@ -12,15 +16,6 @@ public enum ReportReason {
     DISCRIMINATION("Discrimination"),
     VIOLATION_OF_TERMS("Violation of term");
     private final String reason;
-
-    ReportReason(String string) {
-        reason = string;
-    }
-
-    @Override
-    public String toString() {
-        return reason;
-    }
 
     public static void isValid(ReportReason reportReason) {
         if (reportReason == null) {
