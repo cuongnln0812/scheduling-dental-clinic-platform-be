@@ -50,4 +50,8 @@ public class Blog {
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private ClinicStaff staff;
+
+    @ManyToOne
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
 }
