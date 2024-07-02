@@ -48,6 +48,6 @@ public class ServiceUpdateRequest {
     @NotNull(message = "Category Id cannot be null")
     private Long categoryId;
 
-    @NotNull(message = "ClinicStatus cannot be null")
-    private ClinicStatus status;
+    @NotNull(message = "ServiceStatus cannot be null")
+    private boolean status;
 }

@@ -16,5 +16,5 @@ public class ServiceChangeStatusRequest {
     public Long serviceId;
 
     @NotNull(message = "Category status can not be null")
-    public ClinicStatus serviceStatus;
+    public boolean serviceStatus;
 }
