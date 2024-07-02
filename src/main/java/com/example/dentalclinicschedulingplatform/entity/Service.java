@@ -39,8 +39,7 @@ public class Service {
     private Integer duration;
     @Column(name = "service_type")
     private String serviceType;
-    @Enumerated(EnumType.STRING)
-    private ClinicStatus status;
+    private boolean status;
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;

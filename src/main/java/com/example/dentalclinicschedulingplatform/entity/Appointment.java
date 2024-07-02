@@ -40,6 +40,7 @@ public class Appointment {
     private LocalDate appointmentDate;
     @Column(name = "service_duration")
     private int duration;
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)

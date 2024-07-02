@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service;
 
+import com.example.dentalclinicschedulingplatform.payload.response.SlotDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursDetailsResponse;
 
 import java.time.LocalDate;
@@ -15,4 +16,6 @@ public interface ISlotService {
     WorkingHoursDetailsResponse viewAvailableSlotsByDateByClinicBranch(LocalDate date, Long clinicBranchId);
 
     void generateSlotForUpdatingWorkingHoursDentalClinic(Long workingHourId);
+
+    SlotDetailsResponse removeSlot(Long slotId);
 }

@@ -35,6 +35,10 @@ public class SlotService implements ISlotService {
 
     private final ClinicBranchRepository clinicBranchRepository;
 
+    private final AuthenticateService authenticateService;
+
+    private final OwnerRepository ownerRepository;
+
     private final ModelMapper modelMapper;
     @Override
     public void generateSlotForDentalClinic(Long workingHourId) {
@@ -61,7 +65,7 @@ public class SlotService implements ISlotService {
             List<SlotDetailsResponse> slotDetailResponses = new ArrayList<>();
 
             for (Slot slot: slots) {
-                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime()));
+                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
             }
 
             slotList.add(new WorkingHoursDetailsResponse(day.name(), slotDetailResponses));
@@ -99,7 +103,7 @@ public class SlotService implements ISlotService {
 
             for (Slot slot: slots) {
                 if (!bookedSlots.contains(slot)) {
-                    slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime()));
+                    slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
                 }
             }
 
@@ -135,7 +139,7 @@ public class SlotService implements ISlotService {
 
         for (Slot slot :slots) {
             if (!bookedSlots.contains(slot)){
-                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime()));
+                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
             }
         }
 
@@ -156,6 +160,36 @@ public class SlotService implements ISlotService {
         }
 
         generateSlots(workingHours);
+    }
+
+    @Override
+    public SlotDetailsResponse removeSlot(Long slotId) {
+        if (!authenticateService.getUserInfo().getRole().equals(UserType.OWNER.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        ClinicOwner owner = ownerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
+
+        Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        Slot currSlot = slotRepository.findById(slotId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+        if (currSlot.getClinic().getClinicId() != clinic.getClinicId()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Slot does not belong to current clinic");
+        }
+
+        if (!currSlot.isStatus()){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Slot removed already");
+        }
+
+        currSlot.setStatus(false);
+
+        slotRepository.save(currSlot);
+
+        return modelMapper.map(currSlot, SlotDetailsResponse.class);
     }
 
     public List<String> getDaysBetween(LocalDate startDate, LocalDate endDate) {
