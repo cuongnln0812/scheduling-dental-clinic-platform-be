@@ -21,9 +21,4 @@ public class SendFeedbackRequest {
 
     @NotNull(message = "BranchClinicID cannot be null")
     private long branchclinicID;
-
-    @NotNull(message = "UserID cannot be null")
-    private long userID;
-
-
 }
