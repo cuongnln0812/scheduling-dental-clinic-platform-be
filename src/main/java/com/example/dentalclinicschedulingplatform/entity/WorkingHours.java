@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,6 +43,8 @@ public class WorkingHours {
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
 
+    @OneToMany(mappedBy = "workingHours")
+    private List<Slot> slots;
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
