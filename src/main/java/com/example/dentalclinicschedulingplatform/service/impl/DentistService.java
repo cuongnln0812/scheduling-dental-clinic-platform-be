@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
+import com.example.dentalclinicschedulingplatform.entity.Appointment;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import com.example.dentalclinicschedulingplatform.entity.Dentist;
@@ -9,6 +10,8 @@ import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateR
 import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistListResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.DentistViewListResponse;
+import com.example.dentalclinicschedulingplatform.repository.AppointmentRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
@@ -27,10 +30,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DentistService implements IDentistService {
+public class DentistService implements IDentistService  {
 
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
@@ -38,6 +44,8 @@ public class DentistService implements IDentistService {
     private final ClinicBranchRepository branchRepository;
     private final IMailService mailService;
     private final IAuthenticateService authenticateService;
+
+    private final AppointmentRepository appointmentRepository;
 
     @Override
     public Page<DentistListResponse> getDentistListByBranch(Long branchId, int page, int size, String dir, String by) {
@@ -137,5 +145,29 @@ public class DentistService implements IDentistService {
         }else throw new ApiException(HttpStatus.CONFLICT, "Account is not able to remove because it may in INACTIVE or PENDING status");
         Dentist updatedDentist = dentistRepository.save(existingDentist);
         return modelMapper.map(updatedDentist, DentistDetailResponse.class);
+    }
+
+    @Override
+    public List<DentistViewListResponse> getAvailableDentistOfDateByBranch(Long branchId, LocalDate date, Long slotId) {
+
+        ClinicBranch clinicBranch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        List<Appointment> appointments = appointmentRepository.findByDateAndSlotOfClinicBranch(date, branchId, slotId);
+
+        List<DentistViewListResponse> availableDentists = new ArrayList<>();
+
+        List<Dentist> occupiedDentists = appointments.stream()
+                .map(Appointment::getDentist)
+                .collect(Collectors.toList());
+
+        List<Dentist> dentistList = dentistRepository.findAllByClinicBranch_BranchId(clinicBranch.getBranchId());
+
+        for (Dentist dentist: dentistList) {
+            if (!occupiedDentists.contains(dentist)){
+                availableDentists.add(modelMapper.map(dentist, DentistViewListResponse.class));
+            }
+        }
+        return availableDentists;
     }
 }
