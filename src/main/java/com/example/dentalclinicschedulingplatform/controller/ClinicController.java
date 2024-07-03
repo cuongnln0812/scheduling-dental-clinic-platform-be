@@ -78,4 +78,16 @@ public class ClinicController {
                 clinicService.getPendingClinicDetail(clinicId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get all staff and dentist")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<ClinicStaffAndDentistResponse>> getAllStaffAndDentist()
+    {
+        ApiResponse<ClinicStaffAndDentistResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get all staff and dentist successfully!",
+                clinicService.getAllStaffAndDentistByOwner());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
