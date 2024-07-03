@@ -24,7 +24,7 @@ public class Feedback {
     private String comment;
     private int rating;
     @CreatedDate
-    @Column(name = "created_date_time", updatable = false)
+    @Column(name = "created_date_time", nullable = false, updatable = false)
     private LocalDateTime createdDateTime;
 
     @ManyToOne

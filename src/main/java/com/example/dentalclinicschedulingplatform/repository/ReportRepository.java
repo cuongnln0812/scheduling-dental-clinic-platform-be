@@ -21,4 +21,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Page<Report> findByClinic_ClinicId(Long clinicId, Pageable pageable);
 
     Page<Report> findAll(Pageable pageable);
+
+    Optional<Report> findByFeedback_FeedbackIdAndReporter(Long feedbackId, String reporter);
 }
