@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserInformationRes {
     private String username;
     private String fullName;
@@ -22,4 +23,6 @@ public class UserInformationRes {
     private String address;
     private String avatar;
     private String role;
+    private Long clinicId;
+    private Long branchId;
 }

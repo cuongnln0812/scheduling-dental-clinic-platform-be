@@ -124,16 +124,21 @@ public class AuthenticateService implements IAuthenticateService {
             Dentist user = dentistRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
+            res.setClinicId(user.getClinicBranch().getClinic().getClinicId());
+            res.setBranchId(user.getClinicBranch().getBranchId());
             res.setRole(UserType.DENTIST.toString());
         }else if(role.equals("ROLE_" + UserType.STAFF)){
             ClinicStaff user = staffRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
+            res.setClinicId(user.getClinicBranch().getClinic().getClinicId());
+            res.setBranchId(user.getClinicBranch().getBranchId());
             res.setRole(UserType.STAFF.toString());
         }else if(role.equals("ROLE_" + UserType.OWNER)){
             ClinicOwner user = ownerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             res = modelMapper.map(user, UserInformationRes.class);
+            res.setClinicId(user.getClinic().getClinicId());
             res.setRole(UserType.OWNER.toString());
         } else if (role.equals("ROLE_" + UserType.ADMIN)) {
             SystemAdmin user = systemAdminRepository.findByUsername(name)
