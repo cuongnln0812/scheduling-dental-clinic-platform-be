@@ -9,4 +9,5 @@ public interface IClinicService {
     ApprovedClinicResponse approveClinic(Long clinicId, boolean isApproved);
     Page<PendingClinicListResponse> getClinicPendingList(int page, int size);
     ClinicRegisterResponse getPendingClinicDetail(Long clinicId);
+    ClinicStaffAndDentistResponse getAllStaffAndDentistByOwner();
 }
