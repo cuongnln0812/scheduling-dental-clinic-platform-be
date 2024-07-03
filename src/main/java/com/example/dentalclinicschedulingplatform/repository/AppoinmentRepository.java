@@ -1,6 +1,8 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,5 +18,7 @@ public interface AppoinmentRepository extends JpaRepository<Appointment, Long> {
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +
             "and branch_id = :clinicBranchId ", nativeQuery = true)
     List<Appointment> findByDateOfClinicBranch(LocalDate date, Long clinicBranchId);
-    List<Appointment> findAppointmentsByCustomerId(Long customerId);
+    Page<Appointment> findAppointmentsByCustomerId(Long customerId, Pageable pageable);
+    Page<Appointment> findAppointmentsByClinicBranch_BranchId(Long branchId, Pageable pageable);
+    Page<Appointment> findAppointmentsByDentistId(Long dentistId, Pageable pageable);
 }
