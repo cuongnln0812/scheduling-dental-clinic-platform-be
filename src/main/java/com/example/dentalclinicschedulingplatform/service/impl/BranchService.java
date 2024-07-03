@@ -13,6 +13,7 @@ import com.example.dentalclinicschedulingplatform.service.IBranchService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.engine.spi.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,9 +86,10 @@ public class BranchService implements IBranchService {
 
             ClinicBranch branch = new ClinicBranch();
             modelMapper.map(request, branch);
-            branch.setStatus(ClinicStatus.PENDING);
+            branch.setStatus(ClinicStatus.ACTIVE);
             branch.setClinic(clinic);
             branch.setMain(false);
+            branch.setCreatedDate(LocalDateTime.now());
 
             branchRepository.save(branch);
             return modelMapper.map(branch, BranchDetailResponse.class);
@@ -96,32 +99,47 @@ public class BranchService implements IBranchService {
     }
 
     @Override
-    @Transactional
-    public BranchDetailResponse approveNewBranch(Long id, boolean isApproved) {
-        if(!authenticateService.getUserInfo().getRole().equals(UserType.ADMIN.toString())){
-            throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
-        }
-        ClinicBranch clinicBranch = branchRepository.findById(id)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
-        Clinic clinic = clinicRepository.findById(clinicBranch.getClinic().getClinicId())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
-        ClinicOwner owner = ownerRepository.findById(clinic.getClinicOwner().getId())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));;
-        if (!clinicBranch.getStatus().equals(ClinicStatus.PENDING))
-            throw new ApiException(HttpStatus.CONFLICT, "Branch status must be pending to be approved");
-        if(isApproved) {
-            clinicBranch.setStatus(ClinicStatus.ACTIVE);
-            branchRepository.save(clinicBranch);
-            mailService.sendBranchRequestApprovalMail(owner);
-            return modelMapper.map(clinicBranch, BranchDetailResponse.class);
-        }else {
-            clinicBranch.setStatus(ClinicStatus.DENIED);
-            ClinicBranch branchDenied = clinicBranch;
-            branchRepository.delete(clinicBranch);
-            mailService.sendBranchRequestRejectionMail(owner);
-            return modelMapper.map(branchDenied, BranchDetailResponse.class);
+    public List<BranchSummaryResponse> getBranchByClinic(Long clinicId) {
+        try{
+            Clinic clinic = clinicRepository.findById(clinicId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicIdAndStatus(clinic.getClinicId(), ClinicStatus.ACTIVE);
+            // Map List<ClinicBranch> to List<BranchSummaryResponse>
+            return branchList.stream()
+                    .map(BranchSummaryResponse::new)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw e;
         }
     }
+
+    //    @Override
+//    @Transactional
+//    public BranchDetailResponse approveNewBranch(Long id, boolean isApproved) {
+//        if(!authenticateService.getUserInfo().getRole().equals(UserType.ADMIN.toString())){
+//            throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
+//        }
+//        ClinicBranch clinicBranch = branchRepository.findById(id)
+//                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
+//        Clinic clinic = clinicRepository.findById(clinicBranch.getClinic().getClinicId())
+//                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+//        ClinicOwner owner = ownerRepository.findById(clinic.getClinicOwner().getId())
+//                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));;
+//        if (!clinicBranch.getStatus().equals(ClinicStatus.PENDING))
+//            throw new ApiException(HttpStatus.CONFLICT, "Branch status must be pending to be approved");
+//        if(isApproved) {
+//            clinicBranch.setStatus(ClinicStatus.ACTIVE);
+//            branchRepository.save(clinicBranch);
+//            mailService.sendBranchRequestApprovalMail(owner);
+//            return modelMapper.map(clinicBranch, BranchDetailResponse.class);
+//        }else {
+//            clinicBranch.setStatus(ClinicStatus.DENIED);
+//            ClinicBranch branchDenied = clinicBranch;
+//            branchRepository.delete(clinicBranch);
+//            mailService.sendBranchRequestRejectionMail(owner);
+//            return modelMapper.map(branchDenied, BranchDetailResponse.class);
+//        }
+//    }
 
     @Override
     public Page<BranchSummaryResponse> getBranchPendingList(int page, int size) {
