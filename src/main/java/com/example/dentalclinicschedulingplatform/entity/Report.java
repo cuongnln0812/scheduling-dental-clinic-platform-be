@@ -1,5 +1,7 @@
 package com.example.dentalclinicschedulingplatform.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,8 +29,8 @@ public class Report {
     @JoinColumn(name = "feedback_id")
     private Feedback feedback;
 
-    @Enumerated(EnumType.STRING)
-    private ReportReason reportReason;
+    @Column(name = "report_reasons", nullable = false)
+    private String reportReasons;
 
     @CreatedBy
     @Column(name = "reporter", nullable = false, updatable = false)
@@ -47,4 +50,22 @@ public class Report {
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private ClinicBranch branch;
+
+    public void setReportReasons(List<ReportReason> reasons) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            this.reportReasons = objectMapper.writeValueAsString(reasons);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error converting reasons to JSON", e);
+        }
+    }
+
+    public List<ReportReason> getReportReasons() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(this.reportReasons, objectMapper.getTypeFactory().constructCollectionType(List.class, ReportReason.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error converting JSON to reasons", e);
+        }
+    }
 }

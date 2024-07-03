@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CreateReportRequest {
@@ -12,10 +14,7 @@ public class CreateReportRequest {
     private Long feedbackId;
 
     @NotNull
-    private ReportReason reportReason;
-
-    @NotNull
-    private String reporter;
+    private List<ReportReason> reportReason;
 
     @NotNull
     private String reportedCustomer;
