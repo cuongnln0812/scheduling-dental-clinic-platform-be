@@ -6,6 +6,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCre
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IAppointmentService;
+import com.example.dentalclinicschedulingplatform.service.IMailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -48,6 +49,8 @@ public class AppointmentService implements IAppointmentService {
     private final SlotService slotService;
 
     private final DentistService dentistService;
+
+    private final IMailService mailService;
 
     private final ModelMapper modelMapper;
     @Override
@@ -295,6 +298,8 @@ public class AppointmentService implements IAppointmentService {
         newAppointment.setCustomer(customer);
 
         appointmentRepository.save(newAppointment);
+
+        mailService.sendCustomerAppointmentRequestConfirmationMail(customer, newAppointment);
 
         return new AppointmentViewDetailsResponse(newAppointment.getId(), newAppointment.getCustomerName(), newAppointment.getCustomerAddress(),
                 newAppointment.getCustomerPhone(), newAppointment.getCustomerDob(), newAppointment.getCustomerAge(),

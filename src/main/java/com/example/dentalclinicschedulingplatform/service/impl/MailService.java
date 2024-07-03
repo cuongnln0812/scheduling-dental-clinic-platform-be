@@ -1,15 +1,14 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
-import com.example.dentalclinicschedulingplatform.entity.ClinicOwner;
-import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
-import com.example.dentalclinicschedulingplatform.entity.Customer;
-import com.example.dentalclinicschedulingplatform.entity.Dentist;
+import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -162,6 +161,27 @@ public class MailService implements IMailService {
                 "• Password: " + password + "\n" + // Placeholder for the password
                 "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
         // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(message);
+    }
+
+    @Async
+    @Override
+    public void sendCustomerAppointmentRequestConfirmationMail(Customer customer, Appointment appointment) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(appointment.getCustomerEmail());
+        message.setSubject("[F-Dental] - Xác nhận lịch hẹn thành công");
+        message.setText("Chào " + appointment.getCustomerName() + ",\n\n" +
+                "Cảm ơn bạn đã đặt lịch hẹn với F-Dental. Chúng tôi rất vui thông báo rằng lịch hẹn của bạn đã được xác nhận. Dưới đây là thông tin chi tiết về lịch hẹn của bạn:\n\n" +
+                "• Ngày hẹn: " + appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
+                "• Giờ hẹn: " + appointment.getSlot().getStartTime() + " - " + appointment.getSlot().getEndTime() + "\n" +
+                "• Nha sĩ: " + appointment.getDentist().getFullName() + "\n" +
+                "• Dịch vụ: " + appointment.getService().getServiceName() + "\n" +
+                "• Địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
+                "Vui lòng có mặt đúng giờ và mang theo tất cả các giấy tờ cần thiết. Nếu bạn có bất kỳ câu hỏi nào hoặc cần thay đổi lịch hẹn, xin vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email này.\n\n" +
+                "Cảm ơn bạn đã tin tưởng và lựa chọn F-Dental. Chúng tôi rất mong được phục vụ bạn.\n\n" +
+                "Trân trọng,\n" +
+                "Đội ngũ F-Dental");
         mailSender.send(message);
     }
 
