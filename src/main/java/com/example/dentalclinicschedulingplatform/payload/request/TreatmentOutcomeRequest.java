@@ -8,16 +8,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TreatmentOutcomeRequest {
-    @NotBlank
+    @NotBlank(message = "Diagnosis cannot be blank")
     private String diagnosis;
-    @NotBlank
+
+    @NotBlank(message = "Treatment plan cannot be blank")
     private String treatmentPlan;
-    @NotBlank
+
+    @NotBlank(message = "Prescription cannot be blank")
     private String prescription;
-    @NotBlank
+
+    @NotBlank(message = "Recommendations cannot be blank")
     private String recommendations;
-    @NotBlank
+
+    @NotBlank(message = "Follow-up date cannot be blank")
     private String followUpDate;
-    @NotNull
+
+    @NotNull(message = "Appointment ID cannot be null")
     private Long appointmentId;
 }
