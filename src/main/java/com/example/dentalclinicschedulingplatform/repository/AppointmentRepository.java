@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface AppoinmentRepository extends JpaRepository<Appointment, Long> {
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @Query(value = "SELECT * FROM appointment where appointment_date >= :startDate and appointment_date <= :endDate " +
             "and branch_id = :clinicBranchId ", nativeQuery = true)

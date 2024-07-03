@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,7 @@ public class AppointmentService implements IAppointmentService {
 
     private final CustomerRepository customerRepository;
 
-    private final AppoinmentRepository appoinmentRepository;
+    private final AppointmentRepository appointmentRepository;
 
     private final ClinicBranchRepository clinicBranchRepository;
 
@@ -54,7 +53,7 @@ public class AppointmentService implements IAppointmentService {
         Customer customer = customerRepository.findByUsername(userInformationRes.getUsername())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
 
-        Page<Appointment> appointments = appoinmentRepository.findAppointmentsByCustomerId(customer.getId(), pageable);
+        Page<Appointment> appointments = appointmentRepository.findAppointmentsByCustomerId(customer.getId(), pageable);
 
         List<AppointmentViewDetailsResponse> pendingAppointments = new ArrayList<>();
 
@@ -63,7 +62,7 @@ public class AppointmentService implements IAppointmentService {
         for (Appointment appointment: appointments) {
             if (appointment.getStatus().equals(AppointmentStatus.PENDING)) {
 
-                Appointment currAppointment = appoinmentRepository.findById(appointment.getId())
+                Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
                 Customer currCustomer = customerRepository.findByUsername(currAppointment.getCustomer().getUsername())
@@ -120,12 +119,12 @@ public class AppointmentService implements IAppointmentService {
             Dentist dentist = dentistRepository.findByUsername(userInformationRes.getUsername())
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
-            Page<Appointment> appointments = appoinmentRepository.findAppointmentsByDentistId(dentist.getId(), pageable);
+            Page<Appointment> appointments = appointmentRepository.findAppointmentsByDentistId(dentist.getId(), pageable);
 
             for (Appointment appointment: appointments) {
                 if (appointment.getStatus().equals(AppointmentStatus.PENDING)){
 
-                    Appointment currAppointment = appoinmentRepository.findById(appointment.getId())
+                    Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
                     Customer currCustomer = customerRepository.findByUsername(appointment.getCustomer().getUsername())
@@ -162,12 +161,12 @@ public class AppointmentService implements IAppointmentService {
         ClinicBranch clinicBranch = clinicBranchRepository.findById(staff.getClinicBranch().getBranchId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
 
-        Page<Appointment> appointments = appoinmentRepository.findAppointmentsByClinicBranch_BranchId(clinicBranch.getBranchId(), pageable);
+        Page<Appointment> appointments = appointmentRepository.findAppointmentsByClinicBranch_BranchId(clinicBranch.getBranchId(), pageable);
 
         for (Appointment appointment: appointments) {
             if (appointment.getStatus().equals(AppointmentStatus.PENDING)){
 
-                Appointment currAppointment = appoinmentRepository.findById(appointment.getId())
+                Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
                 Customer currCustomer = customerRepository.findByUsername(appointment.getCustomer().getUsername())
@@ -210,7 +209,7 @@ public class AppointmentService implements IAppointmentService {
         Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
                 .orElse(null);
 
-        Appointment currAppointment = appoinmentRepository.findById(appointmentId)
+        Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
         Customer currCustomer = customerRepository.findByUsername(currAppointment.getCustomer().getUsername())
