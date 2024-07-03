@@ -31,7 +31,7 @@ public class SlotService implements ISlotService {
 
     private final ClinicRepository clinicRepository;
 
-    private final AppoinmentRepository appoinmentRepository;
+    private final AppointmentRepository appointmentRepository;
 
     private final ClinicBranchRepository clinicBranchRepository;
 
@@ -75,7 +75,7 @@ public class SlotService implements ISlotService {
 
     @Override
     public List<WorkingHoursDetailsResponse> viewAvailableSlotsByClinicBranch(LocalDate startDate, LocalDate endDate, Long clinicBranchId) {
-        List<Appointment> appointments = appoinmentRepository.findByStartDateAndEndDateOfClinicBranch(startDate, endDate, clinicBranchId);
+        List<Appointment> appointments = appointmentRepository.findByStartDateAndEndDateOfClinicBranch(startDate, endDate, clinicBranchId);
 
         List<Slot> bookedSlots = new ArrayList<>();
 
@@ -114,7 +114,7 @@ public class SlotService implements ISlotService {
 
     @Override
     public WorkingHoursDetailsResponse viewAvailableSlotsByDateByClinicBranch(LocalDate date, Long clinicBranchId) {
-        List<Appointment> appointments = appoinmentRepository.findByDateOfClinicBranch(date, clinicBranchId);
+        List<Appointment> appointments = appointmentRepository.findByDateOfClinicBranch(date, clinicBranchId);
 
         ClinicBranch clinicBranch = clinicBranchRepository.findById(clinicBranchId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));

@@ -6,7 +6,7 @@ import com.example.dentalclinicschedulingplatform.entity.TreatmentOutcome;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.TreatmentOutcomeRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.TreatmentOutcomeResponse;
-import com.example.dentalclinicschedulingplatform.repository.AppoinmentRepository;
+import com.example.dentalclinicschedulingplatform.repository.AppointmentRepository;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.TreatmentOutcomeRepository;
 import com.example.dentalclinicschedulingplatform.service.ITreatmentOutcomeService;
@@ -27,7 +27,7 @@ public class TreatmentOutcomeService implements ITreatmentOutcomeService {
 
     private final TreatmentOutcomeRepository treatmentOutcomeRepository;
     private final CustomerRepository customerRepository;
-    private final AppoinmentRepository appointmentRepository;
+    private final AppointmentRepository appointmentRepository;
     private final ModelMapper modelMapper;
 
     @Override
