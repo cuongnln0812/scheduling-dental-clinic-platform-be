@@ -86,26 +86,6 @@ public class AuthenticateService implements IAuthenticateService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(true);
         user = customerRepository.save(user);
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-//        message.setTo(user.getEmail());
-//        // Set a meaningful message
-//        message.setSubject("[F-Dental] - Tài khoản được tạo thành công");
-//        String body = "Kính gửi " + user.getUsername() + ",\n\n" +
-//                "Cảm ơn bạn đã tạo tài khoản trên " + "F-Dental" + "! Chúng tôi rất vui mừng được chào đón bạn đến với cộng đồng của mình và hỗ trợ bạn đạt được mục tiêu sức khỏe răng miệng.\n\n" +
-//                "Để bắt đầu:\n\n" +
-//                "1. Hoàn thành hồ sơ của bạn: Truy cập cài đặt tài khoản để thêm thông tin cá nhân, bao gồm chi tiết bảo hiểm nha khoa của bạn. Điều này sẽ giúp chúng tôi đơn giản hóa quy trình đặt lịch hẹn của bạn.\n\n" +
-//                "2. Đặt lịch hẹn đầu tiên: Duyệt qua danh sách nha sĩ có sẵn và tìm thời gian phù hợp với lịch trình của bạn. Bạn có thể dễ dàng đặt lịch hẹn trực tuyến hoặc bằng cách gọi điện đến trung tâm chăm sóc khách hàng của chúng tôi.\n\n" +
-//                "3. Khám phá các nguồn tài nguyên của chúng tôi: Chúng tôi cung cấp nhiều nguồn tài nguyên hữu ích để hỗ trợ hành trình sức khỏe răng miệng của bạn, bao gồm các bài viết, video và mẹo về cách duy trì vệ sinh răng miệng tốt.\n\n" +
-//                "Chúng tôi luôn sẵn sàng hỗ trợ:\n\n" +
-//                "Nếu bạn có bất kỳ câu hỏi nào hoặc cần trợ giúp về tài khoản của mình, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
-//                "Cảm ơn bạn đã chọn " + "F-Dental" + "!\n\n" +
-//                "Trân trọng,\n\n" +
-//                "Đội ngũ F-Dental";
-//        message.setText(body);
-//
-//        // Send the email (assuming you have a mailSender bean configured)
-//        mailSender.send(message);
         mailService.sendCustomerRegistrationMail(user);
         return modelMapper.map(user, CustomerRegisterResponse.class);
     }

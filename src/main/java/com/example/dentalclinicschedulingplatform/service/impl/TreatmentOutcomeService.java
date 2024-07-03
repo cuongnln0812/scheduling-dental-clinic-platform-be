@@ -6,7 +6,7 @@ import com.example.dentalclinicschedulingplatform.entity.TreatmentOutcome;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.TreatmentOutcomeRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.TreatmentOutcomeResponse;
-import com.example.dentalclinicschedulingplatform.repository.AppointmentRepository;
+import com.example.dentalclinicschedulingplatform.repository.AppoinmentRepository;
 import com.example.dentalclinicschedulingplatform.repository.CustomerRepository;
 import com.example.dentalclinicschedulingplatform.repository.TreatmentOutcomeRepository;
 import com.example.dentalclinicschedulingplatform.service.ITreatmentOutcomeService;
@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class TreatmentOutcomeService implements ITreatmentOutcomeService {
 
     private final TreatmentOutcomeRepository treatmentOutcomeRepository;
     private final CustomerRepository customerRepository;
-    private final AppointmentRepository appointmentRepository;
+    private final AppoinmentRepository appointmentRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -36,7 +37,7 @@ public class TreatmentOutcomeService implements ITreatmentOutcomeService {
         treatmentOutcome.setTreatmentPlan(request.getTreatmentPlan());
         treatmentOutcome.setPrescription(request.getPrescription());
         treatmentOutcome.setRecommendations(request.getRecommendations());
-        treatmentOutcome.setFollowUpDate(request.getFollowUpDate());
+        treatmentOutcome.setFollowUpDate(LocalDate.parse(request.getFollowUpDate()));
 
         Customer customer = customerRepository.findByUsername(getCurrentUsername())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
@@ -59,7 +60,7 @@ public class TreatmentOutcomeService implements ITreatmentOutcomeService {
         treatmentOutcome.setTreatmentPlan(request.getTreatmentPlan());
         treatmentOutcome.setPrescription(request.getPrescription());
         treatmentOutcome.setRecommendations(request.getRecommendations());
-        treatmentOutcome.setFollowUpDate(request.getFollowUpDate());
+        treatmentOutcome.setFollowUpDate(LocalDate.parse(request.getFollowUpDate()));
 
         treatmentOutcome = treatmentOutcomeRepository.save(treatmentOutcome);
         return modelMapper.map(treatmentOutcome, TreatmentOutcomeResponse.class);
