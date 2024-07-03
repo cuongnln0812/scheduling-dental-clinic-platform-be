@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @RequiredArgsConstructor
-@ToString
 public enum UserType {
     ADMIN("ADMIN"),
     CUSTOMER("CUSTOMER"),
@@ -13,4 +12,9 @@ public enum UserType {
     DENTIST("DENTIST");
 
     private final String type;
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }
