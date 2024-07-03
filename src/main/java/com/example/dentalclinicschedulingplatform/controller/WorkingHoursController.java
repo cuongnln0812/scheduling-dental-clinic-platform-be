@@ -28,7 +28,7 @@ public class WorkingHoursController {
     private final WorkingHoursService workingHourService;
 
     @Operation(summary = "Create new working hours for Clinic")
-    @PreAuthorize("hasAnyRole('OWNER')")
+//    @PreAuthorize("hasAnyRole('OWNER')")
     @PostMapping
     public ResponseEntity<ApiResponse<List<WorkingHoursResponse>>> createWorkingHours
             (@Valid @RequestBody List<WorkingHoursCreateRequest> request){
@@ -41,7 +41,7 @@ public class WorkingHoursController {
     }
 
     @Operation(summary = "Update start time and end of working hour for Clinic")
-    @PreAuthorize("hasAnyRole('OWNER')")
+//    @PreAuthorize("hasAnyRole('OWNER')")
     @PutMapping
     public ResponseEntity<ApiResponse<WorkingHoursResponse>> updateWorkingHours
             (@Valid @RequestBody WorkingHoursUpdateRequest request){
