@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
+import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,4 +22,15 @@ public class BranchSummaryResponse {
     private String phone;
     private ClinicStatus status;
     private LocalDateTime createdDate;
+
+    public BranchSummaryResponse(ClinicBranch clinicBranch) {
+        this.branchId = clinicBranch.getBranchId();
+        this.branchName = clinicBranch.getBranchName();
+        this.clinicName = clinicBranch.getClinic().getClinicName(); // Assuming Clinic has getClinicName method
+        this.address = clinicBranch.getAddress();
+        this.city = clinicBranch.getCity();
+        this.phone = clinicBranch.getPhone();
+        this.status = clinicBranch.getStatus();
+        this.createdDate = clinicBranch.getCreatedDate();
+    }
 }

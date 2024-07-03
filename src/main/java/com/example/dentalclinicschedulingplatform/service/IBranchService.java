@@ -8,11 +8,15 @@ import com.example.dentalclinicschedulingplatform.payload.response.BranchDetailR
 import com.example.dentalclinicschedulingplatform.payload.response.BranchSummaryResponse;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IBranchService {
     ClinicBranch createMainBranch(Clinic clinic);
     BranchDetailResponse createBranch(BranchCreateRequest request);
-    BranchDetailResponse approveNewBranch(Long id, boolean isApproved);
+
+//    BranchDetailResponse approveNewBranch(Long id, boolean isApproved);
     Page<BranchSummaryResponse> getBranchPendingList(int page, int size);
+    List<BranchSummaryResponse> getBranchByClinic(Long clinicId);
     BranchSummaryResponse getBranchPendingDetail(Long branchId);
     BranchSummaryResponse updateBranch(BranchUpdateRequest request);
     BranchSummaryResponse deleteBranch(Long branchId);

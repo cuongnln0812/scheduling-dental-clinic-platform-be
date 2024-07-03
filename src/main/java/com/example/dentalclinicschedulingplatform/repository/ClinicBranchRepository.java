@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
+import org.hibernate.engine.spi.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,8 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
     Optional<ClinicBranch> findById(Long id);
 
     List<ClinicBranch> findAllByClinic_ClinicId(Long id);
+
+    List<ClinicBranch> findAllByClinic_ClinicIdAndStatus(Long id, ClinicStatus status);
 
     @Query(value = "SELECT cb.* FROM public.clinic_branch cb " +
                    "WHERE cb.clinic_id = " +

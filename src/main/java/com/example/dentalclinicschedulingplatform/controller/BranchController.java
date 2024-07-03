@@ -20,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @Tag(name = "Branch Controller")
@@ -47,6 +49,20 @@ public class BranchController {
     }
 
     @Operation(
+            summary = "Get all branch by clinicId"
+    )
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
+    @GetMapping("/clinic/{id}")
+    public ResponseEntity<ApiResponse<List<BranchSummaryResponse>>> viewAllBranchByClinicId(@PathVariable("id") Long id) {
+        log.info("Has request with data: {}", id.toString());
+        ApiResponse<List<BranchSummaryResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "View all branch successfully",
+                branchService.getBranchByClinic(id));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
             summary = "Create branch"
     )
     @PreAuthorize("hasAnyRole('OWNER')")
@@ -61,19 +77,19 @@ public class BranchController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(
-            summary = "Approve for new branch"
-    )
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @PostMapping("/approval/{branchId}")
-    public ResponseEntity<ApiResponse<BranchDetailResponse>> approveBranch(
-            @PathVariable("branchId") Long id, @RequestParam boolean isApproved){
-        ApiResponse<BranchDetailResponse> response = new ApiResponse<>(
-                HttpStatus.OK,
-                "Approve clinic branch successfully!",
-                branchService.approveNewBranch(id, isApproved));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    @Operation(
+//            summary = "Approve for new branch"
+//    )
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @PostMapping("/approval/{branchId}")
+//    public ResponseEntity<ApiResponse<BranchDetailResponse>> approveBranch(
+//            @PathVariable("branchId") Long id, @RequestParam boolean isApproved){
+//        ApiResponse<BranchDetailResponse> response = new ApiResponse<>(
+//                HttpStatus.OK,
+//                "Approve clinic branch successfully!",
+//                branchService.approveNewBranch(id, isApproved));
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     @Operation(
             summary = "Get pending branch list"
@@ -124,7 +140,7 @@ public class BranchController {
     )
     @PreAuthorize("hasAnyRole('OWNER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<BranchSummaryResponse>> deleteStaff(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<BranchSummaryResponse>> deleteBranch(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         ApiResponse<BranchSummaryResponse> response = new ApiResponse<>(
                 HttpStatus.OK,

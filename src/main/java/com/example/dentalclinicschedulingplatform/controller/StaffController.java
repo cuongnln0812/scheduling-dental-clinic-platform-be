@@ -161,7 +161,7 @@ public class StaffController {
     @Operation(
             summary = "Get pending staff list"
     )
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/pending")
     public ResponseEntity<ApiResponse<Page<StaffSummaryResponse>>> getPendingStaffList(
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
