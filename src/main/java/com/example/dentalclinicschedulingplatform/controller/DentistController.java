@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateR
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistListResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.DentistViewListResponse;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
 import com.example.dentalclinicschedulingplatform.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/dentists")
@@ -122,6 +126,19 @@ public class DentistController {
                 HttpStatus.OK,
                 "Create account successfully!",
                 dentistService.removeDentist(dentistId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get available dentist")
+    @GetMapping("/available")
+    public ResponseEntity<ApiResponse<List<DentistViewListResponse>>> getAvailableDentist(
+            @RequestParam Long branchId,
+            @RequestParam LocalDate date,
+            @RequestParam Long slotId){
+        ApiResponse<List<DentistViewListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get dentist detail successfully!",
+                dentistService.getAvailableDentistOfDateByBranch(branchId, date, slotId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

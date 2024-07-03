@@ -25,6 +25,8 @@ public class AppointmentViewDetailsResponse {
 
     private String customerPhone;
 
+    private LocalDate dob;
+
     private int customerAge;
 
     private String customerEmail;
