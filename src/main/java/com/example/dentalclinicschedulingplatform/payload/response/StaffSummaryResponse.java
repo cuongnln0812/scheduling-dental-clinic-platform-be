@@ -14,6 +14,7 @@ import lombok.Setter;
 public class StaffSummaryResponse {
     private Long id;
     private String fullName;
+    private String email;
     private String phone;
     private String gender;
     private String clinicBranchName;
@@ -23,6 +24,7 @@ public class StaffSummaryResponse {
     public StaffSummaryResponse(ClinicStaff clinicStaff) {
         this.id = clinicStaff.getId();
         this.fullName = clinicStaff.getFullName();
+        this.email = clinicStaff.getEmail();
         this.phone = clinicStaff.getPhone();
         this.gender = clinicStaff.getGender();
         this.clinicBranchName = clinicStaff.getClinicBranch().getBranchName();

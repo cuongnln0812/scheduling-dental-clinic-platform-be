@@ -149,6 +149,20 @@ public class BranchController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Re-active branch"
+    )
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<BranchSummaryResponse>> reactiveBranch(@PathVariable("id") Long id) {
+        log.info("Has request with data: {}", id.toString());
+        ApiResponse<BranchSummaryResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Re-active branch successfully",
+                branchService.reactiveBranch(id));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 
 }
