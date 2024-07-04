@@ -11,6 +11,7 @@ public interface IMailService {
     void sendStaffRequestRejectionMail(ClinicStaff staff, String branchName);
     void sendDentistRequestApprovalMail(Dentist dentist, String password);
     void sendCustomerAppointmentRequestConfirmationMail(Customer customer, Appointment appointment);
+    void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment);
 
 //    void sendBranchRequestApprovalMail(ClinicOwner owner);
 //    void sendBranchRequestRejectionMail(ClinicOwner owner);

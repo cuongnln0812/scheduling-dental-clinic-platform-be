@@ -1,9 +1,6 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
-import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.ServiceViewDetailsResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.SlotDetailsResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursDetailsResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.service.impl.SlotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,9 +27,9 @@ public class SlotController {
             summary = "View slots of clinic branch"
     )
     @GetMapping()
-    public ResponseEntity<ApiResponse<List<WorkingHoursDetailsResponse>>> viewSlotListByClinic
+    public ResponseEntity<ApiResponse<List<WorkingHoursViewResponse>>> viewSlotListByClinic
             (@RequestParam(required = true) Long clinicBranchId){
-        ApiResponse<List<WorkingHoursDetailsResponse>> response = new ApiResponse<>(
+        ApiResponse<List<WorkingHoursViewResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get slots successfully",
                 slotService.viewSlotListByClinicBranch(clinicBranchId));
