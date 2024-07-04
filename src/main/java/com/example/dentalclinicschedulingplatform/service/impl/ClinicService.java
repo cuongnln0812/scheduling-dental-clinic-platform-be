@@ -5,11 +5,10 @@ import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
+import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
-import com.example.dentalclinicschedulingplatform.service.IBranchService;
-import com.example.dentalclinicschedulingplatform.service.IClinicService;
-import com.example.dentalclinicschedulingplatform.service.IMailService;
-import com.example.dentalclinicschedulingplatform.service.IOwnerService;
+import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
+import com.example.dentalclinicschedulingplatform.service.*;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,15 +19,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ClinicService implements IClinicService {
 
     private final ModelMapper modelMapper;
     private final ClinicRepository clinicRepository;
+    private final OwnerRepository ownerRepository;
+    private final ClinicBranchRepository branchRepository;
     private final IMailService mailService;
     private final IBranchService branchService;
     private final IOwnerService ownerService;
+    private final IAuthenticateService authenticateService;
 
     @Override
     @Transactional
@@ -106,5 +112,51 @@ public class ClinicService implements IClinicService {
         response.setClinicStatus(tmpClinic.getStatus());
         response.setOwnerDetail(modelMapper.map(tmpOwner, OwnerRegisterResponse.class));
         return response;
+    }
+
+    @Override
+    public ClinicStaffAndDentistResponse getAllStaffAndDentistByOwner() {
+        try {
+            ClinicOwner clinicOwner = ownerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic owner not found"));
+
+            Clinic clinic = clinicRepository.findByClinicOwnerId(clinicOwner.getId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+            List<ClinicBranch> clinicBranchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
+
+            // Lấy danh sách staff từ clinicBranchList
+            List<ClinicStaff> staffList = clinicBranchList.stream()
+                    .flatMap(branch -> branch.getStaffs().stream())
+                    .collect(Collectors.toList());
+
+            // Chuyển đổi danh sách ClinicStaff sang StaffSummaryResponse
+            List<StaffSummaryResponse> staffSummaryResponses = staffList.stream()
+                    .map(StaffSummaryResponse::new)
+                    .collect(Collectors.toList());
+
+            // Lấy danh sách dentist từ clinicBranchList
+            List<Dentist> dentistList = clinicBranchList.stream()
+                    .flatMap(branch -> branch.getDentists().stream())
+                    .collect(Collectors.toList());
+
+            // Chuyển đổi danh sách Dentist sang DentistListResponse
+            List<DentistListResponse> dentistListResponses = dentistList.stream()
+                    .map(dentist -> new DentistListResponse(
+                            dentist.getId(),
+                            dentist.getFullName(),
+                            dentist.getUsername(),
+                            dentist.getEmail(),
+                            dentist.getPhone(),
+                            dentist.getDob(),
+                            dentist.getGender(),
+                            dentist.getClinicBranch().getBranchName(),
+                            dentist.getStatus()))
+                    .collect(Collectors.toList());
+
+            return new ClinicStaffAndDentistResponse(staffSummaryResponses, dentistListResponses);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

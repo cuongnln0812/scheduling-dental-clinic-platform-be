@@ -319,7 +319,7 @@ public class StaffService implements IStaffService {
         clinicStaffs = iStaffRepository.findAllStaffByStatus(ClinicStatus.PENDING, pageRequest);
         return clinicStaffs.map(staff ->
                 new StaffSummaryResponse(staff.getId(),
-                staff.getFullName(), staff.getPhone(), staff.getGender(),
+                staff.getFullName(), staff.getEmail(), staff.getPhone(), staff.getGender(),
                             staff.getClinicBranch().getBranchName(), staff.getStatus()));
     }
 }
