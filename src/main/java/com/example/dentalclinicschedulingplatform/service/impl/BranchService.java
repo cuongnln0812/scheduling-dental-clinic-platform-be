@@ -246,4 +246,42 @@ public class BranchService implements IBranchService {
             throw e;
         }
     }
+
+    @Override
+    public BranchSummaryResponse reactiveBranch(Long branchId) {
+        try{
+            String role = authenticateService.getUserInfo().getRole();
+            if(!role.equals(UserType.OWNER.toString())){
+                throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
+            }
+            Optional<ClinicOwner> clinicOwner = Optional.ofNullable(ownerRepository.findByUsernameOrEmail(authenticateService.getUserInfo().getUsername(), authenticateService.getUserInfo().getEmail())
+                    .orElseThrow(() -> {
+                        throw new ApiException(HttpStatus.NOT_FOUND, "Clinic owner not found");
+                    }));
+            Clinic clinic = clinicRepository.findByClinicOwnerId(clinicOwner.get().getId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+            ClinicBranch clinicBranch = branchRepository.findById(branchId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
+            if(!clinicBranch.getStatus().equals(ClinicStatus.INACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not inactive");
+
+            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
+            boolean branchExists = false;
+            for (ClinicBranch branch : branchList) {
+                if (branch.getBranchId().equals(clinicBranch.getBranchId())) {
+                    branchExists = true;
+                    break;
+                }
+            }
+            if (!branchExists) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to owner");
+            }
+
+            clinicBranch.setStatus(ClinicStatus.ACTIVE);
+            clinicBranch.setModifiedDate(LocalDateTime.now());
+            branchRepository.save(clinicBranch);
+            return modelMapper.map(clinicBranch, BranchSummaryResponse.class);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }
