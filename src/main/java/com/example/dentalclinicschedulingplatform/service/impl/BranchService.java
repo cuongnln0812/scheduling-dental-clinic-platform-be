@@ -202,9 +202,15 @@ public class BranchService implements IBranchService {
             } else  {
                 clinicBranch.setPhone(request.getPhone());
             }
-            clinicBranch.setBranchName(request.getBranchName());
-            clinicBranch.setAddress(request.getAddress());
-            clinicBranch.setCity(request.getCity());
+            if(!request.getBranchName().isEmpty()) {
+                clinicBranch.setBranchName(request.getBranchName());
+            }
+            if(!request.getAddress().isEmpty()) {
+                clinicBranch.setAddress(request.getAddress());
+            }
+            if(!request.getCity().isEmpty()) {
+                clinicBranch.setCity(request.getCity());
+            }
             clinicBranch.setModifiedDate(LocalDateTime.now());
 
             branchRepository.save(clinicBranch);
