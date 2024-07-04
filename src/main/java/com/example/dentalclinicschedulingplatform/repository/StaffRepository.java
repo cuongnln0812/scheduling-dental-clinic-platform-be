@@ -45,4 +45,6 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
             "join clinic c on cb.clinic_id = c.clinic_id " +
             "WHERE cs.staff_id = :staffId", nativeQuery = true)
     Long getClinicIdOfStaff(Long staffId);
+
+    List<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId);
 }

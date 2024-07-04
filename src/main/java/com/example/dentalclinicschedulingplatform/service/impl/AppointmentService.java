@@ -224,12 +224,15 @@ public class AppointmentService implements IAppointmentService {
         }
 
         Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+                .orElse(null);
 
-//        if (customer == null) {
-//            customer = customerRepository.findById(appointment.getCustomerId())
-//                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
-//        }
+        if (customer == null && appointment.getCustomerId() != null) {
+            customer = customerRepository.findById(appointment.getCustomerId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+        }
+
+        ClinicStaff staff = staffRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                .orElse(null);
 
         WorkingHoursDetailsResponse workingHoursDetailsResponse = slotService.viewAvailableSlotsByDateByClinicBranch(appointment.getAppointmentDate(), appointment.getClinicBranchId());
 
@@ -262,6 +265,13 @@ public class AppointmentService implements IAppointmentService {
 
         Clinic currClinic = clinicRepository.findById(currClinicBranch.getClinic().getClinicId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        if (staff != null) {
+            List<ClinicStaff> staffOfBranch = staffRepository.findAllByClinicBranch_BranchId(currClinicBranch.getBranchId());
+            if (!staffOfBranch.contains(staff)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Staff does not belong to current branch");
+            }
+        }
 
         List<com.example.dentalclinicschedulingplatform.entity.Service> serviceOfClinic = serviceRepository.findServicesByClinic_ClinicId(currClinic.getClinicId());
 
