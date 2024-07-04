@@ -234,6 +234,10 @@ public class AppointmentService implements IAppointmentService {
         ClinicStaff staff = staffRepository.findByUsername(authenticateService.getUserInfo().getUsername())
                 .orElse(null);
 
+        if (customer == null && staff == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
         WorkingHoursDetailsResponse workingHoursDetailsResponse = slotService.viewAvailableSlotsByDateByClinicBranch(appointment.getAppointmentDate(), appointment.getClinicBranchId());
 
         List<SlotDetailsResponse> slotDetailsResponses = workingHoursDetailsResponse.slots;
