@@ -75,7 +75,7 @@ public class AppointmentService implements IAppointmentService {
                 Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
-                Customer currCustomer = customerRepository.findByUsername(currAppointment.getCustomer().getUsername())
+                Customer currCustomer = customerRepository.findById(currAppointment.getCustomer().getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
 
                 ClinicBranch currBranch = clinicBranchRepository.findById(currAppointment.getClinicBranch().getBranchId())
@@ -90,10 +90,10 @@ public class AppointmentService implements IAppointmentService {
                 Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
 
-                pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+                pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId(),currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                          currAppointment.getCustomerDob(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                         , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
-                        , modelMapper.map(currService, ServiceViewListResponse.class)));
+                        , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
 
             }else if (appointment.getStatus().equals(AppointmentStatus.DONE)){
                 doneAppointments.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
@@ -152,10 +152,10 @@ public class AppointmentService implements IAppointmentService {
                     Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
                             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
 
-                    pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+                    pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name() , currCustomer.getId(),currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                             currAppointment.getCustomerDob() ,currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                             , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
-                            , modelMapper.map(currService, ServiceViewListResponse.class)));
+                            , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
 
                 }else if (appointment.getStatus().equals(AppointmentStatus.DONE)) {
                     doneAppointments.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
@@ -179,7 +179,7 @@ public class AppointmentService implements IAppointmentService {
                 Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
-                Customer currCustomer = customerRepository.findByUsername(appointment.getCustomer().getUsername())
+                Customer currCustomer = customerRepository.findById(appointment.getCustomer().getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
 
                 ClinicBranch currBranch = clinicBranchRepository.findById(currAppointment.getClinicBranch().getBranchId())
@@ -194,10 +194,10 @@ public class AppointmentService implements IAppointmentService {
                 Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
 
-                pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+                pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId(),currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                         currAppointment.getCustomerDob(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                         , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
-                        , modelMapper.map(currService, ServiceViewListResponse.class)));
+                        , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
             }else if (appointment.getStatus().equals(AppointmentStatus.DONE)) {
                 doneAppointments.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
             }
@@ -224,7 +224,12 @@ public class AppointmentService implements IAppointmentService {
         }
 
         Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+                .orElse(null);
+
+        if (customer == null) {
+            customer = customerRepository.findById(appointment.getCustomerId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+        }
 
         WorkingHoursDetailsResponse workingHoursDetailsResponse = slotService.viewAvailableSlotsByDateByClinicBranch(appointment.getAppointmentDate(), appointment.getClinicBranchId());
 
@@ -301,13 +306,13 @@ public class AppointmentService implements IAppointmentService {
 
         mailService.sendCustomerAppointmentRequestConfirmationMail(customer, newAppointment);
 
-        return new AppointmentViewDetailsResponse(newAppointment.getId(), newAppointment.getCustomerName(), newAppointment.getCustomerAddress(),
+        return new AppointmentViewDetailsResponse(newAppointment.getId(), newAppointment.getStatus().name(), customer.getId(),newAppointment.getCustomerName(), newAppointment.getCustomerAddress(),
                 newAppointment.getCustomerPhone(), newAppointment.getCustomerDob(), newAppointment.getCustomerAge(),
                 newAppointment.getCustomerEmail(), newAppointment.getAppointmentDate(),
                 newAppointment.getDuration(), modelMapper.map(newAppointment.getSlot(), SlotDetailsResponse.class),
                 modelMapper.map(newAppointment.getClinicBranch(), BranchSummaryResponse.class),
                 modelMapper.map(newAppointment.getDentist(), DentistViewListResponse.class),
-                modelMapper.map(newAppointment.getService(), ServiceViewListResponse.class));
+                modelMapper.map(newAppointment.getService(), ServiceViewListResponse.class), newAppointment.getCreatedDate());
 //        return null;
     }
 
@@ -320,7 +325,7 @@ public class AppointmentService implements IAppointmentService {
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
-        Customer currCustomer = customerRepository.findByUsername(currAppointment.getCustomer().getUsername())
+        Customer currCustomer = customerRepository.findById(currAppointment.getCustomer().getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
 
 
@@ -342,9 +347,49 @@ public class AppointmentService implements IAppointmentService {
             }
         }
         
-        return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+        return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                 currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
-                , modelMapper.map(currService, ServiceViewListResponse.class));
+                , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
+    }
+
+    @Override
+    public AppointmentViewDetailsResponse cancelAppointment(Long appointmentId) {
+
+        if (!authenticateService.getUserInfo().getRole().equals(UserType.CUSTOMER.toString()) &&
+                !authenticateService.getUserInfo().getRole().equals(UserType.STAFF.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        Appointment currAppointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
+
+        Customer currCustomer = customerRepository.findById(currAppointment.getCustomer().getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+
+        ClinicBranch currBranch = clinicBranchRepository.findById(currAppointment.getClinicBranch().getBranchId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        com.example.dentalclinicschedulingplatform.entity.Service currService = serviceRepository.findById(currAppointment.getService().getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service not found"));
+
+        Slot currSlot = slotRepository.findById(currAppointment.getSlot().getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+        Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
+
+        if (currAppointment.getStatus().equals(AppointmentStatus.CANCELED)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "The appointment is already canceled");
+        }
+
+        currAppointment.setStatus(AppointmentStatus.CANCELED);
+
+        appointmentRepository.save(currAppointment);
+
+        return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+                currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
+                , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
     }
 }

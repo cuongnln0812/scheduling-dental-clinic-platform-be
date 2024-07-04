@@ -33,5 +33,5 @@ public class AppointmentCreateRequest {
 
     private Long serviceId;
 
-//    private Long customerId;
+    private Long customerId;
 }

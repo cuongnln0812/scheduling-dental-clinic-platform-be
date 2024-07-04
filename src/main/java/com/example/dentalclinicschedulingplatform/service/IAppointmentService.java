@@ -14,4 +14,5 @@ public interface IAppointmentService {
     Map<String, Object> getAppointments(UserInformationRes userInformationRes, int page, int size);
     AppointmentViewDetailsResponse makeAppointment(AppointmentCreateRequest appointment);
     AppointmentViewDetailsResponse viewDetailsAppointment(Long appointmentId);
+    AppointmentViewDetailsResponse cancelAppointment(Long appointmentId);
 }

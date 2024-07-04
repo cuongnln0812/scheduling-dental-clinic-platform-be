@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.response.SlotDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursDetailsResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursViewResponse;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.ISlotService;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class SlotService implements ISlotService {
     }
 
     @Override
-    public List<WorkingHoursDetailsResponse> viewSlotListByClinicBranch(Long clinicBranchId) {
+    public List<WorkingHoursViewResponse> viewSlotListByClinicBranch(Long clinicBranchId) {
 
         ClinicBranch clinicBranch = clinicBranchRepository.findById(clinicBranchId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
@@ -57,10 +58,13 @@ public class SlotService implements ISlotService {
         Clinic clinic = clinicRepository.findById(clinicBranch.getClinic().getClinicId())
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Clinic not found"));
 
-        List<WorkingHoursDetailsResponse> slotList = new ArrayList<>();
+        List<WorkingHoursViewResponse> slotList = new ArrayList<>();
 
         for (DayInWeek day: DayInWeek.values()) {
             List<Slot> slots = slotRepository.findByClinicAndDay(day.name(), clinic.getClinicId());
+
+            WorkingHours existingDay = workingHourRepository.findByDayAndClinic(day, clinic)
+                    .orElse(null);
 
             List<SlotDetailsResponse> slotDetailResponses = new ArrayList<>();
 
@@ -68,7 +72,11 @@ public class SlotService implements ISlotService {
                 slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
             }
 
-            slotList.add(new WorkingHoursDetailsResponse(day.name(), slotDetailResponses));
+            if (existingDay != null) {
+                slotList.add(new WorkingHoursViewResponse(day.name(),existingDay.getCreatedDate(), existingDay.getModifiedDate(),slotDetailResponses));
+            }else {
+                slotList.add(new WorkingHoursViewResponse(day.name(),null, null,slotDetailResponses));
+            }
         }
         return slotList;
     }

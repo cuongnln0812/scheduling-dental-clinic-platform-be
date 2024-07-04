@@ -19,6 +19,10 @@ public class AppointmentViewDetailsResponse {
 
     public Long appointmentId;
 
+    public String appointmentStatus;
+
+    public Long customerId;
+
     public String customerName;
 
     private String customerAddress;
@@ -42,4 +46,6 @@ public class AppointmentViewDetailsResponse {
     private DentistViewListResponse dentist;
 
     private ServiceViewListResponse service;
+
+    private LocalDateTime createdDate;
 }
