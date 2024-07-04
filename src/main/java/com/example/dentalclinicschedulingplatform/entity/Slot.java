@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,8 +41,8 @@ public class Slot {
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
-    @OneToOne(mappedBy = "slot")
-    private Appointment appointment;
+    @OneToMany(mappedBy = "slot")
+    private List<Appointment> appointment;
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
