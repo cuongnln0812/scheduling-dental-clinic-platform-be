@@ -47,8 +47,8 @@ public class Appointment {
     private LocalDateTime createdDate;
     @OneToOne(mappedBy = "appointment")
     private TreatmentOutcome treatmentOutcome;
-    @OneToOne
-    @JoinColumn(name = "slot_id", referencedColumnName = "slot_id")
+    @ManyToOne
+    @JoinColumn(name = "slot_id")
     private Slot slot;
     @ManyToOne
     @JoinColumn(name = "customer_id")
