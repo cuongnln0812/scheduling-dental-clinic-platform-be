@@ -98,33 +98,23 @@ public class AuthenticateService implements IAuthenticateService {
         if(role.equals("ROLE_" + UserType.CUSTOMER)){
             Customer user = customerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(UserType.CUSTOMER.toString());
+            res = mapUserRes(user);
         }else if(role.equals("ROLE_" + UserType.DENTIST)){
             Dentist user = dentistRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            res = modelMapper.map(user, UserInformationRes.class);
-            res.setClinicId(user.getClinicBranch().getClinic().getClinicId());
-            res.setBranchId(user.getClinicBranch().getBranchId());
-            res.setRole(UserType.DENTIST.toString());
+            res = mapUserRes(user);
         }else if(role.equals("ROLE_" + UserType.STAFF)){
             ClinicStaff user = staffRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            res = modelMapper.map(user, UserInformationRes.class);
-            res.setClinicId(user.getClinicBranch().getClinic().getClinicId());
-            res.setBranchId(user.getClinicBranch().getBranchId());
-            res.setRole(UserType.STAFF.toString());
+            res = mapUserRes(user);
         }else if(role.equals("ROLE_" + UserType.OWNER)){
             ClinicOwner user = ownerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            res = modelMapper.map(user, UserInformationRes.class);
-            res.setClinicId(user.getClinic().getClinicId());
-            res.setRole(UserType.OWNER.toString());
+            res = mapUserRes(user);
         } else if (role.equals("ROLE_" + UserType.ADMIN)) {
             SystemAdmin user = systemAdminRepository.findByUsername(name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            res = modelMapper.map(user, UserInformationRes.class);
-            res.setRole(UserType.ADMIN.toString());
+            res = mapUserRes(user);
         }
         return res;
     }
@@ -144,7 +134,7 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             modelMapper.map(request, existingUser);
             var updated = customerRepository.save(existingUser);
-            return modelMapper.map(updated, UserInformationRes.class);
+            return mapUserRes(updated);
         }else if(role.equals("ROLE_" + UserType.DENTIST)){
             var existingUser = dentistRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -156,7 +146,7 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             modelMapper.map(request, existingUser);
             var updated = dentistRepository.save(existingUser);
-            return modelMapper.map(updated, UserInformationRes.class);
+            return mapUserRes(updated);
         }else if(role.equals("ROLE_" + UserType.STAFF)){
             var existingUser = staffRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -168,7 +158,7 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             modelMapper.map(request, existingUser);
             var updated = staffRepository.save(existingUser);
-            return modelMapper.map(updated, UserInformationRes.class);
+            return mapUserRes(updated);
         }else if(role.equals("ROLE_" + UserType.OWNER)){
             var existingUser = ownerRepository.findByUsernameOrEmail(name, name)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -180,7 +170,7 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             modelMapper.map(request, existingUser);
             var updated = ownerRepository.save(existingUser);
-            return modelMapper.map(updated, UserInformationRes.class);
+            return mapUserRes(updated);
         } else {
             throw new ApiException(HttpStatus.NOT_FOUND, "Invalid role!");
         }
@@ -468,4 +458,59 @@ public class AuthenticateService implements IAuthenticateService {
         }
     }
 
+    private UserInformationRes mapUserRes(Object user){
+        UserInformationRes res = new UserInformationRes();
+        if(user instanceof Customer){
+            res.setUsername(((Customer) user).getUsername());
+            res.setFullName(((Customer) user).getFullName());
+            res.setEmail(((Customer) user).getEmail());
+            res.setAddress(((Customer) user).getAddress());
+            res.setPhone(((Customer) user).getPhone());
+            res.setDob(((Customer) user).getDob());
+            res.setGender(((Customer) user).getGender());
+            res.setAvatar(((Customer) user).getAvatar());
+            res.setRole(UserType.CUSTOMER.toString());
+        }else if(user instanceof Dentist){
+            res.setUsername(((Dentist) user).getUsername());
+            res.setFullName(((Dentist) user).getFullName());
+            res.setEmail(((Dentist) user).getEmail());
+            res.setAddress(((Dentist) user).getAddress());
+            res.setPhone(((Dentist) user).getPhone());
+            res.setDob(((Dentist) user).getDob());
+            res.setGender(((Dentist) user).getGender());
+            res.setAvatar(((Dentist) user).getAvatar());
+            res.setClinicId(((Dentist) user).getClinicBranch().getClinic().getClinicId());
+            res.setClinicId(((Dentist) user).getClinicBranch().getBranchId());
+            res.setRole(UserType.DENTIST.toString());
+        }else if(user instanceof ClinicStaff){
+            res.setUsername(((ClinicStaff) user).getUsername());
+            res.setFullName(((ClinicStaff) user).getFullName());
+            res.setEmail(((ClinicStaff) user).getEmail());
+            res.setAddress(((ClinicStaff) user).getAddress());
+            res.setPhone(((ClinicStaff) user).getPhone());
+            res.setDob(((ClinicStaff) user).getDob());
+            res.setGender(((ClinicStaff) user).getGender());
+            res.setAvatar(((ClinicStaff) user).getAvatar());
+            res.setClinicId(((ClinicStaff) user).getClinicBranch().getClinic().getClinicId());
+            res.setClinicId(((ClinicStaff) user).getClinicBranch().getBranchId());
+            res.setRole(UserType.STAFF.toString());
+        }else if(user instanceof ClinicOwner) {
+            res.setUsername(((ClinicOwner) user).getUsername());
+            res.setFullName(((ClinicOwner) user).getFullName());
+            res.setEmail(((ClinicOwner) user).getEmail());
+            res.setAddress(((ClinicOwner) user).getAddress());
+            res.setPhone(((ClinicOwner) user).getPhone());
+            res.setDob(((ClinicOwner) user).getDob());
+            res.setGender(((ClinicOwner) user).getGender());
+            res.setAvatar(((ClinicOwner) user).getAvatar());
+            res.setClinicId(((ClinicOwner) user).getClinic().getClinicId());
+            res.setRole(UserType.OWNER.toString());
+        }else if(user instanceof SystemAdmin){
+            res.setUsername(((SystemAdmin) user).getUsername());
+            res.setRole(UserType.ADMIN.toString());
+        }else {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid user type!");
+        }
+        return res;
+    }
 }
