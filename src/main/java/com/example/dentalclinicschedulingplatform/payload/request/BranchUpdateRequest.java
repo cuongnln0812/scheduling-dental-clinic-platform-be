@@ -16,6 +16,6 @@ public class BranchUpdateRequest {
     private String branchName;
     private String address;
     private String city;
-    @Pattern(regexp="^[0-9]{10,12}$", message="Invalid phone number")
+    @Pattern(regexp = "^$|^[0-9]{10,12}$", message = "Invalid phone number")
     private String phone;
 }
