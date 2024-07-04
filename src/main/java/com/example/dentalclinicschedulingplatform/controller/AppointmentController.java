@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
+import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewListResponse;
@@ -10,6 +11,7 @@ import com.example.dentalclinicschedulingplatform.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -70,6 +72,19 @@ public class AppointmentController {
                 HttpStatus.OK,
                 "Get appointments successfully",
                 appointmentService.getAppointments(authenticateService.getUserInfo(), page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Make appointments"
+    )
+    @PostMapping()
+    public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> makeAppointment
+            (@Valid @RequestBody AppointmentCreateRequest request){
+        ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get appointments successfully",
+                appointmentService.makeAppointment(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

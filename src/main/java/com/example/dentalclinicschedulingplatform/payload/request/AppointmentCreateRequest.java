@@ -19,7 +19,7 @@ public class AppointmentCreateRequest {
 
     private String customerPhone;
 
-    private int customerDob;
+    private LocalDate customerDob;
 
     private String customerEmail;
 
@@ -32,4 +32,6 @@ public class AppointmentCreateRequest {
     private Long dentistId;
 
     private Long serviceId;
+
+//    private Long customerId;
 }
