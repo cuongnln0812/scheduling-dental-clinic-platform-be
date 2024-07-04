@@ -185,6 +185,27 @@ public class MailService implements IMailService {
         mailSender.send(message);
     }
 
+    @Async
+    @Override
+    public void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(appointment.getCustomerEmail());
+        message.setSubject("[F-Dental] - Xác nhận hủy lịch hẹn");
+        message.setText("Chào " + appointment.getCustomerName() + ",\n\n" +
+                "Chúng tôi xin thông báo rằng lịch hẹn của bạn tại F-Dental đã được hủy thành công. Dưới đây là thông tin chi tiết về lịch hẹn đã hủy:\n\n" +
+                "• Ngày hẹn: " + appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
+                "• Giờ hẹn: " + appointment.getSlot().getStartTime() + " - " + appointment.getSlot().getEndTime() + "\n" +
+                "• Nha sĩ: " + appointment.getDentist().getFullName() + "\n" +
+                "• Dịch vụ: " + appointment.getService().getServiceName() + "\n" +
+                "• Địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
+                "Nếu bạn có bất kỳ câu hỏi nào hoặc cần đặt lại lịch hẹn, xin vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email này.\n\n" +
+                "Cảm ơn bạn đã tin tưởng và lựa chọn F-Dental. Chúng tôi rất mong được phục vụ bạn trong tương lai.\n\n" +
+                "Trân trọng,\n" +
+                "Đội ngũ F-Dental");
+        mailSender.send(message);
+    }
+
 //    @Async
 //    @Override
 //    public void sendBranchRequestApprovalMail(ClinicOwner owner) {

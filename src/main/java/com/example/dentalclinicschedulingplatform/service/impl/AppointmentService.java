@@ -224,12 +224,12 @@ public class AppointmentService implements IAppointmentService {
         }
 
         Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
-                .orElse(null);
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
 
-        if (customer == null) {
-            customer = customerRepository.findById(appointment.getCustomerId())
-                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
-        }
+//        if (customer == null) {
+//            customer = customerRepository.findById(appointment.getCustomerId())
+//                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
+//        }
 
         WorkingHoursDetailsResponse workingHoursDetailsResponse = slotService.viewAvailableSlotsByDateByClinicBranch(appointment.getAppointmentDate(), appointment.getClinicBranchId());
 
@@ -361,6 +361,9 @@ public class AppointmentService implements IAppointmentService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
         }
 
+       Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+               .orElse(null);
+
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
@@ -379,6 +382,12 @@ public class AppointmentService implements IAppointmentService {
         Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
 
+        if (customer != null) {
+            if (!customer.getId().equals(currCustomer.getId())) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Can not cancel another customers' appointments");
+            }
+        }
+
         if (currAppointment.getStatus().equals(AppointmentStatus.CANCELED)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "The appointment is already canceled");
         }
@@ -386,6 +395,8 @@ public class AppointmentService implements IAppointmentService {
         currAppointment.setStatus(AppointmentStatus.CANCELED);
 
         appointmentRepository.save(currAppointment);
+
+        mailService.sendCustomerAppointmentCancelConfirmationMail(currCustomer, currAppointment);
 
         return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                 currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
