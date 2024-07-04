@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -16,5 +17,7 @@ public class CategoryViewResponse {
     private String categoryName;
     private String categoryImage;
     private boolean status;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private List<ServiceViewDetailsResponse> services;
 }
