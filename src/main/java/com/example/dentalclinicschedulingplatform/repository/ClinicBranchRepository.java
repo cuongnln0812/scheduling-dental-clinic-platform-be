@@ -28,6 +28,7 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
     Optional<ClinicBranch> findByBranchIdAndOwnerId(@Param("branchId") Long branchId,
                                                     @Param("ownerId") Long ownerId);
     ClinicBranch findByPhone(String phone);
+    ClinicBranch findByAddress(String address);
 
     Page<ClinicBranch> findAllByStatusAndIsMain(ClinicStatus status, boolean isMain, Pageable pageable);
 
