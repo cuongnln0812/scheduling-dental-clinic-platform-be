@@ -20,5 +20,6 @@ public interface IBranchService {
     BranchSummaryResponse getBranchPendingDetail(Long branchId);
     BranchSummaryResponse updateBranch(BranchUpdateRequest request);
     BranchSummaryResponse deleteBranch(Long branchId);
+    BranchSummaryResponse reactiveBranch(Long branchId);
     BranchDetailResponse viewBranch(Long id);
 }
