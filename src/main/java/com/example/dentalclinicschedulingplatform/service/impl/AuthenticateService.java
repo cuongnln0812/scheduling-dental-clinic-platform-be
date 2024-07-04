@@ -77,8 +77,8 @@ public class AuthenticateService implements IAuthenticateService {
     @Transactional
     public CustomerRegisterResponse registerCustomerAccount(CustomerRegisterRequest request) {
         // add check if username already exists
-        if(isUsernameOrEmailExisted(request.getUsername(), request.getEmail()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Username/Email is already used");
+        if(isUsernameExisted(request.getUsername()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Username is already used");
         if(request.getDob().isAfter(LocalDate.now()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
         Customer user = new Customer();
