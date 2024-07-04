@@ -105,7 +105,7 @@ public class BranchService implements IBranchService {
         try{
             Clinic clinic = clinicRepository.findById(clinicId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
-            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicIdAndStatus(clinic.getClinicId(), ClinicStatus.ACTIVE);
+            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
             // Map List<ClinicBranch> to List<BranchSummaryResponse>
             return branchList.stream()
                     .map(BranchSummaryResponse::new)
