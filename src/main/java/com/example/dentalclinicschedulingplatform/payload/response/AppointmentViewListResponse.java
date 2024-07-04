@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
+import com.example.dentalclinicschedulingplatform.entity.AppointmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,6 @@ import java.time.LocalDateTime;
 public class AppointmentViewListResponse {
     public Long appointmentId;
     public LocalDate appointmentDate;
+    private LocalDateTime createdDate;
+    private AppointmentStatus appointmentStatus;
 }

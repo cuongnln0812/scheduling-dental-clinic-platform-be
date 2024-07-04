@@ -46,7 +46,8 @@ public class DentalService implements IDentalService {
         for (Service serviceItem : serviceList) {
             if (serviceItem.isStatus()){
                 serviceViewDetailsResponseList.add(new ServiceViewDetailsResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.getDescription(),
-                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.isStatus()));
+                        serviceItem.getUnitOfPrice(), serviceItem.getMinimumPrice(), serviceItem.getMaximumPrice(), serviceItem.getDuration(),serviceItem.getServiceType(), serviceItem.isStatus()
+                        , serviceItem.getCategory().getId(), serviceItem.getCategory().getCategoryName()));
             }
         }
         return serviceViewDetailsResponseList;
@@ -61,7 +62,9 @@ public class DentalService implements IDentalService {
         if (clinicId == null) {
             Page<Service> servicePage = serviceRepository.findAll(pageRequest);
             for (Service serviceItem: servicePage) {
-                serviceViewListResponses.add(modelMapper.map(serviceItem, ServiceViewListResponse.class));
+                serviceViewListResponses.add(new ServiceViewListResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.isStatus()
+                        , serviceItem.getCreatedDate(), serviceItem.getModifiedDate(), serviceItem.getCategory().getCategoryName()
+                        , serviceItem.getClinic().getClinicId()));
             }
             serviceViewListResponses.sort(Comparator.comparing(ServiceViewListResponse::getId));
             return serviceViewListResponses;
@@ -72,7 +75,9 @@ public class DentalService implements IDentalService {
             Page<Service> serviceList = serviceRepository.findServicesByClinic_ClinicId(clinicId, pageRequest);
 
             for (Service serviceItem :serviceList) {
-                serviceViewListResponses.add(modelMapper.map(serviceItem, ServiceViewListResponse.class));
+                serviceViewListResponses.add(new ServiceViewListResponse(serviceItem.getId(), serviceItem.getServiceName(), serviceItem.isStatus()
+                        , serviceItem.getCreatedDate(), serviceItem.getModifiedDate(), serviceItem.getCategory().getCategoryName()
+                        , serviceItem.getClinic().getClinicId()));
             }
             serviceViewListResponses.sort(Comparator.comparing(ServiceViewListResponse::getId));
             return serviceViewListResponses;
@@ -179,7 +184,8 @@ public class DentalService implements IDentalService {
 
             serviceRepository.save(updatedService);
             return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
-                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(), updatedService.getServiceType(), updatedService.isStatus());
+                    updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration()
+                    , updatedService.getServiceType(), updatedService.isStatus(), updatedService.getCategory().getId(), updatedService.getCategory().getCategoryName());
         }
 
         Clinic clinic = clinicRepository.findByClinicOwnerId(owner.getId())
@@ -221,7 +227,8 @@ public class DentalService implements IDentalService {
 
         serviceRepository.save(updatedService);
         return new ServiceViewDetailsResponse(updatedService.getId(), updatedService.getServiceName(), updatedService.getDescription(),
-                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice(), updatedService.getDuration(),updatedService.getServiceType(), updatedService.isStatus());
+                updatedService.getUnitOfPrice(), updatedService.getMinimumPrice(), updatedService.getMaximumPrice()
+                , updatedService.getDuration(),updatedService.getServiceType(), updatedService.isStatus(), updatedService.getCategory().getId(), updatedService.getCategory().getCategoryName());
     }
 
     @Override
@@ -257,7 +264,8 @@ public class DentalService implements IDentalService {
         serviceRepository.save(deletedService);
 
         return new ServiceViewDetailsResponse(deletedService.getId(), deletedService.getServiceName(), deletedService.getDescription(),
-                deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice(), deletedService.getDuration(), deletedService.getServiceType(), deletedService.isStatus());
+                deletedService.getUnitOfPrice(), deletedService.getMinimumPrice(), deletedService.getMaximumPrice()
+                , deletedService.getDuration(), deletedService.getServiceType(), deletedService.isStatus(), deletedService.getCategory().getId(), deletedService.getCategory().getCategoryName());
     }
 
     @Override
@@ -293,7 +301,7 @@ public class DentalService implements IDentalService {
         serviceRepository.save(currService);
 
         return new ServiceViewDetailsResponse(currService.getId(), currService.getServiceName(), currService.getDescription(), currService.getUnitOfPrice(), currService.getMinimumPrice(), currService.getMaximumPrice(),
-                currService.getDuration(), currService.getServiceType(), currService.isStatus());
+                currService.getDuration(), currService.getServiceType(), currService.isStatus(), currService.getCategory().getId(), currService.getCategory().getCategoryName());
     }
 
     @Override
@@ -318,6 +326,7 @@ public class DentalService implements IDentalService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Current service does not belong to the clinic of owner");
         }
 
-        return modelMapper.map(currService, ServiceViewDetailsResponse.class);
+        return new ServiceViewDetailsResponse(currService.getId(), currService.getServiceName(), currService.getDescription(), currService.getUnitOfPrice(), currService.getMinimumPrice(), currService.getMaximumPrice(),
+                currService.getDuration(), currService.getServiceType(), currService.isStatus(), currService.getCategory().getId(), currService.getCategory().getCategoryName());
     }
 }

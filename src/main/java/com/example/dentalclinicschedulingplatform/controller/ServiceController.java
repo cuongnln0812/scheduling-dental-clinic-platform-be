@@ -47,7 +47,7 @@ public class ServiceController {
              @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
         ApiResponse<List<ServiceViewListResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Get categories successfully",
+                "Get services successfully",
                 dentalService.viewServicesByClinic(clinicId, page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

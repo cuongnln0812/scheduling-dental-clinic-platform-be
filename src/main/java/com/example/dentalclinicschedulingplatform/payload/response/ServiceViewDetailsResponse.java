@@ -20,4 +20,6 @@ public class ServiceViewDetailsResponse {
     private int duration;
     private String serviceType;
     private boolean status;
+    private Long categoryId;
+    private String categoryName;
 }

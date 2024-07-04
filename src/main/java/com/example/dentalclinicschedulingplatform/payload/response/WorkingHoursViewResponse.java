@@ -1,23 +1,20 @@
 package com.example.dentalclinicschedulingplatform.payload.response;
 
-import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class ServiceViewListResponse {
-    private Long id;
-    private String serviceName;
-    private boolean status;
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkingHoursViewResponse {
+    public String day;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
-    private String categoryName;
-    private Long clinicId;
+    public List<SlotDetailsResponse> slots;
 }
