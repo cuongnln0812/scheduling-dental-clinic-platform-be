@@ -87,4 +87,17 @@ public class AppointmentController {
                 appointmentService.makeAppointment(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "Cancel appointment"
+    )
+    @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> cancelAppointment
+            (@PathVariable ("appointmentId") Long appointmentId){
+        ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Cancel appointments successfully",
+                appointmentService.cancelAppointment(appointmentId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
