@@ -29,6 +29,8 @@ public class StaffResponse {
     private String avatar;
     private ClinicStatus status;
     private String clinicBranchName;
+    private Long clinicBranchId;
+    private String clinicBranchCity;
 
 
     public StaffResponse(ClinicStaff clinicStaff){
@@ -44,5 +46,7 @@ public class StaffResponse {
         this.avatar = clinicStaff.getAvatar();
         this.status = clinicStaff.getStatus();
         this.clinicBranchName = clinicStaff.getClinicBranch().getBranchName();
+        this.clinicBranchId = clinicStaff.getClinicBranch().getBranchId();
+        this.clinicBranchCity = clinicStaff.getClinicBranch().getCity();
     }
 }

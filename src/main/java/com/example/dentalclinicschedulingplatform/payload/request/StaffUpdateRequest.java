@@ -18,13 +18,11 @@ public class StaffUpdateRequest {
 
     private String fullName;
 
-//    private String username;
-
     @Pattern(regexp="^(?=.*[A-Z])(?=.*\\d).{6,}$",
             message="Password must be at least 6 characters long, containing at least one uppercase letter and one digit")
     private String password;
 
-    @Pattern(regexp="^[0-9]{10,12}$", message="Invalid phone number")
+    @Pattern(regexp = "^$|^[0-9]{10,12}$", message = "Invalid phone number")
     private String phone;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
