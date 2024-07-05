@@ -93,7 +93,22 @@ public class StaffController {
         StaffResponse staffResponse = iStaffService.deleteStaff(authenticateService.getUserInfo(), id);
         ApiResponse<StaffResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Delete staff successfully",
+                "Change status staff successfully",
+                staffResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Re-active staff"
+    )
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<StaffResponse>> reactiveStaff(@PathVariable("id") Long id) {
+        log.info("Has request with data: {}", id.toString());
+        StaffResponse staffResponse = iStaffService.reactiveStaff(authenticateService.getUserInfo(), id);
+        ApiResponse<StaffResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Change status staff successfully",
                 staffResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
