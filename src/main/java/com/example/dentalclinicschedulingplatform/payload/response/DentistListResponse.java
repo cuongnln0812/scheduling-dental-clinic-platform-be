@@ -14,12 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DentistListResponse {
     private Long dentistId;
+    private String avatar;
     private String fullName;
     private String username;
-    private String email;
-    private String phone;
-    private LocalDate dob;
-    private String gender;
+    private String specialty;
+    private String city;
+    private Long branchId;
     private String branchName;
+    private String clinicName;
     private ClinicStatus status;
 }

@@ -144,13 +144,14 @@ public class ClinicService implements IClinicService {
             List<DentistListResponse> dentistListResponses = dentistList.stream()
                     .map(dentist -> new DentistListResponse(
                             dentist.getId(),
+                            dentist.getAvatar(),
                             dentist.getFullName(),
                             dentist.getUsername(),
-                            dentist.getEmail(),
-                            dentist.getPhone(),
-                            dentist.getDob(),
-                            dentist.getGender(),
+                            dentist.getSpecialty(),
+                            dentist.getClinicBranch().getCity(),
+                            dentist.getClinicBranch().getBranchId(),
                             dentist.getClinicBranch().getBranchName(),
+                            dentist.getClinicBranch().getClinic().getClinicName(),
                             dentist.getStatus()))
                     .collect(Collectors.toList());
 

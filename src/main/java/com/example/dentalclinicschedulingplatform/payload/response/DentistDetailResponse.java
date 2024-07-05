@@ -21,6 +21,10 @@ public class DentistDetailResponse {
     private String specialty;
     private String experience;
     private String avatar;
+    private Long branchId;
     private String branchName;
+    private String city;
+    private Long clinicId;
+    private String clinicName;
     private ClinicStatus status;
 }
