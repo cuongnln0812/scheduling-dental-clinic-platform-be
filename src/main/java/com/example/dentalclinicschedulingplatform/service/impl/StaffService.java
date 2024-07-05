@@ -165,6 +165,7 @@ public class StaffService implements IStaffService {
                     throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
                 clinicStaff.setClinicBranch(clinicBranch);
             }
+
             iStaffRepository.save(clinicStaff);
             return new StaffResponse(clinicStaff);
 
@@ -205,6 +206,48 @@ public class StaffService implements IStaffService {
                 throw new ApiException(HttpStatus.CONFLICT, "Clinic staff is already been deactivated");
             } else {
                 clinicStaff.setStatus(ClinicStatus.INACTIVE);
+            }
+
+            iStaffRepository.save(clinicStaff);
+            return new StaffResponse(clinicStaff);
+
+        }  catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public StaffResponse reactiveStaff(UserInformationRes userInformationRes, Long id) {
+        try {
+            if(!userInformationRes.getRole().contains(UserType.OWNER.toString())){
+                throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
+            }
+
+            Optional<ClinicOwner> clinicOwner = Optional.ofNullable(iOwnerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
+                    .orElseThrow(() -> {
+                        throw new ApiException(HttpStatus.NOT_FOUND, "Clinic owner not found");
+                    }));
+
+            ClinicStaff clinicStaff = iStaffRepository.findById(id)
+                    .orElseThrow(() -> {
+                        throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not found");
+                    });
+
+            List<ClinicStaff> staffList = iStaffRepository.findAllStaffByOwnerId(clinicOwner.get().getId());
+            boolean staffExists = false;
+            for (ClinicStaff staff : staffList) {
+                if (staff.getId().equals(clinicStaff.getId())) {
+                    staffExists = true;
+                    break;
+                }
+            }
+            if (!staffExists) {
+                throw new ApiException(HttpStatus.NOT_FOUND, "Clinic staff not belong to owner");
+            }
+            if(!clinicStaff.getStatus().equals(ClinicStatus.INACTIVE)){
+                throw new ApiException(HttpStatus.CONFLICT, "Clinic staff is not inactive");
+            } else {
+                clinicStaff.setStatus(ClinicStatus.ACTIVE);
             }
 
             iStaffRepository.save(clinicStaff);
