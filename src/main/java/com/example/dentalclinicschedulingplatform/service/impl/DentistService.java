@@ -55,7 +55,12 @@ public class DentistService implements IDentistService  {
             dentistList = dentistRepository.findAllByClinicBranch_BranchId(branchId, pageRequest);
         }else dentistList = dentistRepository.findAll(pageRequest);
 
-        return dentistList.map(dentist -> modelMapper.map(dentist,DentistListResponse.class));
+        return dentistList.map(dentist -> {
+            DentistListResponse res = modelMapper.map(dentist, DentistListResponse.class);
+            res.setCity(dentist.getClinicBranch().getCity());
+            res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
+            return res;
+        });
     }
 
     @Override
@@ -93,7 +98,11 @@ public class DentistService implements IDentistService  {
     public DentistDetailResponse getDentistDetail(Long id) {
         Dentist dentist = dentistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));
-        return modelMapper.map(dentist, DentistDetailResponse.class);
+        DentistDetailResponse res = modelMapper.map(dentist, DentistDetailResponse.class);
+        res.setCity(dentist.getClinicBranch().getCity());
+        res.setClinicId(dentist.getClinicBranch().getClinic().getClinicId());
+        res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
+        return res;
     }
 
     @Override
