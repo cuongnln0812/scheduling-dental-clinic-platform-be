@@ -105,7 +105,7 @@ public class BranchService implements IBranchService {
         try{
             Clinic clinic = clinicRepository.findById(clinicId)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
-            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicIdAndStatus(clinic.getClinicId(), ClinicStatus.ACTIVE);
+            List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
             // Map List<ClinicBranch> to List<BranchSummaryResponse>
             return branchList.stream()
                     .map(BranchSummaryResponse::new)
@@ -202,9 +202,15 @@ public class BranchService implements IBranchService {
             } else  {
                 clinicBranch.setPhone(request.getPhone());
             }
-            clinicBranch.setBranchName(request.getBranchName());
-            clinicBranch.setAddress(request.getAddress());
-            clinicBranch.setCity(request.getCity());
+            if(!request.getBranchName().isEmpty()) {
+                clinicBranch.setBranchName(request.getBranchName());
+            }
+            if(!request.getAddress().isEmpty()) {
+                clinicBranch.setAddress(request.getAddress());
+            }
+            if(!request.getCity().isEmpty()) {
+                clinicBranch.setCity(request.getCity());
+            }
             clinicBranch.setModifiedDate(LocalDateTime.now());
 
             branchRepository.save(clinicBranch);

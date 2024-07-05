@@ -144,7 +144,7 @@ public class BranchController {
         log.info("Has request with data: {}", id.toString());
         ApiResponse<BranchSummaryResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Delete branch successfully",
+                "Change branch status successfully",
                 branchService.deleteBranch(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -158,7 +158,7 @@ public class BranchController {
         log.info("Has request with data: {}", id.toString());
         ApiResponse<BranchSummaryResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Re-active branch successfully",
+                "Change branch status successfully",
                 branchService.reactiveBranch(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -69,10 +69,9 @@ public class StaffService implements IStaffService {
                 throw new ApiException(HttpStatus.FORBIDDEN, "Do not have permission");
             }
 
-            ClinicStaff clinicStaffCheckByPhone = iStaffRepository.findByPhone(request.getPhone())
-                                              .orElseThrow(() -> {
-                                                 throw new ApiException(HttpStatus.CONFLICT, "Phone is existed");
-                                              });
+            Optional<ClinicStaff> clinicStaffCheckByPhone = iStaffRepository.findByPhone(request.getPhone());
+            if(clinicStaffCheckByPhone.isPresent()) throw new ApiException(HttpStatus.CONFLICT, "Phone is existed");
+
 
             Optional<ClinicOwner> clinicOwner = Optional.ofNullable(iOwnerRepository.findByUsernameOrEmail(userInformationRes.getUsername(), userInformationRes.getEmail())
                     .orElseThrow(() -> {
@@ -319,7 +318,7 @@ public class StaffService implements IStaffService {
         clinicStaffs = iStaffRepository.findAllStaffByStatus(ClinicStatus.PENDING, pageRequest);
         return clinicStaffs.map(staff ->
                 new StaffSummaryResponse(staff.getId(),
-                staff.getFullName(), staff.getEmail(), staff.getPhone(), staff.getGender(),
+                staff.getFullName(), staff.getUsername(), staff.getEmail(), staff.getPhone(), staff.getGender(),
                             staff.getClinicBranch().getBranchName(), staff.getStatus()));
     }
 }
