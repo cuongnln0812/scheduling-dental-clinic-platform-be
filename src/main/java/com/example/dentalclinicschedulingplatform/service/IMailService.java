@@ -9,7 +9,8 @@ public interface IMailService {
     void sendClinicRequestRejectionMail(String fullName, String email);
     void sendStaffRequestApprovalMail(ClinicStaff staff, String branchName, String password);
     void sendStaffRequestRejectionMail(ClinicStaff staff, String branchName);
-    void sendDentistRequestApprovalMail(Dentist dentist, String password, String ownerEmail);
+    void senDentistRequestConfirmationMail(Dentist dentist, ClinicOwner owner);
+    void sendDentistRequestApprovalMail(Dentist dentist, String password, ClinicOwner owner);
     void sendCustomerAppointmentRequestConfirmationMail(Customer customer, Appointment appointment);
     void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment);
 

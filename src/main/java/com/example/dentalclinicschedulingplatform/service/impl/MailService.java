@@ -17,23 +17,23 @@ import java.util.concurrent.TimeUnit;
 public class MailService implements IMailService {
 
     private final JavaMailSender mailSender;
-    private final ConcurrentHashMap<String, Long> emailSendTimestamps = new ConcurrentHashMap<>();
-    private final long emailCooldown = TimeUnit.MINUTES.toMillis(1); // 1 minutes cooldown
-    private boolean canSendEmail(String email) {
-        long now = System.currentTimeMillis();
-        return emailSendTimestamps.getOrDefault(email, 0L) + emailCooldown <= now;
-    }
-
-    private void updateEmailTimestamp(String email) {
-        emailSendTimestamps.put(email, System.currentTimeMillis());
-    }
+//    private final ConcurrentHashMap<String, Long> emailSendTimestamps = new ConcurrentHashMap<>();
+//    private final long emailCooldown = TimeUnit.MINUTES.toMillis(1); // 1 minutes cooldown
+//    private boolean canSendEmail(String email) {
+//        long now = System.currentTimeMillis();
+//        return emailSendTimestamps.getOrDefault(email, 0L) + emailCooldown <= now;
+//    }
+//
+//    private void updateEmailTimestamp(String email) {
+//        emailSendTimestamps.put(email, System.currentTimeMillis());
+//    }
 
     @Async
     @Override
     public void sendCustomerRegistrationMail(Customer user){
-        if (!canSendEmail(user.getEmail())) {
-            System.out.println("Please wait " emailCooldown "for: " + user.getEmail());
-        }
+//        if (!canSendEmail(user.getEmail())) {
+//            System.out.println("Please wait " emailCooldown "for: " + user.getEmail());
+//        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
         message.setTo(user.getEmail());
@@ -163,7 +163,27 @@ public class MailService implements IMailService {
 
     @Async
     @Override
-    public void sendDentistRequestApprovalMail(Dentist dentist, String password, String ownerEmail) {
+    public void senDentistRequestConfirmationMail(Dentist dentist, ClinicOwner owner) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(owner.getEmail());
+        message.setSubject("[F-Dental] - Đơn đăng kí tài khoản nha sĩ đang chờ duyệt");
+
+        String body = "Kính gửi " + owner.getFullName() + ",\n\n" +
+                "Chúng tôi xin thông báo rằng tài khoản nha sĩ cho " + dentist.getFullName() + " đã được tiếp nhận và hiện đang chờ duyệt.\n\n" +
+                "Vui lòng lưu ý rằng tài khoản này sẽ chỉ được kích hoạt sau khi quá trình phê duyệt hoàn tất. Chúng tôi sẽ gửi thông báo và thông tin đăng nhập qua email của nha sĩ ngay khi tài khoản được phê duyệt.\n\n" +
+                "Nếu có bất kỳ câu hỏi nào hoặc cần trợ giúp, xin vui lòng liên hệ với đội ngũ dịch vụ khách hàng của chúng tôi qua email hoặc điện thoại. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
+                "Cảm ơn bạn đã chọn F-Dental và hy vọng sẽ sớm được hợp tác cùng bạn!\n\n" +
+                "Trân trọng,\n\n" +
+                "Đội ngũ F-Dental";
+
+        message.setText(body);
+        mailSender.send(message);
+    }
+
+    @Async
+    @Override
+    public void sendDentistRequestApprovalMail(Dentist dentist, String password, ClinicOwner owner) {
         SimpleMailMessage dentistMessage = new SimpleMailMessage();
         dentistMessage.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
         dentistMessage.setTo(dentist.getEmail());
@@ -173,22 +193,24 @@ public class MailService implements IMailService {
                 "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
                 "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
                 "• Username: " + dentist.getUsername() + "\n" +
-                "• Password: " + password + "\n" + // Placeholder for the password
+                "• Password: " + password + "\n" +
                 "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
-        // Send the email (assuming you have a mailSender bean configured)
         mailSender.send(dentistMessage);
+
         SimpleMailMessage ownerMessage = new SimpleMailMessage();
         ownerMessage.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-        ownerMessage.setTo(dentist.getEmail());
-        // Set a meaningful message
-        ownerMessage.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
-        ownerMessage.setText("Hi, " + dentist.getFullName() + ",\n\n" +
-                "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
-                "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
-                "• Username: " + dentist.getUsername() + "\n" +
-                "• Password: " + password + "\n" + // Placeholder for the password
-                "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
-        // Send the email (assuming you have a mailSender bean configured)
+        ownerMessage.setTo(owner.getEmail());
+        ownerMessage.setSubject("[F-Dental] - Đơn đăng kí tài khoản nha sĩ đã được duyệt");
+        String body = "Kính gửi " + owner.getFullName() + ",\n\n" +
+                "Chúng tôi rất vui mừng thông báo rằng đơn đăng kí tài khoản nha sĩ của " + dentist.getFullName() + " đã được duyệt.\n\n" +
+                "Dưới đây là thông tin tài khoản để nha sĩ đăng nhập vào hệ thống:\n\n" +
+                "Tên đăng nhập: " + dentist.getUsername() + "\n\n" +
+                "Để bảo mật tài khoản, nha sĩ cần đăng nhập và đổi mật khẩu ngay sau khi nhận được email này.\n\n" +
+                "Nếu có bất kỳ câu hỏi nào hoặc cần trợ giúp, vui lòng liên hệ với đội ngũ dịch vụ khách hàng thân thiện của chúng tôi. Chúng tôi luôn sẵn lòng giúp đỡ!\n\n" +
+                "Cảm ơn bạn đã chọn F-Dental và chúng tôi rất mong được hợp tác cùng bạn!\n\n" +
+                "Trân trọng,\n\n" +
+                "Đội ngũ F-Dental";
+        ownerMessage.setText(body);
         mailSender.send(ownerMessage);
     }
 
