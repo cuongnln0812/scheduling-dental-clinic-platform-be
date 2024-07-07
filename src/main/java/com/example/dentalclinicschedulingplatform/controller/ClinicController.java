@@ -47,8 +47,20 @@ public class ClinicController {
             @PathVariable("clinicId") Long id, @RequestParam boolean isApproved){
         ApiResponse<ApprovedClinicResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Approve clinic successfully!",
+                isApproved? "Approve clinic successfully!" : "Decline clinic successfully",
                 clinicService.approveClinic(id, isApproved));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "View clinic detail information", description = "View clinic detail information" +
+            "Anyone can perform this request")
+    @PostMapping("/{clinicId}")
+    public ResponseEntity<ApiResponse<ClinicDetailResponse>> getClinicDetail(
+            @PathVariable("clinicId") Long id){
+        ApiResponse<ClinicDetailResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get clinic detail successfully!",
+                clinicService.viewClinicDetail(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -92,6 +104,32 @@ public class ClinicController {
                 HttpStatus.OK,
                 "Update clinic successfully!",
                 clinicService.updateClinicInformation(request));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Re-activate clinic", description = "Can only re-activate clinic if its status is INACTIVE. " +
+            "Only Clinic Owner can perform this request!")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @PutMapping("/re-activate/{clinicId}")
+    public ResponseEntity<ApiResponse<ClinicDetailResponse>> reactivateClinic(
+            @PathVariable("clinicId") Long clinicId){
+        ApiResponse<ClinicDetailResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Re-activate clinic successfully!",
+                clinicService.reactivateClinic(clinicId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Deactivate clinic (SOFT DELETE)", description = "Can only deactivate clinic if its status is ACTIVE. " +
+            "Only Clinic Owner can perform this request!")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @DeleteMapping("/{clinicId}")
+    public ResponseEntity<ApiResponse<ClinicDetailResponse>> deactivateClinic(
+            @PathVariable("clinicId") Long clinicId){
+        ApiResponse<ClinicDetailResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Deactivate clinic successfully!",
+                clinicService.deactivateClinic(clinicId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
