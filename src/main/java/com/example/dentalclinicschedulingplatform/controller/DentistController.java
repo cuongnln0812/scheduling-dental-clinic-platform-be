@@ -133,7 +133,7 @@ public class DentistController {
             "Only dentist account with INACTIVE can re-activate. " +
             "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
     @PreAuthorize("hasAnyRole('OWNER')")
-    @DeleteMapping("/{dentistId}")
+    @PutMapping("/re-activate/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> reactivateDentist(
             @PathVariable("dentistId") Long dentistId){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
