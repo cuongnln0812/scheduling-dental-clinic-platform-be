@@ -2,8 +2,10 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
+import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.BranchCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.BranchUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
@@ -162,6 +164,20 @@ public class BranchService implements IBranchService {
         if(clinicBranch.isMain()) throw new ApiException(HttpStatus.CONFLICT, "This is main clinic not branch");
         if(!clinicBranch.getStatus().equals(ClinicStatus.PENDING)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not pending");
         return modelMapper.map(clinicBranch, BranchSummaryResponse.class);
+    }
+
+    @Override
+    public ClinicBranch updateMainBranch(ClinicUpdateRequest request) {
+        ClinicBranch branch = branchRepository.findByClinic_ClinicId(request.getClinicId())
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic main branch", "clinicId", request.getClinicId()));
+        if(!branch.isMain())
+            throw new ApiException(HttpStatus.NOT_FOUND, "Cannot found the main branch for update!");
+        branch.setBranchName(request.getClinicName());
+        branch.setAddress(request.getAddress());
+        branch.setCity(request.getCity());
+        branch.setPhone(request.getPhone());
+        branch.setStatus(ClinicStatus.ACTIVE);
+        return branchRepository.save(branch);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +34,7 @@ public class ClinicService implements IClinicService {
     private final IMailService mailService;
     private final IBranchService branchService;
     private final IOwnerService ownerService;
+    private final IWorkingHoursService workingHoursService;
     private final IAuthenticateService authenticateService;
 
     @Override
@@ -81,6 +82,31 @@ public class ClinicService implements IClinicService {
             clinicRepository.delete(clinic);
             return modelMapper.map(clinic, ApprovedClinicResponse.class);
         }
+    }
+
+    @Override
+    public ClinicUpdateResponse updateClinicInformation(ClinicUpdateRequest request) {
+        Clinic clinic = clinicRepository.findById(request.getClinicId())
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
+        if(clinic.getStatus().equals(ClinicStatus.INACTIVE) || clinic.getStatus().equals(ClinicStatus.PENDING))
+            throw new ApiException(HttpStatus.CONFLICT, "You cannot update clinic information because this clinic is inactive or pending!");
+        clinic.setAddress(request.getAddress());
+        clinic.setEmail(request.getEmail());
+        clinic.setCity(request.getCity());
+        clinic.setPhone(request.getPhone());
+        clinic.setDescription(request.getDescription());
+        clinic.setLogo(request.getLogo());
+        clinic.setWebsiteUrl(request.getWebsiteUrl());
+        clinic.setClinicImage(request.getClinicImage());
+        clinic.setStatus(ClinicStatus.ACTIVE);
+        branchService.updateMainBranch(request);
+        Clinic updatedClinic = clinicRepository.save(clinic);
+        ClinicUpdateResponse res = modelMapper.map(updatedClinic, ClinicUpdateResponse.class);
+        if(clinic.getStatus().equals(ClinicStatus.APPROVED)){
+            List<WorkingHoursResponse> workingHoursResponses = workingHoursService.createWorkingHour(request.getWorkingHours());
+            res.setWorkingHours(workingHoursResponses);
+        }
+        return res;
     }
 
     @Override

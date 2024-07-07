@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegisterRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.service.IClinicService;
 import com.example.dentalclinicschedulingplatform.utils.AppConstants;
@@ -76,6 +77,21 @@ public class ClinicController {
                 HttpStatus.OK,
                 "Get pending clinic detail successfully!",
                 clinicService.getPendingClinicDetail(clinicId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update clinic information", description = "If the clinic is just approved (status = APPROVED), owner needs to pass the new working hours list " +
+            "for the clinic to create and change the status to ACTIVE. Or else owner can use this to update clinic information regularly without pass the new working hours. " +
+            "This API will also update the main branch information. " +
+            "Only Clinic Owner can perform this request!")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @PutMapping()
+    public ResponseEntity<ApiResponse<ClinicUpdateResponse>> updateClinic(
+            @RequestBody @Valid ClinicUpdateRequest request){
+        ApiResponse<ClinicUpdateResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Update clinic successfully!",
+                clinicService.updateClinicInformation(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

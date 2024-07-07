@@ -4,6 +4,7 @@ import com.example.dentalclinicschedulingplatform.entity.Clinic;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.payload.request.BranchCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.BranchUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.BranchDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.BranchSummaryResponse;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ public interface IBranchService {
     Page<BranchSummaryResponse> getBranchPendingList(int page, int size);
     List<BranchSummaryResponse> getBranchByClinic(Long clinicId);
     BranchSummaryResponse getBranchPendingDetail(Long branchId);
+    ClinicBranch updateMainBranch(ClinicUpdateRequest request);
     BranchSummaryResponse updateBranch(BranchUpdateRequest request);
     BranchSummaryResponse deleteBranch(Long branchId);
     BranchSummaryResponse reactiveBranch(Long branchId);
