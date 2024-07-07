@@ -152,7 +152,7 @@ public class BranchService implements IBranchService {
         return clinicBranches.map(branch ->
                 new BranchSummaryResponse(branch.getBranchId(),
                 branch.getBranchName(), branch.getClinic().getClinicName(),
-                branch.getAddress(), branch.getCity(), branch.getPhone(), branch.getStatus(), branch.getCreatedDate()));
+                branch.getAddress(), branch.getCity(), branch.getPhone(), branch.getStatus(), branch.getCreatedDate(), branch.getModifiedDate()));
     }
 
     @Override
