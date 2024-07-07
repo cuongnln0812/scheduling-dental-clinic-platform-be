@@ -51,9 +51,10 @@ public class DentistController {
     @PostMapping("/approval/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> approveDentistAccount(
              @PathVariable("dentistId") Long id, @RequestParam boolean isApproved){
+        String approveMessage;
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Approve dentist successfully!",
+                isApproved ? "Approve dentist successfully!" : "Decline dentist successfully!" ,
                 dentistService.approveDentistAccount(id, isApproved));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,12 +57,7 @@ public class DentistService implements IDentistService  {
             dentistList = dentistRepository.findAllByClinicBranch_BranchId(branchId, pageRequest);
         }else dentistList = dentistRepository.findAll(pageRequest);
 
-        return dentistList.map(dentist -> {
-            DentistListResponse res = modelMapper.map(dentist, DentistListResponse.class);
-            res.setCity(dentist.getClinicBranch().getCity());
-            res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
-            return res;
-        });
+        return dentistList.map(this::mapListRes);
     }
 
     @Override
@@ -68,7 +65,7 @@ public class DentistService implements IDentistService  {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Dentist> dentistList;
         dentistList = dentistRepository.findAllByStatus(ClinicStatus.PENDING, pageRequest);
-        return dentistList.map(dentist -> modelMapper.map(dentist,DentistListResponse.class));
+        return dentistList.map(this::mapListRes);
     }
 
     @Override
@@ -84,12 +81,13 @@ public class DentistService implements IDentistService  {
             dentist.setUsername("dentist" + dentist.getId());
             dentist.setPassword(passwordEncoder.encode(randomPassword));
             dentist = dentistRepository.save(dentist);
-            mailService.sendDentistRequestApprovalMail(dentist, randomPassword);
-            return modelMapper.map(dentist, DentistDetailResponse.class);
+            String ownerEmail = dentist.getClinicBranch().getClinic().getClinicOwner().getEmail();
+            mailService.sendDentistRequestApprovalMail(dentist, randomPassword, ownerEmail);
+            return mapDetailRes(dentist);
         }else {
             dentist.setStatus(ClinicStatus.DENIED);
             dentistRepository.delete(dentist);
-            return modelMapper.map(dentist, DentistDetailResponse.class);
+            return mapDetailRes(dentist);
         }
     }
 
@@ -98,11 +96,7 @@ public class DentistService implements IDentistService  {
     public DentistDetailResponse getDentistDetail(Long id) {
         Dentist dentist = dentistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));
-        DentistDetailResponse res = modelMapper.map(dentist, DentistDetailResponse.class);
-        res.setCity(dentist.getClinicBranch().getCity());
-        res.setClinicId(dentist.getClinicBranch().getClinic().getClinicId());
-        res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
-        return res;
+        return mapDetailRes(dentist);
     }
 
     @Override
@@ -112,6 +106,8 @@ public class DentistService implements IDentistService  {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+        if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Dob must be over or equals 18 years old!");
         ClinicBranch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic Branch", "id", request.getBranchId()));
         Dentist dentist = new Dentist();
@@ -119,7 +115,7 @@ public class DentistService implements IDentistService  {
         dentist.setStatus(ClinicStatus.PENDING);
         dentist.setClinicBranch(branch);
         dentist = dentistRepository.save(dentist);
-        return modelMapper.map(dentist, DentistDetailResponse.class);
+        return mapDetailRes(dentist);
     }
 
     @Override
@@ -141,7 +137,7 @@ public class DentistService implements IDentistService  {
         modelMapper.map(request, existingDentist);
         existingDentist.setClinicBranch(branch);
         Dentist updatedDentist = dentistRepository.save(existingDentist);
-        return modelMapper.map(updatedDentist, DentistDetailResponse.class);
+        return mapDetailRes(updatedDentist);
     }
 
     @Override
@@ -153,7 +149,7 @@ public class DentistService implements IDentistService  {
             existingDentist.setStatus(ClinicStatus.INACTIVE);
         }else throw new ApiException(HttpStatus.CONFLICT, "Account is not able to remove because it may in INACTIVE or PENDING status");
         Dentist updatedDentist = dentistRepository.save(existingDentist);
-        return modelMapper.map(updatedDentist, DentistDetailResponse.class);
+        return mapDetailRes(updatedDentist);
     }
 
     @Override
@@ -178,5 +174,20 @@ public class DentistService implements IDentistService  {
             }
         }
         return availableDentists;
+    }
+
+    private DentistDetailResponse mapDetailRes(Dentist dentist){
+        DentistDetailResponse res = modelMapper.map(dentist, DentistDetailResponse.class);
+        res.setCity(dentist.getClinicBranch().getCity());
+        res.setClinicId(dentist.getClinicBranch().getClinic().getClinicId());
+        res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
+        return res;
+    }
+
+    private DentistListResponse mapListRes(Dentist dentist){
+        DentistListResponse res = modelMapper.map(dentist, DentistListResponse.class);
+        res.setCity(dentist.getClinicBranch().getCity());
+        res.setClinicName(dentist.getClinicBranch().getClinic().getClinicName());
+        return res;
     }
 }
