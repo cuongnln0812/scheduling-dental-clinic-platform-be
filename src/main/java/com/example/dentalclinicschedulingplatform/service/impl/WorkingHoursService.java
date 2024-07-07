@@ -160,6 +160,23 @@ public class WorkingHoursService implements IWorkingHoursService {
 
     }
 
+    @Override
+    public List<WorkingHoursResponse> viewWorkingHour(Long clinicId) {
+
+        Clinic currClinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        List<WorkingHoursResponse> workingHoursResponseList = new ArrayList<>();
+
+        List<WorkingHours> workingHours = workingHourRepository.findByClinic_ClinicId(currClinic.getClinicId());
+
+        for (WorkingHours workingHour: workingHours) {
+            workingHoursResponseList.add(modelMapper.map(workingHour, WorkingHoursResponse.class));
+        }
+
+        return workingHoursResponseList;
+    }
+
     private Shift determineShift(LocalTime startTime, LocalTime endTime) {
         if (startTime.equals(LocalTime.of(7, 0)) && endTime.equals(LocalTime.of(21, 0))) {
             return Shift.ALLDAY;

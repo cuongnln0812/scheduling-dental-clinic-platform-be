@@ -78,4 +78,19 @@ public class SlotController {
                 deletedSlot);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "View available slot for updating appointment"
+    )
+    @GetMapping("/available-by-date-updating")
+    public ResponseEntity<ApiResponse<WorkingHoursDetailsResponse>> viewAvailableSlotsByDateForUpdating
+            (@RequestParam(required = true) Long clinicBranchId,
+             @RequestParam(required = true) LocalDate date,
+             @RequestParam Long appointmentId){
+        ApiResponse<WorkingHoursDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get slots for updating appointment successfully",
+                slotService.viewAvailableSlotsByDateByClinicBranchForUpdatingAppointment(date, clinicBranchId, appointmentId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

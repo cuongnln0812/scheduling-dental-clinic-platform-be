@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.service;
 
 import com.example.dentalclinicschedulingplatform.entity.Appointment;
 import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.AppointmentUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.UserInformationRes;
@@ -15,4 +16,5 @@ public interface IAppointmentService {
     AppointmentViewDetailsResponse makeAppointment(AppointmentCreateRequest appointment);
     AppointmentViewDetailsResponse viewDetailsAppointment(Long appointmentId);
     AppointmentViewDetailsResponse cancelAppointment(Long appointmentId);
+    AppointmentViewDetailsResponse updateAppointment(AppointmentUpdateRequest appointment);
 }

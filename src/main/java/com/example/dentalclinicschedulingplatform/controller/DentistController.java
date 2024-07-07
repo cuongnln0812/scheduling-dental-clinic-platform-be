@@ -137,8 +137,22 @@ public class DentistController {
             @RequestParam Long slotId){
         ApiResponse<List<DentistViewListResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Get dentist detail successfully!",
+                "Get available dentist successfully!",
                 dentistService.getAvailableDentistOfDateByBranch(branchId, date, slotId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get available dentist for updating appointment")
+    @GetMapping("/available-updating")
+    public ResponseEntity<ApiResponse<List<DentistViewListResponse>>> getAvailableDentistForUpdatingAppointment(
+            @RequestParam Long branchId,
+            @RequestParam LocalDate date,
+            @RequestParam Long slotId,
+            @RequestParam Long appointmentId){
+        ApiResponse<List<DentistViewListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get available dentist for updating appointment successfully!",
+                dentistService.getAvailableDentistOfDateByBranchForUpdatingAppointment(branchId, date, slotId, appointmentId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
