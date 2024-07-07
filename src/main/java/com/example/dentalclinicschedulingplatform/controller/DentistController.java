@@ -51,7 +51,6 @@ public class DentistController {
     @PostMapping("/approval/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> approveDentistAccount(
              @PathVariable("dentistId") Long id, @RequestParam boolean isApproved){
-        String approveMessage;
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 isApproved ? "Approve dentist successfully!" : "Decline dentist successfully!" ,
@@ -117,7 +116,7 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "Remove dentist account (SOFT DELETE)", description = "Remove dentist account by change the status to INACTIVE. " +
+    @Operation(summary = "Deactivate dentist account (SOFT DELETE)", description = "Remove dentist account by change the status to INACTIVE. " +
             "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
     @PreAuthorize("hasAnyRole('OWNER')")
     @DeleteMapping("/{dentistId}")
@@ -125,8 +124,22 @@ public class DentistController {
             @PathVariable("dentistId") Long dentistId){
         ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Create account successfully!",
+                "Deactivate account successfully!",
                 dentistService.removeDentist(dentistId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Re-activate dentist account", description = "Re-activate dentist account by change the status from INACTIVE to ACTIVE. " +
+            "Only dentist account with INACTIVE can re-activate. " +
+            "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    @DeleteMapping("/{dentistId}")
+    public ResponseEntity<ApiResponse<DentistDetailResponse>> reactivateDentist(
+            @PathVariable("dentistId") Long dentistId){
+        ApiResponse<DentistDetailResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Re-activate account successfully!",
+                dentistService.reactivateDentist(dentistId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

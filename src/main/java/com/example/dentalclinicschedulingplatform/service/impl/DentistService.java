@@ -153,6 +153,17 @@ public class DentistService implements IDentistService  {
     }
 
     @Override
+    public DentistDetailResponse reactivateDentist(Long id) {
+        Dentist existingDentist = dentistRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", id));
+        if(existingDentist.getStatus().equals(ClinicStatus.INACTIVE)) {
+            existingDentist.setStatus(ClinicStatus.ACTIVE);
+        }else throw new ApiException(HttpStatus.CONFLICT, "Account is not able to re-activate because it's not currently in INACTIVE status");
+        Dentist updatedDentist = dentistRepository.save(existingDentist);
+        return mapDetailRes(updatedDentist);
+    }
+
+    @Override
     public List<DentistViewListResponse> getAvailableDentistOfDateByBranch(Long branchId, LocalDate date, Long slotId) {
 
         ClinicBranch clinicBranch = branchRepository.findById(branchId)
