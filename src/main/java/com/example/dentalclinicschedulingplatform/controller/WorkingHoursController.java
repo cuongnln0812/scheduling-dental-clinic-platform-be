@@ -52,4 +52,17 @@ public class WorkingHoursController {
                 updateWorkingHoursResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "View working hours for Clinic")
+//    @PreAuthorize("hasAnyRole('OWNER')")
+    @GetMapping("/{clinicId}")
+    public ResponseEntity<ApiResponse<List<WorkingHoursResponse>>> viewWorkingHours
+            (@PathVariable ("clinicId") Long clinicId){
+        List<WorkingHoursResponse> workingHoursResponseList = workingHourService.viewWorkingHour(clinicId);
+        ApiResponse<List<WorkingHoursResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "View working hours successfully",
+                workingHoursResponseList);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }

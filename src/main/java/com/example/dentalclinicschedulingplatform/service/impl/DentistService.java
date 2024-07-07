@@ -179,4 +179,31 @@ public class DentistService implements IDentistService  {
         }
         return availableDentists;
     }
+
+    @Override
+    public List<DentistViewListResponse> getAvailableDentistOfDateByBranchForUpdatingAppointment(Long branchId, LocalDate date, Long slotId, Long appointmentId) {
+        ClinicBranch clinicBranch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        Appointment updatingAppointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment for updating not found"));
+
+        List<Appointment> appointments = appointmentRepository.findByDateAndSlotOfClinicBranch(date, branchId, slotId);
+
+        List<DentistViewListResponse> availableDentists = new ArrayList<>();
+
+        List<Dentist> occupiedDentists = appointments.stream()
+                .filter(appointment -> !appointment.equals(updatingAppointment))
+                .map(Appointment::getDentist)
+                .collect(Collectors.toList());
+
+        List<Dentist> dentistList = dentistRepository.findAllByClinicBranch_BranchId(clinicBranch.getBranchId());
+
+        for (Dentist dentist: dentistList) {
+            if (!occupiedDentists.contains(dentist)){
+                availableDentists.add(modelMapper.map(dentist, DentistViewListResponse.class));
+            }
+        }
+        return availableDentists;
+    }
 }

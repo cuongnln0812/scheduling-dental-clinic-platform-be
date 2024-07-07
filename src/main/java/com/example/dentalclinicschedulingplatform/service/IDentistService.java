@@ -20,4 +20,5 @@ public interface IDentistService{
     DentistDetailResponse updateDentistDetails(DentistUpdateRequest request);
     DentistDetailResponse removeDentist(Long id);
     List<DentistViewListResponse> getAvailableDentistOfDateByBranch(Long branchId, LocalDate date, Long slotId);
+    List<DentistViewListResponse> getAvailableDentistOfDateByBranchForUpdatingAppointment(Long branchId, LocalDate date, Long slotId, Long appointmentId);
 }
