@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class ReportFeedbackService implements IReportFeedbackService {
@@ -62,14 +63,14 @@ public class ReportFeedbackService implements IReportFeedbackService {
     @Override
     public List<ReportResponse> getAllReports() {
         return reportRepository.findAll().stream()
-                .map(report -> modelMapper.map(report, ReportResponse.class))
+                .map(this::convertToReportResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ReportResponse> getReportsByClinicId(Long clinicId) {
         return reportRepository.findByClinic_ClinicId(clinicId).stream()
-                .map(report -> modelMapper.map(report, ReportResponse.class))
+                .map(this::convertToReportResponse)
                 .collect(Collectors.toList());
     }
 
@@ -88,5 +89,26 @@ public class ReportFeedbackService implements IReportFeedbackService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Report not found"));
         reportRepository.delete(report);
+    }
+
+    private ReportResponse convertToReportResponse(Report report) {
+        ReportResponse response = modelMapper.map(report, ReportResponse.class);
+        Feedback feedback = report.getFeedback();
+        response.setAvatar(feedback.getCustomer().getAvatar());
+        response.setFullName(feedback.getCustomer().getFullName());
+        response.setBranchName(feedback.getClinicBranch().getBranchName());
+        response.setCity(feedback.getClinicBranch().getCity());
+        response.setComment(feedback.getComment());
+        response.setRating(Double.valueOf(feedback.getRating()));
+        Long clinicId = feedback.getClinicBranch().getClinic().getClinicId();
+        List<Feedback> feedbacks = feedbackRepository.findByClinicBranch_Clinic_ClinicId(clinicId);
+        double averageRating = feedbacks.stream()
+                .mapToDouble(Feedback::getRating)
+                .average()
+                .orElse(0.0);
+        long totalFeedback = feedbacks.size();
+        response.setAverageRating(averageRating);
+        response.setTotalFeedback(totalFeedback);
+        return response;
     }
 }
