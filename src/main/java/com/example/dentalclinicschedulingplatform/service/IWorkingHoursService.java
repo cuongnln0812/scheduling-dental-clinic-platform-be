@@ -10,4 +10,5 @@ public interface IWorkingHoursService {
     List<WorkingHoursResponse> createWorkingHour(List<WorkingHoursCreateRequest> workingHours);
 
     WorkingHoursResponse updateWorkingHour(WorkingHoursUpdateRequest workingHours);
+    List<WorkingHoursResponse> viewWorkingHour(Long clinicId);
 }
