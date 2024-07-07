@@ -1,6 +1,5 @@
 package com.example.dentalclinicschedulingplatform.service;
 
-import com.example.dentalclinicschedulingplatform.entity.Dentist;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
@@ -19,6 +18,7 @@ public interface IDentistService{
     DentistDetailResponse createDentist(DentistCreateRequest request);
     DentistDetailResponse updateDentistDetails(DentistUpdateRequest request);
     DentistDetailResponse removeDentist(Long id);
+    DentistDetailResponse reactivateDentist(Long id);
     List<DentistViewListResponse> getAvailableDentistOfDateByBranch(Long branchId, LocalDate date, Long slotId);
     List<DentistViewListResponse> getAvailableDentistOfDateByBranchForUpdatingAppointment(Long branchId, LocalDate date, Long slotId, Long appointmentId);
 }
