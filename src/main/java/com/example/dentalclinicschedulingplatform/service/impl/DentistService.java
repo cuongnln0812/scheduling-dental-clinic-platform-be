@@ -48,7 +48,8 @@ public class DentistService implements IDentistService  {
     @Override
     public Page<DentistListResponse> getDentistListByBranch(Long branchId, int page, int size, String dir, String by) {
         Sort sort = dir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(by).ascending() : Sort.by(by).descending();
-        Pageable pageRequest = PageRequest.of(page, size, sort);        Page<Dentist> dentistList;
+        Pageable pageRequest = PageRequest.of(page, size, sort);
+        Page<Dentist> dentistList;
         if(branchId != null){
             dentistList = dentistRepository.findAllByClinicBranch_BranchId(branchId, pageRequest);
         }else dentistList = dentistRepository.findAll(pageRequest);
