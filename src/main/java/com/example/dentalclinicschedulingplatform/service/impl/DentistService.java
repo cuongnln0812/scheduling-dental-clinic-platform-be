@@ -12,7 +12,6 @@ import com.example.dentalclinicschedulingplatform.repository.AppointmentReposito
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
 import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
-import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +163,33 @@ public class DentistService implements IDentistService  {
         List<DentistViewListResponse> availableDentists = new ArrayList<>();
 
         List<Dentist> occupiedDentists = appointments.stream()
+                .map(Appointment::getDentist)
+                .collect(Collectors.toList());
+
+        List<Dentist> dentistList = dentistRepository.findAllByClinicBranch_BranchId(clinicBranch.getBranchId());
+
+        for (Dentist dentist: dentistList) {
+            if (!occupiedDentists.contains(dentist)){
+                availableDentists.add(modelMapper.map(dentist, DentistViewListResponse.class));
+            }
+        }
+        return availableDentists;
+    }
+
+    @Override
+    public List<DentistViewListResponse> getAvailableDentistOfDateByBranchForUpdatingAppointment(Long branchId, LocalDate date, Long slotId, Long appointmentId) {
+        ClinicBranch clinicBranch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        Appointment updatingAppointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment for updating not found"));
+
+        List<Appointment> appointments = appointmentRepository.findByDateAndSlotOfClinicBranch(date, branchId, slotId);
+
+        List<DentistViewListResponse> availableDentists = new ArrayList<>();
+
+        List<Dentist> occupiedDentists = appointments.stream()
+                .filter(appointment -> !appointment.equals(updatingAppointment))
                 .map(Appointment::getDentist)
                 .collect(Collectors.toList());
 

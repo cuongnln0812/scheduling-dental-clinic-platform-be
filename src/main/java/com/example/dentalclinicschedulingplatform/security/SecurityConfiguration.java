@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                                                         "/api/v1/feedback/all",
                                                         "/api/v1/slot/available",
                                                         "/api/v1/slot/available-by-date",
+                                                        "/api/v1/working-hours/{clinicId}",
                                                         "/api/v1/auth/refresh-token",
                                                         "/api/v1/auth/logout",
                                                         "/api/v1/auth/login-google")

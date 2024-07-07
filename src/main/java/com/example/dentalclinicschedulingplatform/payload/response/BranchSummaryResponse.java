@@ -22,6 +22,7 @@ public class BranchSummaryResponse {
     private String phone;
     private ClinicStatus status;
     private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public BranchSummaryResponse(ClinicBranch clinicBranch) {
         this.branchId = clinicBranch.getBranchId();
@@ -32,5 +33,6 @@ public class BranchSummaryResponse {
         this.phone = clinicBranch.getPhone();
         this.status = clinicBranch.getStatus();
         this.createdDate = clinicBranch.getCreatedDate();
+        this.modifiedDate = clinicBranch.getModifiedDate();
     }
 }

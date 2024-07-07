@@ -14,6 +14,7 @@ public interface IStaffService {
     StaffResponse viewStaff(Long id);
     StaffResponse updateStaff(UserInformationRes userInformationRes, StaffUpdateRequest request);
     StaffResponse deleteStaff(UserInformationRes userInformationRes, Long id);
+    StaffResponse reactiveStaff(UserInformationRes userInformationRes, Long id);
     List<StaffSummaryResponse> viewAllStaffByOwner(UserInformationRes userInformationRes, int page, int size);
     List<StaffSummaryResponse> viewAllStaffByClinicBranch(UserInformationRes userInformationRes, Long branchId, int page, int size);
     List<StaffSummaryResponse> viewAll(int page, int size);

@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.AppointmentUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewDetailsResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewListResponse;
@@ -98,6 +99,19 @@ public class AppointmentController {
                 HttpStatus.OK,
                 "Cancel appointments successfully",
                 appointmentService.cancelAppointment(appointmentId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Update appointment"
+    )
+    @PutMapping()
+    public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> updateAppointment
+            (@Valid @RequestBody AppointmentUpdateRequest appointment){
+        ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Update appointments successfully",
+                appointmentService.updateAppointment(appointment));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

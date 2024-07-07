@@ -19,4 +19,6 @@ public interface ISlotService {
     void generateSlotForUpdatingWorkingHoursDentalClinic(Long workingHourId);
 
     SlotDetailsResponse removeSlot(Long slotId);
+
+    WorkingHoursDetailsResponse viewAvailableSlotsByDateByClinicBranchForUpdatingAppointment(LocalDate date, Long clinicBranchId, Long appointmentId);
 }

@@ -3,6 +3,7 @@ package com.example.dentalclinicschedulingplatform.service.impl;
 import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCreateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.AppointmentUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IAppointmentService;
@@ -378,6 +379,13 @@ public class AppointmentService implements IAppointmentService {
        Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
                .orElse(null);
 
+       ClinicStaff staff = staffRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+               .orElse(null);
+
+       if (customer == null && staff == null){
+           throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+       }
+
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
@@ -413,6 +421,125 @@ public class AppointmentService implements IAppointmentService {
         mailService.sendCustomerAppointmentCancelConfirmationMail(currCustomer, currAppointment);
 
         return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
+                currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
+                , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
+    }
+
+    @Override
+    public AppointmentViewDetailsResponse updateAppointment(AppointmentUpdateRequest appointment) {
+
+        List<Dentist> dentistList = new ArrayList<>();
+        List<Slot> slotList = new ArrayList<>();
+
+        if (!authenticateService.getUserInfo().getRole().equals(UserType.CUSTOMER.toString()) &&
+                !authenticateService.getUserInfo().getRole().equals(UserType.STAFF.toString())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
+        }
+
+        Customer customer = customerRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                .orElse(null);
+
+        ClinicStaff staff = staffRepository.findByUsername(authenticateService.getUserInfo().getUsername())
+                .orElse(null);
+
+        if (customer == null && staff == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        Appointment currAppointment = appointmentRepository.findById(appointment.getAppointmentId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment does not exist"));
+
+        if (!currAppointment.getStatus().equals(AppointmentStatus.PENDING)){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Only allow to update information of pending appointment");
+        }
+
+        ClinicBranch currBranch = clinicBranchRepository.findById(currAppointment.getClinicBranch().getBranchId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        Clinic currClinic = clinicRepository.findById(currBranch.getClinic().getClinicId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        WorkingHoursDetailsResponse workingHoursDetailsResponse = slotService.viewAvailableSlotsByDateByClinicBranchForUpdatingAppointment(appointment.getAppointmentDate(), currAppointment.getClinicBranch().getBranchId(), currAppointment.getId());
+
+        List<SlotDetailsResponse> slotDetailsResponses = workingHoursDetailsResponse.slots;
+
+        List<DentistViewListResponse> availableDentists =
+                dentistService.getAvailableDentistOfDateByBranchForUpdatingAppointment(currBranch.getBranchId(), appointment.getAppointmentDate(), appointment.getSlotId(), currAppointment.getId());
+
+        for (DentistViewListResponse dentistItem: availableDentists) {
+            Dentist dentist = dentistRepository.findById(dentistItem.getDentistId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
+            dentistList.add(dentist);
+        }
+
+        for (SlotDetailsResponse slotItem: slotDetailsResponses) {
+            Slot slot = slotRepository.findById(slotItem.getSlotId())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+            slotList.add(slot);
+        }
+
+        Slot currSlot = slotRepository.findById((appointment.getSlotId()))
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+        if (currSlot != currAppointment.getSlot()){
+            if (!slotList.contains(currSlot)){
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Current slot is occupied");
+            }
+        }
+
+        if (customer != null) {
+            if (!customer.getId().equals(currAppointment.getCustomer().getId())) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Can not update another customers' appointments");
+            }
+        }
+
+        if (staff != null) {
+            List<ClinicStaff> staffOfBranch = staffRepository.findAllByClinicBranch_BranchId(currBranch.getBranchId());
+            if (!staffOfBranch.contains(staff)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Staff does not belong to current branch");
+            }
+        }
+
+        List<com.example.dentalclinicschedulingplatform.entity.Service> serviceOfClinic = serviceRepository.findServicesByClinic_ClinicId(currClinic.getClinicId());
+
+        List<Dentist> dentistOfClinicBranch = dentistRepository.findAllByClinicBranch_BranchId(currBranch.getBranchId());
+
+        Dentist currDentist = dentistRepository.findById(appointment.getDentistId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
+
+        com.example.dentalclinicschedulingplatform.entity.Service currService = serviceRepository.findById(appointment.getServiceId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service not found"));
+
+        if (!dentistOfClinicBranch.contains(currDentist)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Dentist doest not belong to current branch");
+        }
+
+        if (!serviceOfClinic.contains(currService)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Service does not belong to current clinic");
+        }
+
+        if (currDentist != currAppointment.getDentist()){
+            if (!dentistList.contains(currDentist)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Current dentist is occupied");
+            }
+        }
+
+        currAppointment.setCustomerName(appointment.customerName);
+        currAppointment.setCustomerAddress(appointment.getCustomerAddress());
+        currAppointment.setCustomerPhone(appointment.getCustomerPhone());
+        currAppointment.setCustomerDob(appointment.getCustomerDob());
+        currAppointment.setCustomerAge(LocalDate.now().getYear() - appointment.getCustomerDob().getYear());
+        currAppointment.setCustomerEmail(appointment.getCustomerEmail());
+        currAppointment.setAppointmentDate(appointment.getAppointmentDate());
+        currAppointment.setDuration(currService.getDuration());
+        currAppointment.setSlot(currSlot);
+        currAppointment.setDentist(currDentist);
+        currAppointment.setService(currService);
+
+        appointmentRepository.save(currAppointment);
+
+        return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currAppointment.getCustomer().getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
                 currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
