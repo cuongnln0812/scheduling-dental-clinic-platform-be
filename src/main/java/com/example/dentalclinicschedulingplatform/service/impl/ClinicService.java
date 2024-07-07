@@ -103,6 +103,8 @@ public class ClinicService implements IClinicService {
         Clinic updatedClinic = clinicRepository.save(clinic);
         ClinicUpdateResponse res = modelMapper.map(updatedClinic, ClinicUpdateResponse.class);
         if(clinic.getStatus().equals(ClinicStatus.APPROVED)){
+            if(request.getWorkingHours().isEmpty())
+                throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
             List<WorkingHoursResponse> workingHoursResponses = workingHoursService.createWorkingHour(request.getWorkingHours());
             res.setWorkingHours(workingHoursResponses);
         }

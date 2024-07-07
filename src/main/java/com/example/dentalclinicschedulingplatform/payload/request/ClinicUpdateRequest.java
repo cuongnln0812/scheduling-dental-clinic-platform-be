@@ -39,6 +39,5 @@ public class ClinicUpdateRequest {
     private String logo;
     @NotBlank(message = "Clinic image must not be empty")
     private String clinicImage;
-    @NotEmpty(message = "Working hours must not be empty")
     private List<WorkingHoursCreateRequest> workingHours;
 }
