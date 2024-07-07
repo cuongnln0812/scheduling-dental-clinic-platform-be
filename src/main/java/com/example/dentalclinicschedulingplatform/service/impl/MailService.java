@@ -9,16 +9,31 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class MailService implements IMailService {
 
     private final JavaMailSender mailSender;
+    private final ConcurrentHashMap<String, Long> emailSendTimestamps = new ConcurrentHashMap<>();
+    private final long emailCooldown = TimeUnit.MINUTES.toMillis(1); // 1 minutes cooldown
+    private boolean canSendEmail(String email) {
+        long now = System.currentTimeMillis();
+        return emailSendTimestamps.getOrDefault(email, 0L) + emailCooldown <= now;
+    }
+
+    private void updateEmailTimestamp(String email) {
+        emailSendTimestamps.put(email, System.currentTimeMillis());
+    }
 
     @Async
     @Override
     public void sendCustomerRegistrationMail(Customer user){
+        if (!canSendEmail(user.getEmail())) {
+            System.out.println("Please wait " emailCooldown "for: " + user.getEmail());
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
         message.setTo(user.getEmail());
@@ -148,20 +163,33 @@ public class MailService implements IMailService {
 
     @Async
     @Override
-    public void sendDentistRequestApprovalMail(Dentist dentist, String password) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
-        message.setTo(dentist.getEmail());
+    public void sendDentistRequestApprovalMail(Dentist dentist, String password, String ownerEmail) {
+        SimpleMailMessage dentistMessage = new SimpleMailMessage();
+        dentistMessage.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        dentistMessage.setTo(dentist.getEmail());
         // Set a meaningful message
-        message.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
-        message.setText("Hi, " + dentist.getFullName() + ",\n\n" +
+        dentistMessage.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
+        dentistMessage.setText("Hi, " + dentist.getFullName() + ",\n\n" +
                 "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
                 "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
                 "• Username: " + dentist.getUsername() + "\n" +
                 "• Password: " + password + "\n" + // Placeholder for the password
                 "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
         // Send the email (assuming you have a mailSender bean configured)
-        mailSender.send(message);
+        mailSender.send(dentistMessage);
+        SimpleMailMessage ownerMessage = new SimpleMailMessage();
+        ownerMessage.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        ownerMessage.setTo(dentist.getEmail());
+        // Set a meaningful message
+        ownerMessage.setSubject("[F-Dental] - Tài khoản được duyệt và tạo thành công");
+        ownerMessage.setText("Hi, " + dentist.getFullName() + ",\n\n" +
+                "Tài khoản đăng nhập vào hệ thống F-Dental của bạn đã được duyệt và tạo thành công.\n" +
+                "Vui lòng truy cập hệ thống theo thông tin sau:\n" +
+                "• Username: " + dentist.getUsername() + "\n" +
+                "• Password: " + password + "\n" + // Placeholder for the password
+                "Lưu ý: Vui lòng thay đổi mật khẩu sau khi đăng nhập.\n");
+        // Send the email (assuming you have a mailSender bean configured)
+        mailSender.send(ownerMessage);
     }
 
     @Async
