@@ -200,6 +200,46 @@ public class SlotService implements ISlotService {
         return modelMapper.map(currSlot, SlotDetailsResponse.class);
     }
 
+    @Override
+    public WorkingHoursDetailsResponse viewAvailableSlotsByDateByClinicBranchForUpdatingAppointment(LocalDate date, Long clinicBranchId, Long appointmentId) {
+
+        List<Appointment> appointments = appointmentRepository.findByDateOfClinicBranch(date, clinicBranchId);
+
+        Appointment updatingAppointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment for updating not found"));
+
+        ClinicBranch clinicBranch = clinicBranchRepository.findById(clinicBranchId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        Clinic clinic = clinicRepository.findById(clinicBranch.getClinic().getClinicId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        List<Slot> bookedSlots = new ArrayList<>();
+
+        for (Appointment appointment: appointments) {
+            if (!appointment.equals(updatingAppointment)){
+                Slot slot = slotRepository.findById(appointment.getSlot().getId())
+                        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+                bookedSlots.add(slot);
+            }
+        }
+
+        List<WorkingHoursDetailsResponse> availableSlotsByDate = new ArrayList<>();
+
+        List<Slot> slots = slotRepository.findByClinicAndDay(date.getDayOfWeek().toString().toUpperCase(), clinic.getClinicId());
+
+        List<SlotDetailsResponse> slotDetailResponses = new ArrayList<>();
+
+        for (Slot slot :slots) {
+            if (!bookedSlots.contains(slot)){
+                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+            }
+        }
+
+        return new WorkingHoursDetailsResponse(date.getDayOfWeek().toString(), slotDetailResponses);
+    }
+
     public List<String> getDaysBetween(LocalDate startDate, LocalDate endDate) {
         LocalDate start = startDate;
         List<String> days = new ArrayList<>();
