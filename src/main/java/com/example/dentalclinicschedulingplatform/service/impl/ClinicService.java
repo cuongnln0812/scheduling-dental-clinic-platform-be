@@ -85,6 +85,13 @@ public class ClinicService implements IClinicService {
     }
 
     @Override
+    public ClinicDetailResponse viewClinicDetail(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
+        return modelMapper.map(clinic, ClinicDetailResponse.class);
+    }
+
+    @Override
     public ClinicUpdateResponse updateClinicInformation(ClinicUpdateRequest request) {
         Clinic clinic = clinicRepository.findById(request.getClinicId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
@@ -125,6 +132,28 @@ public class ClinicService implements IClinicService {
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
         return getClinicRegisterResponse(clinic, clinic.getClinicOwner());
+    }
+
+    @Override
+    public ClinicDetailResponse reactivateClinic(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(clinicId)
+            .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
+
+        if(!clinic.getStatus().equals(ClinicStatus.INACTIVE))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot re-activate clinic because clinic status is not INACTIVE status");
+        clinic.setStatus(ClinicStatus.ACTIVE);
+        return modelMapper.map(clinic, ClinicDetailResponse.class);
+    }
+
+    @Override
+    public ClinicDetailResponse deactivateClinic(Long clinicId) {
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
+
+        if(!clinic.getStatus().equals(ClinicStatus.ACTIVE))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot deactivate clinic because clinic status is not ACTIVE status");
+        clinic.setStatus(ClinicStatus.INACTIVE);
+        return modelMapper.map(clinic, ClinicDetailResponse.class);
     }
 
     private ClinicRegisterResponse getClinicRegisterResponse(Clinic tmpClinic, ClinicOwner tmpOwner) {
