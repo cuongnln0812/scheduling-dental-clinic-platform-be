@@ -54,7 +54,7 @@ public class ClinicController {
 
     @Operation(summary = "View clinic detail information", description = "View clinic detail information" +
             "Anyone can perform this request")
-    @PostMapping("/{clinicId}")
+    @GetMapping("/{clinicId}")
     public ResponseEntity<ApiResponse<ClinicDetailResponse>> getClinicDetail(
             @PathVariable("clinicId") Long id){
         ApiResponse<ClinicDetailResponse> response = new ApiResponse<>(
