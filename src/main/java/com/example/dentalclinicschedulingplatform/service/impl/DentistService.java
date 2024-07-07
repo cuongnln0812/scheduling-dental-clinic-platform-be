@@ -1,9 +1,6 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
-import com.example.dentalclinicschedulingplatform.entity.Appointment;
-import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
-import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
-import com.example.dentalclinicschedulingplatform.entity.Dentist;
+import com.example.dentalclinicschedulingplatform.entity.*;
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.DentistCreateRequest;
@@ -14,6 +11,7 @@ import com.example.dentalclinicschedulingplatform.payload.response.DentistViewLi
 import com.example.dentalclinicschedulingplatform.repository.AppointmentRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
+import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
@@ -25,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +42,9 @@ public class DentistService implements IDentistService  {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final DentistRepository dentistRepository;
+    private final OwnerRepository ownerRepository;
     private final ClinicBranchRepository branchRepository;
     private final IMailService mailService;
-    private final IAuthenticateService authenticateService;
-
     private final AppointmentRepository appointmentRepository;
 
     @Override
@@ -81,8 +79,8 @@ public class DentistService implements IDentistService  {
             dentist.setUsername("dentist" + dentist.getId());
             dentist.setPassword(passwordEncoder.encode(randomPassword));
             dentist = dentistRepository.save(dentist);
-            String ownerEmail = dentist.getClinicBranch().getClinic().getClinicOwner().getEmail();
-            mailService.sendDentistRequestApprovalMail(dentist, randomPassword, ownerEmail);
+            ClinicOwner owner = dentist.getClinicBranch().getClinic().getClinicOwner();
+            mailService.sendDentistRequestApprovalMail(dentist, randomPassword, owner);
             return mapDetailRes(dentist);
         }else {
             dentist.setStatus(ClinicStatus.DENIED);
@@ -102,6 +100,9 @@ public class DentistService implements IDentistService  {
     @Override
     @Transactional
     public DentistDetailResponse createDentist(DentistCreateRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        ClinicOwner owner = ownerRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "System cannot find the owner who currently logged in!"));
         if(dentistRepository.existsByEmail(request.getEmail()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))
@@ -115,6 +116,7 @@ public class DentistService implements IDentistService  {
         dentist.setStatus(ClinicStatus.PENDING);
         dentist.setClinicBranch(branch);
         dentist = dentistRepository.save(dentist);
+        mailService.senDentistRequestConfirmationMail(dentist, owner);
         return mapDetailRes(dentist);
     }
 
