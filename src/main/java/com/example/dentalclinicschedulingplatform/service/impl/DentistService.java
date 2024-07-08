@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,6 +111,7 @@ public class DentistService implements IDentistService  {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob must be over or equals 18 years old!");
         ClinicBranch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic Branch", "id", request.getBranchId()));
+
         Dentist dentist = new Dentist();
         modelMapper.map(request, dentist);
         dentist.setStatus(ClinicStatus.PENDING);
