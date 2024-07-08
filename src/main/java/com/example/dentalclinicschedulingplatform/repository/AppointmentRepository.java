@@ -20,6 +20,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByDateOfClinicBranch(LocalDate date, Long clinicBranchId);
     Page<Appointment> findAppointmentsByCustomerId(Long customerId, Pageable pageable);
     Page<Appointment> findAppointmentsByClinicBranch_BranchId(Long branchId, Pageable pageable);
+
     Page<Appointment> findAppointmentsByDentistId(Long dentistId, Pageable pageable);
 
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +

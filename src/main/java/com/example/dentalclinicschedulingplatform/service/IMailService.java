@@ -12,7 +12,7 @@ public interface IMailService {
     void senDentistRequestConfirmationMail(Dentist dentist, ClinicOwner owner);
     void sendDentistRequestApprovalMail(Dentist dentist, String password, ClinicOwner owner);
     void sendCustomerAppointmentRequestConfirmationMail(Customer customer, Appointment appointment);
-    void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment);
+    void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment, String reason);
 
 //    void sendBranchRequestApprovalMail(ClinicOwner owner);
 //    void sendBranchRequestRejectionMail(ClinicOwner owner);

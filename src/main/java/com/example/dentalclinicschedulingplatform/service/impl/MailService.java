@@ -237,7 +237,7 @@ public class MailService implements IMailService {
 
     @Async
     @Override
-    public void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment) {
+    public void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment, String reason) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
         message.setTo(appointment.getCustomerEmail());
@@ -249,6 +249,7 @@ public class MailService implements IMailService {
                 "• Nha sĩ: " + appointment.getDentist().getFullName() + "\n" +
                 "• Dịch vụ: " + appointment.getService().getServiceName() + "\n" +
                 "• Địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
+                "Lý do hủy: " + reason + "\n\n" +
                 "Nếu bạn có bất kỳ câu hỏi nào hoặc cần đặt lại lịch hẹn, xin vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email này.\n\n" +
                 "Cảm ơn bạn đã tin tưởng và lựa chọn F-Dental. Chúng tôi rất mong được phục vụ bạn trong tương lai.\n\n" +
                 "Trân trọng,\n" +
