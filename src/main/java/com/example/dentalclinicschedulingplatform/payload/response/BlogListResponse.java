@@ -18,13 +18,5 @@ public class BlogListResponse {
     private Long id;
     private String title;
     private String summary;
-    private String content;
     private String thumbnail;
-    private LocalDate publishDate;
-    private ClinicStatus status;
-    private String createdBy;
-    private LocalDateTime createdDate;
-    private String modifiedBy;
-    private LocalDateTime modifiedDate;
-    private ClinicStaff staff;
 }

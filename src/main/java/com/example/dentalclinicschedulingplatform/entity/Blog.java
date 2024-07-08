@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Length;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -28,6 +29,7 @@ public class Blog {
     private Long id;
     private String title;
     private String summary;
+    @Column(length = Length.LOB_DEFAULT)
     private String content;
     private String thumbnail;
     @Column(name = "publish_date")
@@ -46,10 +48,6 @@ public class Blog {
     @LastModifiedDate
     @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
-
-    @ManyToOne
-    @JoinColumn(name = "staff_id")
-    private ClinicStaff staff;
 
     @ManyToOne
     @JoinColumn(name = "clinic_id")
