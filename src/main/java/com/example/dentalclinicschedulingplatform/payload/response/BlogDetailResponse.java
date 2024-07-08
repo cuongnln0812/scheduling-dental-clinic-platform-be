@@ -26,5 +26,5 @@ public class BlogDetailResponse {
     private LocalDateTime createdDate;
     private String modifiedBy;
     private LocalDateTime modifiedDate;
-    private ClinicStaff staff;
+    private String clinicName;
 }

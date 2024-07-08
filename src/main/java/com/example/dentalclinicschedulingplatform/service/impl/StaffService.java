@@ -27,6 +27,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -81,6 +84,8 @@ public class StaffService implements IStaffService {
                     .orElseThrow(() -> {
                         throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found");
                     });
+            if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Staff age must be over 18");
             if(!iClinicBranchRepository.findByBranchIdAndOwnerId(request.getClinicBranchId(), clinicOwner.get().getId()).isPresent())
             {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to this owner");
