@@ -244,7 +244,7 @@ public class SlotService implements ISlotService {
         LocalDate start = startDate;
         List<String> days = new ArrayList<>();
 
-        while (start.isBefore(endDate)){
+        while (!start.isAfter(endDate)){
             days.add(start.getDayOfWeek().toString().toUpperCase());
             start = start.plusDays(1);
         }

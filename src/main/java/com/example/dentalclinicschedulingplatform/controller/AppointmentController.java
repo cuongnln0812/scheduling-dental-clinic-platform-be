@@ -2,10 +2,8 @@ package com.example.dentalclinicschedulingplatform.controller;
 
 import com.example.dentalclinicschedulingplatform.payload.request.AppointmentCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.AppointmentUpdateRequest;
-import com.example.dentalclinicschedulingplatform.payload.response.ApiResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewDetailsResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.AppointmentViewListResponse;
-import com.example.dentalclinicschedulingplatform.payload.response.CategoryViewResponse;
+import com.example.dentalclinicschedulingplatform.payload.request.CancelAppointmentRequest;
+import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.service.impl.AppointmentService;
 import com.example.dentalclinicschedulingplatform.service.impl.AuthenticateService;
 import com.example.dentalclinicschedulingplatform.utils.AppConstants;
@@ -20,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -63,16 +62,16 @@ public class AppointmentController {
     }
 
     @Operation(
-            summary = "View appointments for staff/ dentist"
+            summary = "View appointments for clinic branch"
     )
-    @GetMapping("/manage")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getAppointments
+    @GetMapping("/branch")
+    public ResponseEntity<ApiResponse<List<AppointmentBranchResponse>>> getAppointmentsForClinicBranch
             (@RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
              @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>(
+        ApiResponse<List<AppointmentBranchResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get appointments successfully",
-                appointmentService.getAppointments(authenticateService.getUserInfo(), page, size));
+                appointmentService.getAppointmentsOfClinicBranch(authenticateService.getUserInfo(), page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -92,13 +91,13 @@ public class AppointmentController {
     @Operation(
             summary = "Cancel appointment"
     )
-    @DeleteMapping("/{appointmentId}")
+    @DeleteMapping
     public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> cancelAppointment
-            (@PathVariable ("appointmentId") Long appointmentId){
+            (@Valid @RequestBody CancelAppointmentRequest request){
         ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Cancel appointments successfully",
-                appointmentService.cancelAppointment(appointmentId));
+                appointmentService.cancelAppointment(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -112,6 +111,21 @@ public class AppointmentController {
                 HttpStatus.OK,
                 "Update appointments successfully",
                 appointmentService.updateAppointment(appointment));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "View appointments for clinic dentist"
+    )
+    @GetMapping("/dentist")
+    public ResponseEntity<ApiResponse<List<AppointmentDentistViewListResponse>>> getAppointmentsForDentist
+            (@RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+             @RequestParam (defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size,
+             @RequestParam LocalDate startDate, @RequestParam LocalDate endDate){
+        ApiResponse<List<AppointmentDentistViewListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get appointments successfully",
+                appointmentService.getAppointmentsOfDentist(authenticateService.getUserInfo(), page, size, startDate, endDate));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
