@@ -88,10 +88,13 @@ public class ClinicService implements IClinicService {
     public ClinicDetailResponse viewClinicDetail(Long clinicId) {
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
-        return modelMapper.map(clinic, ClinicDetailResponse.class);
+        ClinicDetailResponse response = modelMapper.map(clinic, ClinicDetailResponse.class);
+        response.setOwnerName(clinic.getClinicOwner().getFullName());
+        return response;
     }
 
     @Override
+    @Transactional
     public ClinicUpdateResponse updateClinicInformation(ClinicUpdateRequest request) {
         Clinic clinic = clinicRepository.findById(request.getClinicId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
@@ -119,6 +122,22 @@ public class ClinicService implements IClinicService {
     }
 
     @Override
+    public Page<ClinicListResponse> getAllActiveClinic(int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        Page<Clinic> clinics;
+        clinics = clinicRepository.findAllByStatus(ClinicStatus.ACTIVE, pageRequest);
+        return clinics.map(clinic -> modelMapper.map(clinic, ClinicListResponse.class));
+    }
+
+    @Override
+    public Page<ClinicListResponse> getAllClinic(int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        Page<Clinic> clinics;
+        clinics = clinicRepository.findAll(pageRequest);
+        return clinics.map(clinic -> modelMapper.map(clinic, ClinicListResponse.class));
+    }
+
+    @Override
     public Page<PendingClinicListResponse> getClinicPendingList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Clinic> clinics;
@@ -143,7 +162,9 @@ public class ClinicService implements IClinicService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot re-activate clinic because clinic status is not INACTIVE status");
         clinic.setStatus(ClinicStatus.ACTIVE);
         clinic = clinicRepository.save(clinic);
-        return modelMapper.map(clinic, ClinicDetailResponse.class);
+        ClinicDetailResponse response = modelMapper.map(clinic, ClinicDetailResponse.class);
+        response.setOwnerName(clinic.getClinicOwner().getFullName());
+        return response;
     }
 
     @Override
@@ -155,7 +176,9 @@ public class ClinicService implements IClinicService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot deactivate clinic because clinic status is not ACTIVE status");
         clinic.setStatus(ClinicStatus.INACTIVE);
         clinic = clinicRepository.save(clinic);
-        return modelMapper.map(clinic, ClinicDetailResponse.class);
+        ClinicDetailResponse response = modelMapper.map(clinic, ClinicDetailResponse.class);
+        response.setOwnerName(clinic.getClinicOwner().getFullName());
+        return response;
     }
 
     private ClinicRegisterResponse getClinicRegisterResponse(Clinic tmpClinic, ClinicOwner tmpOwner) {

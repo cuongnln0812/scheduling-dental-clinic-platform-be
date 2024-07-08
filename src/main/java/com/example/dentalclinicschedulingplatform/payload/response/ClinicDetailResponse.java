@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -23,5 +25,8 @@ public class ClinicDetailResponse {
     private String clinicRegistration;
     private String clinicImage;
     private Float totalRating;
+    private String ownerName;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private ClinicStatus status;
 }

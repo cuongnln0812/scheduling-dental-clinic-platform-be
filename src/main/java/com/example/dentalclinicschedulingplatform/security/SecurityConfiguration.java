@@ -58,7 +58,9 @@ public class SecurityConfiguration {
                                                         "/api/v1/working-hours/{clinicId}",
                                                         "/api/v1/auth/refresh-token",
                                                         "/api/v1/auth/logout",
-                                                        "/api/v1/auth/login-google")
+                                                        "/api/v1/auth/login-google",
+                                                        "api/v1/clinics/{clinicId}",
+                                                        "api/v1/clinics")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",
