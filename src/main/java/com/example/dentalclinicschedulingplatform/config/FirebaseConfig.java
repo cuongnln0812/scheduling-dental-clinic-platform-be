@@ -13,7 +13,7 @@ import java.io.IOException;
 public class FirebaseConfig {
 
     @PostConstruct
-    public void init() throws IOException, IOException {
+    public void init() throws IOException {
         FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase-service-account.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
