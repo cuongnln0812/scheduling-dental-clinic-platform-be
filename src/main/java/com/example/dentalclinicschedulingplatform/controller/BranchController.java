@@ -51,7 +51,7 @@ public class BranchController {
     @Operation(
             summary = "Get all branch by clinicId"
     )
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/clinic/{id}")
     public ResponseEntity<ApiResponse<List<BranchSummaryResponse>>> viewAllBranchByClinicId(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
