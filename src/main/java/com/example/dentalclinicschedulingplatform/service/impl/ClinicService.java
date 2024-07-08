@@ -142,6 +142,7 @@ public class ClinicService implements IClinicService {
         if(!clinic.getStatus().equals(ClinicStatus.INACTIVE))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot re-activate clinic because clinic status is not INACTIVE status");
         clinic.setStatus(ClinicStatus.ACTIVE);
+        clinic = clinicRepository.save(clinic);
         return modelMapper.map(clinic, ClinicDetailResponse.class);
     }
 
@@ -153,6 +154,7 @@ public class ClinicService implements IClinicService {
         if(!clinic.getStatus().equals(ClinicStatus.ACTIVE))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot deactivate clinic because clinic status is not ACTIVE status");
         clinic.setStatus(ClinicStatus.INACTIVE);
+        clinic = clinicRepository.save(clinic);
         return modelMapper.map(clinic, ClinicDetailResponse.class);
     }
 
