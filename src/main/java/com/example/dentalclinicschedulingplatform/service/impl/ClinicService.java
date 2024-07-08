@@ -126,7 +126,7 @@ public class ClinicService implements IClinicService {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Clinic> clinics;
         clinics = clinicRepository.findAllByStatus(ClinicStatus.ACTIVE, pageRequest);
-        return clinics.map(clinic -> modelMapper.map(clinic, ClinicListResponse.class));
+        return clinics.map(this::mapListRes);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class ClinicService implements IClinicService {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Clinic> clinics;
         clinics = clinicRepository.findAll(pageRequest);
-        return clinics.map(clinic -> modelMapper.map(clinic, ClinicListResponse.class));
+        return clinics.map(this::mapListRes);
     }
 
     @Override
@@ -194,6 +194,12 @@ public class ClinicService implements IClinicService {
         response.setClinicStatus(tmpClinic.getStatus());
         response.setOwnerDetail(modelMapper.map(tmpOwner, OwnerRegisterResponse.class));
         return response;
+    }
+
+    private ClinicListResponse mapListRes(Clinic clinic){
+        ClinicListResponse res = modelMapper.map(clinic, ClinicListResponse.class);
+        res.setOwnerName(clinic.getClinicOwner().getFullName());
+        return res;
     }
 
     @Override
