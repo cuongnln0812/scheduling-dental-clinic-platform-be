@@ -10,6 +10,8 @@ public interface IClinicService {
     ApprovedClinicResponse approveClinic(Long clinicId, boolean isApproved);
     ClinicDetailResponse viewClinicDetail(Long clinicId);
     ClinicUpdateResponse updateClinicInformation(ClinicUpdateRequest request);
+    Page<ClinicListResponse> getAllActiveClinic(int page, int size);
+    Page<ClinicListResponse> getAllClinic(int page, int size);
     Page<PendingClinicListResponse> getClinicPendingList(int page, int size);
     ClinicRegisterResponse getPendingClinicDetail(Long clinicId);
     ClinicDetailResponse reactivateClinic(Long clinicId);

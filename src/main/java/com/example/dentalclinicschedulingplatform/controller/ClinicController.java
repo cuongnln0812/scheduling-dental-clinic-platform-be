@@ -64,6 +64,33 @@ public class ClinicController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get all clinic list", description = "Get all clinic list by pagination for system admin. " +
+            "Only System Admin can perform this request!")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping()
+    public ResponseEntity<ApiResponse<Page<ClinicListResponse>>> getAllClinic(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
+        ApiResponse<Page<ClinicListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get all clinic list successfully!",
+                clinicService.getAllClinic(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get active clinic list", description = "Get active clinic list by pagination. " +
+            "Only System Admin can perform this request!")
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<Page<ClinicListResponse>>> getActiveClinics(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size){
+        ApiResponse<Page<ClinicListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get active clinics list successfully!",
+                clinicService.getAllActiveClinic(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @Operation(summary = "Get pending clinic request list", description = "Get all pending clinic request for the approval action. " +
             "Only System Admin can perform this request!")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -109,7 +136,7 @@ public class ClinicController {
 
     @Operation(summary = "Re-activate clinic", description = "Can only re-activate clinic if its status is INACTIVE. " +
             "Only Clinic Owner can perform this request!")
-    @PreAuthorize("hasAnyRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
     @PutMapping("/re-activate/{clinicId}")
     public ResponseEntity<ApiResponse<ClinicDetailResponse>> reactivateClinic(
             @PathVariable("clinicId") Long clinicId){
@@ -122,7 +149,7 @@ public class ClinicController {
 
     @Operation(summary = "Deactivate clinic (SOFT DELETE)", description = "Can only deactivate clinic if its status is ACTIVE. " +
             "Only Clinic Owner can perform this request!")
-    @PreAuthorize("hasAnyRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
     @DeleteMapping("/{clinicId}")
     public ResponseEntity<ApiResponse<ClinicDetailResponse>> deactivateClinic(
             @PathVariable("clinicId") Long clinicId){
