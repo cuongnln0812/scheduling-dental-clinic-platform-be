@@ -80,14 +80,29 @@ public class BlogController {
             summary = "Get all active blog"
     )
     //@PreAuthorize("hasAnyRole('ADMIN')")
-    @GetMapping()
-    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllBlog(
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllActiveBlog(
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
         ApiResponse<Page<BlogDetailResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Get all blog successfully!",
-                blogService.getAllBlog(page, size));
+                "Get all active blog successfully!",
+                blogService.getAllActiveBlog(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get all active and inactive blog"
+    )
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllActiveAndInactiveBlog(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
+        ApiResponse<Page<BlogDetailResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get all active and inactive blog successfully!",
+                blogService.getAllActiveAndInactiveBlog(page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -103,6 +118,22 @@ public class BlogController {
                 HttpStatus.OK,
                 "Get all pending blog successfully!",
                 blogService.getAllPendingBlog(page, size));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get all blog by clinic id"
+    )
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/clinic/{id}")
+    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllBlogByClinic(
+            @PathVariable("id") Long id,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
+        ApiResponse<Page<BlogDetailResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get all blog by clinic id successfully!",
+                blogService.getAllBlogByClinicId(id, page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

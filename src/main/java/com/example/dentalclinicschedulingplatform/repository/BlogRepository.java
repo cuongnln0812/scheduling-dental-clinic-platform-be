@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BlogRepository extends JpaRepository<Blog, Long> {
     Page<Blog> findAllByStatus(ClinicStatus status, Pageable pageable);
+    Page<Blog> findAllByStatusOrStatus(ClinicStatus status, ClinicStatus status2, Pageable pageable);
+    Page<Blog> findAllByClinic_ClinicId(Long id, Pageable pageable);
 }

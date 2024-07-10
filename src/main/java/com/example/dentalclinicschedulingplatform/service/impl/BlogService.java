@@ -10,6 +10,7 @@ import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IBlogService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
+import com.google.protobuf.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -98,11 +99,29 @@ public class BlogService implements IBlogService {
     }
 
     @Override
-    public Page<BlogDetailResponse> getAllBlog(int page, int size) {
+    public Page<BlogDetailResponse> getAllActiveBlog(int page, int size) {
         try {
             Pageable pageRequest = PageRequest.of(page, size);
             Page<Blog> listBlog;
             listBlog = blogRepository.findAllByStatus(ClinicStatus.ACTIVE, pageRequest);
+            return listBlog.map(blog ->
+                    new BlogDetailResponse(blog.getId(), blog.getTitle(),
+                            blog.getSummary(), blog.getContent(),
+                            blog.getThumbnail(), blog.getPublishDate(),
+                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getCreatedDate(), blog.getModifiedBy(),
+                            blog.getModifiedDate(), blog.getClinic().getClinicName()));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<BlogDetailResponse> getAllActiveAndInactiveBlog(int page, int size) {
+        try {
+            Pageable pageRequest = PageRequest.of(page, size);
+            Page<Blog> listBlog;
+            listBlog = blogRepository.findAllByStatusOrStatus(ClinicStatus.ACTIVE, ClinicStatus.INACTIVE, pageRequest);
             return listBlog.map(blog ->
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
@@ -121,6 +140,26 @@ public class BlogService implements IBlogService {
             Pageable pageRequest = PageRequest.of(page, size);
             Page<Blog> listBlog;
             listBlog = blogRepository.findAllByStatus(ClinicStatus.PENDING, pageRequest);
+            return listBlog.map(blog ->
+                    new BlogDetailResponse(blog.getId(), blog.getTitle(),
+                            blog.getSummary(), blog.getContent(),
+                            blog.getThumbnail(), blog.getPublishDate(),
+                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getCreatedDate(), blog.getModifiedBy(),
+                            blog.getModifiedDate(), blog.getClinic().getClinicName()));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<BlogDetailResponse> getAllBlogByClinicId(Long id, int page, int size) {
+        try {
+            Clinic clinic = clinicRepository.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+            Pageable pageRequest = PageRequest.of(page, size);
+            Page<Blog> listBlog;
+            listBlog = blogRepository.findAllByClinic_ClinicId(id, pageRequest);
             return listBlog.map(blog ->
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
