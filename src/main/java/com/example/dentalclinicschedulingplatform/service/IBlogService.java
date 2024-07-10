@@ -13,8 +13,8 @@ public interface IBlogService {
     BlogDetailResponse createBlog(BlogCreateRequest request);
     BlogDetailResponse approveBlog(Long id, boolean isApproved);
     BlogDetailResponse viewBlog(Long id);
-    Page<BlogListResponse> getAllBlog(int page, int size);
-    Page<BlogListResponse> getAllPendingBlog(int page, int size);
+    Page<BlogDetailResponse> getAllBlog(int page, int size);
+    Page<BlogDetailResponse> getAllPendingBlog(int page, int size);
     BlogDetailResponse updateBlog(BlogUpdateRequest request);
     BlogDetailResponse removeBlog(Long id);
 

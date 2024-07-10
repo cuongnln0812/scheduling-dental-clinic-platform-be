@@ -98,26 +98,36 @@ public class BlogService implements IBlogService {
     }
 
     @Override
-    public Page<BlogListResponse> getAllBlog(int page, int size) {
+    public Page<BlogDetailResponse> getAllBlog(int page, int size) {
         try {
             Pageable pageRequest = PageRequest.of(page, size);
             Page<Blog> listBlog;
             listBlog = blogRepository.findAllByStatus(ClinicStatus.ACTIVE, pageRequest);
             return listBlog.map(blog ->
-                    new BlogListResponse(blog.getId(), blog.getTitle(), blog.getSummary(), blog.getThumbnail()));
+                    new BlogDetailResponse(blog.getId(), blog.getTitle(),
+                            blog.getSummary(), blog.getContent(),
+                            blog.getThumbnail(), blog.getPublishDate(),
+                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getCreatedDate(), blog.getModifiedBy(),
+                            blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public Page<BlogListResponse> getAllPendingBlog(int page, int size) {
+    public Page<BlogDetailResponse> getAllPendingBlog(int page, int size) {
         try {
             Pageable pageRequest = PageRequest.of(page, size);
             Page<Blog> listBlog;
             listBlog = blogRepository.findAllByStatus(ClinicStatus.PENDING, pageRequest);
             return listBlog.map(blog ->
-                    new BlogListResponse(blog.getId(), blog.getTitle(), blog.getSummary(), blog.getThumbnail()));
+                    new BlogDetailResponse(blog.getId(), blog.getTitle(),
+                            blog.getSummary(), blog.getContent(),
+                            blog.getThumbnail(), blog.getPublishDate(),
+                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getCreatedDate(), blog.getModifiedBy(),
+                            blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {
             throw e;
         }

@@ -65,7 +65,7 @@ public class BlogController {
     @Operation(
             summary = "View detail blog"
     )
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BlogDetailResponse>> viewBlog(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
@@ -77,14 +77,14 @@ public class BlogController {
     }
 
     @Operation(
-            summary = "Get all blog"
+            summary = "Get all active blog"
     )
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping()
-    public ResponseEntity<ApiResponse<Page<BlogListResponse>>> getAllBlog(
+    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllBlog(
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
-        ApiResponse<Page<BlogListResponse>> response = new ApiResponse<>(
+        ApiResponse<Page<BlogDetailResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get all blog successfully!",
                 blogService.getAllBlog(page, size));
@@ -96,10 +96,10 @@ public class BlogController {
     )
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/pending")
-    public ResponseEntity<ApiResponse<Page<BlogListResponse>>> getAllPendingBlog(
+    public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllPendingBlog(
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size) {
-        ApiResponse<Page<BlogListResponse>> response = new ApiResponse<>(
+        ApiResponse<Page<BlogDetailResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Get all pending blog successfully!",
                 blogService.getAllPendingBlog(page, size));
