@@ -93,7 +93,7 @@ public class AppointmentService implements IAppointmentService {
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));
 
                 pendingAppointments.add(new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId(),currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
-                         currAppointment.getCustomerDob(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                         currAppointment.getCustomerDob(), currCustomer.getGender(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                         , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                         , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
 
@@ -270,7 +270,7 @@ public class AppointmentService implements IAppointmentService {
         mailService.sendCustomerAppointmentRequestConfirmationMail(customer, newAppointment);
 
         return new AppointmentViewDetailsResponse(newAppointment.getId(), newAppointment.getStatus().name(), customer.getId(),newAppointment.getCustomerName(), newAppointment.getCustomerAddress(),
-                newAppointment.getCustomerPhone(), newAppointment.getCustomerDob(), newAppointment.getCustomerAge(),
+                newAppointment.getCustomerPhone(), newAppointment.getCustomerDob(), customer.getGender(), newAppointment.getCustomerAge(),
                 newAppointment.getCustomerEmail(), newAppointment.getAppointmentDate(),
                 newAppointment.getDuration(), modelMapper.map(newAppointment.getSlot(), SlotDetailsResponse.class),
                 modelMapper.map(newAppointment.getClinicBranch(), BranchSummaryResponse.class),
@@ -311,7 +311,7 @@ public class AppointmentService implements IAppointmentService {
         }
         
         return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
-                currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                currAppointment.getCustomerDob(), currCustomer.getGender(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
     }
@@ -369,7 +369,7 @@ public class AppointmentService implements IAppointmentService {
         mailService.sendCustomerAppointmentCancelConfirmationMail(currCustomer, currAppointment, request.getCancelReason());
 
         return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currCustomer.getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
-                currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                currAppointment.getCustomerDob(), currCustomer.getGender(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
     }
@@ -488,7 +488,7 @@ public class AppointmentService implements IAppointmentService {
         appointmentRepository.save(currAppointment);
 
         return new AppointmentViewDetailsResponse(currAppointment.getId(), currAppointment.getStatus().name(), currAppointment.getCustomer().getId() ,currAppointment.getCustomerName(), currAppointment.getCustomerAddress(), currAppointment.getCustomerPhone(),
-                currAppointment.getCustomerDob(),currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
+                currAppointment.getCustomerDob(), currAppointment.getCustomer().getGender() ,currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
     }
