@@ -34,6 +34,8 @@ public class Appointment {
     private LocalDate customerDob;
     @Column(name = "customer_age")
     private int customerAge;
+    @Column(name = "customer_gender")
+    private String customerGender;
     @Column(name = "customer_email")
     private String customerEmail;
     @Column(name = "appointment_date")
