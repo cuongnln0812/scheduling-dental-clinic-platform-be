@@ -18,4 +18,5 @@ public class AppointmentViewListResponse {
     public LocalDate appointmentDate;
     private LocalDateTime createdDate;
     private AppointmentStatus appointmentStatus;
+    private Long clinicBranchId;
 }

@@ -91,7 +91,7 @@ public class AppointmentController {
     @Operation(
             summary = "Cancel appointment"
     )
-    @DeleteMapping
+    @PostMapping("/cancel")
     public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> cancelAppointment
             (@Valid @RequestBody CancelAppointmentRequest request){
         ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(

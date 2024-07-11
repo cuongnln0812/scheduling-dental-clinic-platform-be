@@ -12,11 +12,11 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @Query(value = "SELECT * FROM appointment where appointment_date >= :startDate and appointment_date <= :endDate " +
-            "and branch_id = :clinicBranchId ", nativeQuery = true)
+            "and branch_id = :clinicBranchId and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByStartDateAndEndDateOfClinicBranch(LocalDate startDate, LocalDate endDate, Long clinicBranchId);
 
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +
-            "and branch_id = :clinicBranchId ", nativeQuery = true)
+            "and branch_id = :clinicBranchId and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByDateOfClinicBranch(LocalDate date, Long clinicBranchId);
     Page<Appointment> findAppointmentsByCustomerId(Long customerId, Pageable pageable);
     Page<Appointment> findAppointmentsByClinicBranch_BranchId(Long branchId, Pageable pageable);
@@ -24,6 +24,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findAppointmentsByDentistId(Long dentistId, Pageable pageable);
 
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +
-            "and branch_id = :clinicBranchId and slot_id = :slotId ", nativeQuery = true)
+            "and branch_id = :clinicBranchId and slot_id = :slotId and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByDateAndSlotOfClinicBranch(LocalDate date, Long clinicBranchId, Long slotId);
 }

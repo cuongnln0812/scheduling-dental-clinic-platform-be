@@ -29,6 +29,9 @@ public class AppointmentCreateRequest {
     @NotNull(message = "Customer date of birth is required")
     private LocalDate customerDob;
 
+    @NotNull(message = "Customer gender is required")
+    private String customerGender;
+
     @NotBlank(message = "Customer email is required")
     @Email(message = "Customer email should be valid")
     private String customerEmail;
