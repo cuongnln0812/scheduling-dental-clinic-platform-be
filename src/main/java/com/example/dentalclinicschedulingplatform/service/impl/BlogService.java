@@ -211,4 +211,20 @@ public class BlogService implements IBlogService {
             throw e;
         }
     }
+
+    @Override
+    public BlogDetailResponse reactiveBlog(Long id) {
+        Blog blogReturn;
+        try {
+            Blog blog = blogRepository.findById(id)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Blog not found"));
+            if(blog.getStatus().equals(ClinicStatus.INACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Blog is already inactive");blog.setStatus(ClinicStatus.INACTIVE);
+            blogReturn = blog;
+
+            blogRepository.delete(blog);
+            return modelMapper.map(blogReturn, BlogDetailResponse.class);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }
