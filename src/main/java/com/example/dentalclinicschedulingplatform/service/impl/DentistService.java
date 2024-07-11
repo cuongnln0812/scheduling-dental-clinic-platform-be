@@ -59,6 +59,16 @@ public class DentistService implements IDentistService  {
     }
 
     @Override
+    public Page<DentistListResponse> getDentistListByClinic(Long id, int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        Page<Dentist> dentistList;
+        if(id != null){
+            dentistList = dentistRepository.findByClinicId(id, pageRequest);
+        }else throw new ResourceNotFoundException("Clinic", "id", id);
+        return dentistList.map(this::mapListRes);
+    }
+
+    @Override
     public Page<DentistListResponse> getPendingDentistList(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Dentist> dentistList;

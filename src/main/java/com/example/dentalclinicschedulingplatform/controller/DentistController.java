@@ -58,11 +58,11 @@ public class DentistController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get dentist list by branch", description = "If branchId is null, it will return all dentist account in the system," +
+    @Operation(summary = "Get dentist list by branch", description = "If branchId is null, it will return all dentist account branch in the system," +
             " but if branchIdi is set it will return the list of that branch. " +
             "Anyone can perform this request!")
     @GetMapping()
-    public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistList(
+    public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistListByBranch(
             @RequestParam(required = false) Long branchId,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
             @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size,
@@ -73,6 +73,22 @@ public class DentistController {
                 HttpStatus.OK,
                 "Get list dentist successfully!",
                 dentistService.getDentistListByBranch(branchId, page, size, dir, by));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get dentist list by clinic", description = "It will return all dentist account by clinic in the system," +
+            " but if branchIdi is set it will return the list of that branch. " +
+            "Anyone can perform this request!")
+    @GetMapping("/clinic/{clinicId}")
+    public ResponseEntity<ApiResponse<Page<DentistListResponse>>> getDentistListByClinic(
+            @PathVariable Long clinicId,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size)
+    {
+        ApiResponse<Page<DentistListResponse>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get list dentist successfully!",
+                dentistService.getDentistListByClinic(clinicId, page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

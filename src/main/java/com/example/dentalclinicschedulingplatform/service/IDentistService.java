@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface IDentistService{
     Page<DentistListResponse> getDentistListByBranch(Long id, int page, int size, String dir, String by);
+    Page<DentistListResponse> getDentistListByClinic(Long id, int page, int size);
     Page<DentistListResponse> getPendingDentistList(int page, int size);
     DentistDetailResponse approveDentistAccount(Long id, boolean isApproved);
     DentistDetailResponse getDentistDetail(Long id);
