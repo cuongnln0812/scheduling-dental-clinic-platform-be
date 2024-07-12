@@ -128,4 +128,17 @@ public class AppointmentController {
                 appointmentService.getAppointmentsOfDentist(authenticateService.getUserInfo(), page, size, startDate, endDate));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "Complete appointment"
+    )
+    @PostMapping("/complete/{appointmentId}")
+    public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> completeAppointment
+            (@PathVariable ("appointmentId") Long appointmentId){
+        ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Complete appointment successfully",
+                appointmentService.completeAppointment(appointmentId));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

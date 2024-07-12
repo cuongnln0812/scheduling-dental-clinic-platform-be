@@ -18,4 +18,5 @@ public interface IAppointmentService {
     AppointmentViewDetailsResponse cancelAppointment(CancelAppointmentRequest request);
     AppointmentViewDetailsResponse updateAppointment(AppointmentUpdateRequest appointment);
     List<AppointmentDentistViewListResponse> getAppointmentsOfDentist(UserInformationRes userInformationRes, int page, int size, LocalDate startDate, LocalDate endDate);
+    AppointmentViewDetailsResponse completeAppointment(Long appointmentId);
 }

@@ -8,10 +8,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.DentistUpdateR
 import com.example.dentalclinicschedulingplatform.payload.response.DentistDetailResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistListResponse;
 import com.example.dentalclinicschedulingplatform.payload.response.DentistViewListResponse;
-import com.example.dentalclinicschedulingplatform.repository.AppointmentRepository;
-import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
-import com.example.dentalclinicschedulingplatform.repository.DentistRepository;
-import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
+import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
@@ -45,6 +42,7 @@ public class DentistService implements IDentistService  {
     private final ClinicBranchRepository branchRepository;
     private final IMailService mailService;
     private final AppointmentRepository appointmentRepository;
+    private final SlotRepository slotRepository;
 
     @Override
     public Page<DentistListResponse> getDentistListByBranch(Long branchId, int page, int size, String dir, String by) {
@@ -182,6 +180,9 @@ public class DentistService implements IDentistService  {
         ClinicBranch clinicBranch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
 
+        Slot currSlot = slotRepository.findById(slotId)
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
         List<Appointment> appointments = appointmentRepository.findByDateAndSlotOfClinicBranch(date, branchId, slotId);
 
         List<DentistViewListResponse> availableDentists = new ArrayList<>();
@@ -193,7 +194,7 @@ public class DentistService implements IDentistService  {
         List<Dentist> dentistList = dentistRepository.findAllByClinicBranch_BranchId(clinicBranch.getBranchId());
 
         for (Dentist dentist: dentistList) {
-            if (!occupiedDentists.contains(dentist)){
+            if (!occupiedDentists.contains(dentist) && dentist.getStatus().equals(ClinicStatus.ACTIVE)){
                 availableDentists.add(modelMapper.map(dentist, DentistViewListResponse.class));
             }
         }
@@ -204,6 +205,9 @@ public class DentistService implements IDentistService  {
     public List<DentistViewListResponse> getAvailableDentistOfDateByBranchForUpdatingAppointment(Long branchId, LocalDate date, Long slotId, Long appointmentId) {
         ClinicBranch clinicBranch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch not found"));
+
+        Slot currSlot = slotRepository.findById(slotId)
+                .orElseThrow(()-> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
         Appointment updatingAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment for updating not found"));
@@ -220,7 +224,7 @@ public class DentistService implements IDentistService  {
         List<Dentist> dentistList = dentistRepository.findAllByClinicBranch_BranchId(clinicBranch.getBranchId());
 
         for (Dentist dentist: dentistList) {
-            if (!occupiedDentists.contains(dentist)){
+            if (!occupiedDentists.contains(dentist) && dentist.getStatus().equals(ClinicStatus.ACTIVE)){
                 availableDentists.add(modelMapper.map(dentist, DentistViewListResponse.class));
             }
         }
