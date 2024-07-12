@@ -34,6 +34,7 @@ public class ClinicService implements IClinicService {
     private final IMailService mailService;
     private final IBranchService branchService;
     private final IOwnerService ownerService;
+    private final IFeedbackService feedbackService;
     private final IWorkingHoursService workingHoursService;
     private final IAuthenticateService authenticateService;
 
@@ -199,6 +200,7 @@ public class ClinicService implements IClinicService {
     private ClinicListResponse mapListRes(Clinic clinic){
         ClinicListResponse res = modelMapper.map(clinic, ClinicListResponse.class);
         res.setOwnerName(clinic.getClinicOwner().getFullName());
+        res.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).size());
         return res;
     }
 

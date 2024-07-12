@@ -20,7 +20,7 @@ public class ClinicListResponse {
     private String phone;
     private String ownerName;
     private String totalRating;
-    private String feedbackCount;
+    private Integer feedbackCount;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private ClinicStatus status;
