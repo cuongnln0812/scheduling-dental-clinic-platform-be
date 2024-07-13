@@ -2,11 +2,9 @@ package com.example.dentalclinicschedulingplatform.entity;
 
 import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
-@ToString
 public enum ClinicStatus {
     PENDING("PENDING"),
     DENIED("DENIED"),
@@ -15,6 +13,11 @@ public enum ClinicStatus {
     INACTIVE("INACTIVE");
 
     private final String status;
+
+    @Override
+    public String toString() {
+        return status;
+    }
 
     public static void isValid(ClinicStatus status) {
         if (status == null) {
