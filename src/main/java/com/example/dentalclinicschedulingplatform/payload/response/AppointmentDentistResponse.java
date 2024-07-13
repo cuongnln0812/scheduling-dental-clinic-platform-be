@@ -26,4 +26,6 @@ public class AppointmentDentistResponse {
     public String customerName;
 
     public String service;
+
+    public Long treatmentOutcomeId;
 }

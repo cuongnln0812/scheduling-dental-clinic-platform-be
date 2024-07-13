@@ -56,7 +56,7 @@ public class AppointmentController {
         AppointmentViewDetailsResponse appointment = appointmentService.viewDetailsAppointment(appointmentId);
         ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "View details category successfully",
+                "View details appointment successfully",
                 appointment);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -126,6 +126,19 @@ public class AppointmentController {
                 HttpStatus.OK,
                 "Get appointments successfully",
                 appointmentService.getAppointmentsOfDentist(authenticateService.getUserInfo(), page, size, startDate, endDate));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Complete appointment"
+    )
+    @PostMapping("/complete/{appointmentId}")
+    public ResponseEntity<ApiResponse<AppointmentViewDetailsResponse>> completeAppointment
+            (@PathVariable ("appointmentId") Long appointmentId){
+        ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Complete appointment successfully",
+                appointmentService.completeAppointment(appointmentId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
