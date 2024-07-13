@@ -19,6 +19,7 @@ public class ClinicListResponse {
     private String city;
     private String phone;
     private String ownerName;
+    private String logo;
     private String totalRating;
     private Integer feedbackCount;
     private LocalDateTime createdDate;
