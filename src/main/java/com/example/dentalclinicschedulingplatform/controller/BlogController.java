@@ -124,7 +124,7 @@ public class BlogController {
     @Operation(
             summary = "Get all blog by clinic id"
     )
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
     @GetMapping("/clinic/{id}")
     public ResponseEntity<ApiResponse<Page<BlogDetailResponse>>> getAllBlogByClinic(
             @PathVariable("id") Long id,
@@ -155,14 +155,14 @@ public class BlogController {
     @Operation(
             summary = "Delete blog"
     )
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<BlogDetailResponse>> deleteBlog(@PathVariable("id") Long id) {
         log.info("Has request with data: {}", id.toString());
         BlogDetailResponse blog = blogService.removeBlog(id);
         ApiResponse<BlogDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Change status blog successfully",
+                "Remove blog successfully",
                 blog);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

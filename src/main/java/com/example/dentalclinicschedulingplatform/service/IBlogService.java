@@ -19,7 +19,7 @@ public interface IBlogService {
     Page<BlogDetailResponse> getAllBlogByClinicId(Long id, int page, int size);
     BlogDetailResponse updateBlog(BlogUpdateRequest request);
     BlogDetailResponse removeBlog(Long id);
-    BlogDetailResponse reactiveBlog(Long id);
+
 
 
 
