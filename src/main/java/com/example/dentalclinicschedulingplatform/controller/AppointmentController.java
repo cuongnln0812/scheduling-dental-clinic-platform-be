@@ -56,7 +56,7 @@ public class AppointmentController {
         AppointmentViewDetailsResponse appointment = appointmentService.viewDetailsAppointment(appointmentId);
         ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "View details category successfully",
+                "View details appointment successfully",
                 appointment);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

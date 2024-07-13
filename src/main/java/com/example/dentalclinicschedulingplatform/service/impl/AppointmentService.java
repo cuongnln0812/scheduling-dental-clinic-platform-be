@@ -537,7 +537,8 @@ public class AppointmentService implements IAppointmentService {
 
 
                         appointmentDentistResponses.add(new AppointmentDentistResponse(currAppointment.getId(), currAppointment.getStatus().name(), currAppointment.getAppointmentDate(),
-                                modelMapper.map(currSlot, SlotDetailsResponse.class), currCustomer.getId(), currAppointment.getCustomerName(), currService.getServiceName()));
+                                modelMapper.map(currSlot, SlotDetailsResponse.class), currCustomer.getId(), currAppointment.getCustomerName(), currService.getServiceName(),
+                                currAppointment.getTreatmentOutcome() != null ? currAppointment.getTreatmentOutcome().getId() : null));
                     }
                 }
             }
