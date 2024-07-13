@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountListResponse {
+    private Long id;
     private String username;
     private String fullName;
     private String email;

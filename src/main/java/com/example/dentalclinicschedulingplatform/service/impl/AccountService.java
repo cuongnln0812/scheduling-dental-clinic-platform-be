@@ -65,6 +65,7 @@ public class AccountService implements IAccountService {
         Page<SystemAdmin> adminPage = adminRepository.findAll(pageable);
         Page<AccountListResponse> adminResponse = adminPage.map(user -> {
             AccountListResponse res = modelMapper.map(user, AccountListResponse.class);
+            res.setId(user.getAdminId());
             res.setRoleName("ADMIN");
             res.setStatus(user.isStatus() ? "ACTIVE" : "INACTIVE");
             return res;
