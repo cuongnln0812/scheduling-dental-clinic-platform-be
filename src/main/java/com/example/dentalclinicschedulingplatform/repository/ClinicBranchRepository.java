@@ -17,7 +17,9 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
     Optional<ClinicBranch> findById(Long id);
 
     List<ClinicBranch> findAllByClinic_ClinicId(Long id);
-    Optional<ClinicBranch> findByClinic_ClinicId(Long id);
+
+    @Query("SELECT b FROM ClinicBranch b WHERE b.clinic.clinicId = :id AND b.isMain = true")
+    Optional<ClinicBranch> findByClinic_ClinicIdAndIsMain(Long id);
 
     List<ClinicBranch> findAllByClinic_ClinicIdAndStatus(Long id, ClinicStatus status);
 

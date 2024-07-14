@@ -168,7 +168,7 @@ public class BranchService implements IBranchService {
 
     @Override
     public ClinicBranch updateMainBranch(ClinicUpdateRequest request) {
-        ClinicBranch branch = branchRepository.findByClinic_ClinicId(request.getClinicId())
+        ClinicBranch branch = branchRepository.findByClinic_ClinicIdAndIsMain(request.getClinicId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic main branch", "clinicId", request.getClinicId()));
         if(!branch.isMain())
             throw new ApiException(HttpStatus.NOT_FOUND, "Cannot found the main branch for update!");
