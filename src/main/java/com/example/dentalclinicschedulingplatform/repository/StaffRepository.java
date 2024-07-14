@@ -2,6 +2,7 @@ package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.ClinicStaff;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
+import com.example.dentalclinicschedulingplatform.entity.Dentist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,4 +48,6 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     Long getClinicIdOfStaff(Long staffId);
 
     List<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId);
+    @Query("SELECT d FROM ClinicStaff d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
+    Page<ClinicStaff> findAllActiveAndInactive(Pageable pageable);
 }

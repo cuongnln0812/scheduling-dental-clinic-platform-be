@@ -33,12 +33,12 @@ public class AccountService implements IAccountService {
         Page<Customer> customerPage = customerRepository.findAll(pageable);
         Page<AccountListResponse> customerResponses = customerPage.map(user -> {
                 AccountListResponse res = modelMapper.map(user, AccountListResponse.class);
-                res.setRoleName("DENTIST");
+                res.setRoleName("CUSTOMER");
                 res.setStatus(user.isStatus() ? "ACTIVE" : "INACTIVE");
                 return res;
         });
 
-        Page<Dentist> dentistPage = dentistRepository.findAll(pageable);
+        Page<Dentist> dentistPage = dentistRepository.findAllActiveAndInactive(pageable);
         Page<AccountListResponse> dentistResponses = dentistPage.map(user -> {
                 AccountListResponse res = modelMapper.map(user, AccountListResponse.class);
                 res.setRoleName("DENTIST");
@@ -46,7 +46,7 @@ public class AccountService implements IAccountService {
                 return res;
         });
 
-        Page<ClinicStaff> staffPage = staffRepository.findAll(pageable);
+        Page<ClinicStaff> staffPage = staffRepository.findAllActiveAndInactive(pageable);
         Page<AccountListResponse> staffResponse = staffPage.map(user -> {
                 AccountListResponse res = modelMapper.map(user, AccountListResponse.class);
                 res.setRoleName("STAFF");
@@ -54,7 +54,7 @@ public class AccountService implements IAccountService {
                 return res;
         });
 
-        Page<ClinicOwner> ownerPage = ownerRepository.findAll(pageable);
+        Page<ClinicOwner> ownerPage = ownerRepository.findAllActiveAndInactive(pageable);
         Page<AccountListResponse> ownerResponses = ownerPage.map(user -> {
             AccountListResponse res = modelMapper.map(user, AccountListResponse.class);
             res.setRoleName("OWNER");
