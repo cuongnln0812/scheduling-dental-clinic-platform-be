@@ -79,8 +79,19 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public List<SendFeedbackResponse> getAllFeedback() {
         List<Feedback> feedbackList = feedbackRepository.findAll();
+        double averageRating = feedbackList.stream()
+                .mapToDouble(Feedback::getRating)
+                .average()
+                .orElse(0.0);
+        long totalFeedback = feedbackList.size();
+
         return feedbackList.stream()
-                .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
+                .map(feedback -> {
+                    SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
+                    response.setAverageRating(averageRating);
+                    response.setTotalFeedback(totalFeedback);
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 

@@ -10,8 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendFeedbackResponse {
-    private long feedbackID;
+    private Long feedbackId;
     private String comment;
-    private int rating;
-    private long userID;
+    private double rating;
+    private String customerFullName;
+    private String branchName;
+    private double averageRating;
+    private long totalFeedback;
 }
