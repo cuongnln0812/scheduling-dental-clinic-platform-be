@@ -257,6 +257,24 @@ public class MailService implements IMailService {
         mailSender.send(message);
     }
 
+    @Async
+    @Override
+    public void sendPasswordRecoveryMail(String email, String verificationCode) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(email);
+        message.setSubject("[F-Dental] - Khôi phục mật khẩu");
+        String body = "Kính gửi,\n\n" +
+                "Bạn đã yêu cầu khôi phục mật khẩu cho tài khoản của mình tại F-Dental. Dưới đây là mã xác thực để đặt lại mật khẩu của bạn:\n\n" +
+                "Mã xác thực: " + verificationCode + "\n\n" +
+                "Vui lòng nhập mã này vào trang khôi phục mật khẩu của chúng tôi trong vòng 15 phút.\n\n" +
+                "Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.\n\n" +
+                "Trân trọng,\n\n" +
+                "Đội ngũ F-Dental";
+        message.setText(body);
+        mailSender.send(message);
+    }
+
 //    @Async
 //    @Override
 //    public void sendBranchRequestApprovalMail(ClinicOwner owner) {

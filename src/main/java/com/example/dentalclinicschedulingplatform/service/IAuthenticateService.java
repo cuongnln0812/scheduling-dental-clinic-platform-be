@@ -18,5 +18,7 @@ public interface IAuthenticateService {
     RefreshTokenResponse refreshToken(RefreshTokenRequest request);
     void logout(RefreshTokenRequest refreshToken);
     AuthenticationResponse loginWithGoogle(LoginGoogleRequest request);
+    void recoverPassword(RecoverPasswordRequest request);
+    void verifyAndResetPassword(VerifyResetPasswordRequest request);
 
 }

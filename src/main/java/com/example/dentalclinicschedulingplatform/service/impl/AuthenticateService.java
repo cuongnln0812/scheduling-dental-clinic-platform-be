@@ -13,6 +13,7 @@ import com.example.dentalclinicschedulingplatform.security.JwtService;
 import com.example.dentalclinicschedulingplatform.service.IAuthenticateService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.SecurityUtils;
+import com.example.dentalclinicschedulingplatform.utils.VerificationCodeCache;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.json.JsonParser;
@@ -27,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -57,6 +56,8 @@ public class AuthenticateService implements IAuthenticateService {
     private final OwnerRepository ownerRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final IMailService mailService;
+    private final VerificationCodeCache verificationCodeCache = new VerificationCodeCache();
+
 
     public AuthenticationResponse authenticateAccount(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -513,4 +514,113 @@ public class AuthenticateService implements IAuthenticateService {
         }
         return res;
     }
+
+    private String generateVerificationCode() {
+        Random random = new Random ();
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
+    }
+
+    private Object findUserByUsernameOrEmail(String usernameOrEmail) {
+
+        Optional<Customer> customer = customerRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (customer.isPresent()) return customer.get();
+
+        Optional<Dentist> dentist = dentistRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (dentist.isPresent()) return dentist.get();
+
+        Optional<ClinicStaff> staff = staffRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (staff.isPresent()) return staff.get();
+
+        Optional<ClinicOwner> owner = ownerRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (owner.isPresent()) return owner.get();
+
+        return null;
+    }
+
+    private String getUsername(Object user) {
+        if (user instanceof Customer) {
+            return ((Customer) user).getUsername();
+        } else if (user instanceof Dentist) {
+            return ((Dentist) user).getUsername();
+        } else if (user instanceof ClinicStaff) {
+            return ((ClinicStaff) user).getUsername();
+        } else if (user instanceof ClinicOwner) {
+            return ((ClinicOwner) user).getUsername();
+        } else {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid user type");
+        }
+    }
+
+    private String getEmail(Object user) {
+        if (user instanceof Customer) {
+            return ((Customer) user).getEmail();
+        } else if (user instanceof Dentist) {
+            return ((Dentist) user).getEmail();
+        } else if (user instanceof ClinicStaff) {
+            return ((ClinicStaff) user).getEmail();
+        } else if (user instanceof ClinicOwner) {
+            return ((ClinicOwner) user).getEmail();
+        } else {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid user type");
+        }
+    }
+
+    @Override
+    public void recoverPassword(RecoverPasswordRequest request) {
+        Object user = findUserByUsernameOrEmail(request.getEmail());
+        if (user == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        String verificationCode = generateVerificationCode();
+        String username = getUsername(user);
+        verificationCodeCache.put(username, verificationCode, 15);
+        mailService.sendPasswordRecoveryMail(getEmail(user), verificationCode);
+    }
+
+    @Override
+    public void verifyAndResetPassword(VerifyResetPasswordRequest request) {
+        Object user = findUserByUsernameOrEmail(request.getEmail());
+        if (user == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        String username = getUsername(user);
+        String cachedCode = verificationCodeCache.get(username);
+        if (cachedCode == null || !cachedCode.equals(request.getVerificationCode())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid or expired verification code");
+        }
+
+        setPassword(user, request.getNewPassword());
+        saveUser(user);
+    }
+
+    private void setPassword(Object user, String newPassword) {
+        if (user instanceof Customer) {
+            ((Customer) user).setPassword(passwordEncoder.encode(newPassword));
+        } else if (user instanceof Dentist) {
+            ((Dentist) user).setPassword(passwordEncoder.encode(newPassword));
+        } else if (user instanceof ClinicStaff) {
+            ((ClinicStaff) user).setPassword(passwordEncoder.encode(newPassword));
+        } else if (user instanceof ClinicOwner) {
+            ((ClinicOwner) user).setPassword(passwordEncoder.encode(newPassword));
+        } else {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid user type");
+        }
+    }
+
+    private void saveUser(Object user) {
+        if (user instanceof Customer) {
+            customerRepository.save((Customer) user);
+        } else if (user instanceof Dentist) {
+            dentistRepository.save((Dentist) user);
+        } else if (user instanceof ClinicStaff) {
+            staffRepository.save((ClinicStaff) user);
+        } else if (user instanceof ClinicOwner) {
+            ownerRepository.save((ClinicOwner) user);
+        } else {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid user type");
+        }
+    }
+
 }
