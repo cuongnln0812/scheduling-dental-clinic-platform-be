@@ -43,10 +43,10 @@ public class WorkingHoursController {
     @Operation(summary = "Update start time and end of working hour for Clinic")
 //    @PreAuthorize("hasAnyRole('OWNER')")
     @PutMapping
-    public ResponseEntity<ApiResponse<WorkingHoursResponse>> updateWorkingHours
-            (@Valid @RequestBody WorkingHoursUpdateRequest request){
-        WorkingHoursResponse updateWorkingHoursResponse = workingHourService.updateWorkingHour(request);
-        ApiResponse<WorkingHoursResponse> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponse<List<WorkingHoursResponse>>> updateWorkingHours
+            (@Valid @RequestBody List<WorkingHoursUpdateRequest> request){
+        List<WorkingHoursResponse> updateWorkingHoursResponse = workingHourService.updateWorkingHour(request);
+        ApiResponse<List<WorkingHoursResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "Updated working hours successfully",
                 updateWorkingHoursResponse);

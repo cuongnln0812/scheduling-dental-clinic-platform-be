@@ -17,10 +17,10 @@ public class WorkingHoursUpdateRequest {
     @NotNull(message = "Day can not be null")
     private DayInWeek day;
 
-    @NotNull(message = "Start time can not be null")
+//    @NotNull(message = "Start time can not be null")
     private LocalTime startTime;
 
-    @NotNull(message = "End time can not be null")
+//    @NotNull(message = "End time can not be null")
     private LocalTime endTime;
 
     @NotNull(message = "Clinic branch id can not be null")
