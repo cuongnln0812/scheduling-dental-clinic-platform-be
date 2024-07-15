@@ -2,13 +2,12 @@ package com.example.dentalclinicschedulingplatform.service;
 
 import com.example.dentalclinicschedulingplatform.payload.request.SendFeedbackRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.SendFeedbackResponse;
-
-import java.util.List;
+import com.example.dentalclinicschedulingplatform.payload.response.SummaryFeedbackResponse;
 
 public interface IFeedbackService {
     SendFeedbackResponse sendFeedback(SendFeedbackRequest request);
-    List<SendFeedbackResponse> getFeedbackByBranchId(Long branchId);
-    List<SendFeedbackResponse> getFeedbackByClinicId(Long clinicId);
-    List<SendFeedbackResponse> getAllFeedback();
+    SummaryFeedbackResponse getFeedbackByBranchId(Long branchId);
+    SummaryFeedbackResponse getFeedbackByClinicId(Long clinicId);
+    SummaryFeedbackResponse getAllFeedback();
     void deleteFeedback(Long feedbackId);
 }
