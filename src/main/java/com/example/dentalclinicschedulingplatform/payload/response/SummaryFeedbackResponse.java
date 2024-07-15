@@ -5,14 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendFeedbackResponse {
-    private Long feedbackId;
-    private String comment;
-    private double rating;
-    private String customerFullName;
-    private String branchName;
+public class SummaryFeedbackResponse {
+    private List<SendFeedbackResponse> feedbacks;
+    private double averageRating;
+    private long totalFeedback;
+    private List<StarRatingResponse> starRatings;
 }
