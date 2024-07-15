@@ -39,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
 
 
@@ -82,6 +83,8 @@ public class AuthenticateService implements IAuthenticateService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Username is already used");
         if(request.getDob().isAfter(LocalDate.now()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+        if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Dob must be over or equals 18 years old!");
         Customer user = new Customer();
         modelMapper.map(request, user);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -132,7 +135,9 @@ public class AuthenticateService implements IAuthenticateService {
             if(!existingUser.getEmail().equals(request.getEmail()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
             if(request.getDob().isAfter(LocalDate.now()))
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
+            if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth must be over or equals 18 years old!");
             modelMapper.map(request, existingUser);
             var updated = customerRepository.save(existingUser);
             return mapUserRes(updated);
@@ -145,6 +150,8 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
             if(request.getDob().isAfter(LocalDate.now()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth must be over or equals 18 years old!");
             modelMapper.map(request, existingUser);
             var updated = dentistRepository.save(existingUser);
             return mapUserRes(updated);
@@ -156,7 +163,9 @@ public class AuthenticateService implements IAuthenticateService {
             if(!existingUser.getEmail().equals(request.getEmail()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
             if(request.getDob().isAfter(LocalDate.now()))
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
+            if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth must be over or equals 18 years old!");
             modelMapper.map(request, existingUser);
             var updated = staffRepository.save(existingUser);
             return mapUserRes(updated);
@@ -169,6 +178,8 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
             if(request.getDob().isAfter(LocalDate.now()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Dob must be over or equals 18 years old!");
             modelMapper.map(request, existingUser);
             var updated = ownerRepository.save(existingUser);
             return mapUserRes(updated);

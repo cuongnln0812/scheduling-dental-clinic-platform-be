@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendFeedbackResponse {
-    private Long feedbackId;
-    private String comment;
-    private double rating;
-    private String customerFullName;
-    private String branchName;
+public class StarRatingResponse {
+    private int star;
+    private long count;
 }
