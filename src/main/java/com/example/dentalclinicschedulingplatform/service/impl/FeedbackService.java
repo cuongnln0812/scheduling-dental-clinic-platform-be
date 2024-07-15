@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,10 +60,37 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public List<SendFeedbackResponse> getFeedbackByBranchId(Long branchId) {
         List<Feedback> feedbackList = feedbackRepository.findByClinicBranch_BranchId(branchId);
+
+        double averageRating = feedbackList.stream()
+                .mapToDouble(Feedback::getRating)
+                .average()
+                .orElse(0.0);
+        long totalFeedback = feedbackList.size();
+
+        Map<Integer, Long> starCounts = feedbackList.stream()
+                .collect(Collectors.groupingBy(feedback -> (int) feedback.getRating(), Collectors.counting()));
+
+        long totalOneStar = starCounts.getOrDefault(1, 0L);
+        long totalTwoStar = starCounts.getOrDefault(2, 0L);
+        long totalThreeStar = starCounts.getOrDefault(3, 0L);
+        long totalFourStar = starCounts.getOrDefault(4, 0L);
+        long totalFiveStar = starCounts.getOrDefault(5, 0L);
+
         return feedbackList.stream()
-                .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
+                .map(feedback -> {
+                    SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
+                    response.setAverageRating(averageRating);
+                    response.setTotalFeedback(totalFeedback);
+                    response.setTotalOneStar(totalOneStar);
+                    response.setTotalTwoStar(totalTwoStar);
+                    response.setTotalThreeStar(totalThreeStar);
+                    response.setTotalFourStar(totalFourStar);
+                    response.setTotalFiveStar(totalFiveStar);
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<SendFeedbackResponse> getFeedbackByClinicId(Long clinicId) {
@@ -71,8 +99,34 @@ public class FeedbackService implements IFeedbackService {
         List<Feedback> feedbackList = clinic.getClinicBranch().stream()
                 .flatMap(branch -> branch.getFeedbacks().stream())
                 .collect(Collectors.toList());
+
+        double averageRating = feedbackList.stream()
+                .mapToDouble(Feedback::getRating)
+                .average()
+                .orElse(0.0);
+        long totalFeedback = feedbackList.size();
+
+        Map<Integer, Long> starCounts = feedbackList.stream()
+                .collect(Collectors.groupingBy(feedback -> (int) feedback.getRating(), Collectors.counting()));
+
+        long totalOneStar = starCounts.getOrDefault(1, 0L);
+        long totalTwoStar = starCounts.getOrDefault(2, 0L);
+        long totalThreeStar = starCounts.getOrDefault(3, 0L);
+        long totalFourStar = starCounts.getOrDefault(4, 0L);
+        long totalFiveStar = starCounts.getOrDefault(5, 0L);
+
         return feedbackList.stream()
-                .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
+                .map(feedback -> {
+                    SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
+                    response.setAverageRating(averageRating);
+                    response.setTotalFeedback(totalFeedback);
+                    response.setTotalOneStar(totalOneStar);
+                    response.setTotalTwoStar(totalTwoStar);
+                    response.setTotalThreeStar(totalThreeStar);
+                    response.setTotalFourStar(totalFourStar);
+                    response.setTotalFiveStar(totalFiveStar);
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -85,11 +139,25 @@ public class FeedbackService implements IFeedbackService {
                 .orElse(0.0);
         long totalFeedback = feedbackList.size();
 
+        Map<Integer, Long> starCounts = feedbackList.stream()
+                .collect(Collectors.groupingBy(feedback -> (int) feedback.getRating(), Collectors.counting()));
+
+        long totalOneStar = starCounts.getOrDefault(1, 0L);
+        long totalTwoStar = starCounts.getOrDefault(2, 0L);
+        long totalThreeStar = starCounts.getOrDefault(3, 0L);
+        long totalFourStar = starCounts.getOrDefault(4, 0L);
+        long totalFiveStar = starCounts.getOrDefault(5, 0L);
+
         return feedbackList.stream()
                 .map(feedback -> {
                     SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
                     response.setAverageRating(averageRating);
                     response.setTotalFeedback(totalFeedback);
+                    response.setTotalOneStar(totalOneStar);
+                    response.setTotalTwoStar(totalTwoStar);
+                    response.setTotalThreeStar(totalThreeStar);
+                    response.setTotalFourStar(totalFourStar);
+                    response.setTotalFiveStar(totalFiveStar);
                     return response;
                 })
                 .collect(Collectors.toList());

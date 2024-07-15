@@ -17,4 +17,10 @@ public class SendFeedbackResponse {
     private String branchName;
     private double averageRating;
     private long totalFeedback;
+    private long totalOneStar;
+    private long totalTwoStar;
+    private long totalThreeStar;
+    private long totalFourStar;
+    private long totalFiveStar;
+
 }
