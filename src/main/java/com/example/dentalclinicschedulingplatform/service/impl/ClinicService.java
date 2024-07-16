@@ -229,7 +229,7 @@ public class ClinicService implements IClinicService {
     private ClinicListResponse mapListRes(Clinic clinic){
         ClinicListResponse res = modelMapper.map(clinic, ClinicListResponse.class);
         res.setOwnerName(clinic.getClinicOwner().getFullName());
-        res.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).size());
+        res.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks ( ).size ());
         return res;
     }
 
