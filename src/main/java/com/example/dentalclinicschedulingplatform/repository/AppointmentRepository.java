@@ -26,4 +26,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query(value = "SELECT * FROM appointment where appointment_date=:date " +
             "and branch_id = :clinicBranchId and slot_id = :slotId and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByDateAndSlotOfClinicBranch(LocalDate date, Long clinicBranchId, Long slotId);
+
+    @Query(value = "SELECT * FROM appointment where branch_id in (:branchList) and slot_id in (:slotList) and status = 'PENDING' ", nativeQuery = true)
+    List<Appointment> findByClinicBranch(List<Long> branchList, List<Long> slotList);
 }

@@ -34,4 +34,6 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
 
     Page<ClinicBranch> findAllByStatusAndIsMain(ClinicStatus status, boolean isMain, Pageable pageable);
 
+    @Query(value = "SELECT branch_id FROM clinic_branch where clinic_id = :clinicId and status = 'ACTIVE' ", nativeQuery = true)
+    List<Long> findClinicBranchIdsByClinic(Long clinicId);
 }

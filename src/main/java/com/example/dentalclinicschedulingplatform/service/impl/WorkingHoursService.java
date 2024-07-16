@@ -5,10 +5,7 @@ import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.WorkingHoursResponse;
-import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
-import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
-import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
-import com.example.dentalclinicschedulingplatform.repository.WorkingHoursRepository;
+import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IWorkingHoursService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParsePosition;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -43,6 +41,10 @@ public class WorkingHoursService implements IWorkingHoursService {
     private final SlotService slotService;
 
     private final ModelMapper modelMapper;
+
+    private final SlotRepository slotRepository;
+
+    private final AppointmentRepository appointmentRepository;
     @Override
     public List<WorkingHoursResponse> createWorkingHour(List<WorkingHoursCreateRequest> workingHours) {
         if (!authenticateService.getUserInfo().getRole().equals(UserType.OWNER.toString())) {
@@ -129,6 +131,16 @@ public class WorkingHoursService implements IWorkingHoursService {
 
         Clinic ownerClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
+
+        List<Long> getAllSlotOfClinic = slotRepository.findSlotIdByClinic(ownerClinic.getClinicId());
+
+        List<Long> getAllBranchOfClinic = branchRepository.findClinicBranchIdsByClinic(ownerClinic.getClinicId());
+
+        List<Appointment> appointments = appointmentRepository.findByClinicBranch(getAllBranchOfClinic, getAllSlotOfClinic);
+
+        if (!appointments.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Working hours has booked slot, can not modified");
+        }
 
         for (WorkingHoursCreateRequest updateWorkingHour: workingHours) {
 

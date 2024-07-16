@@ -106,7 +106,6 @@ public class SlotService implements ISlotService {
 
         for (String day: days) {
             List<Slot> slots = slotRepository.findByClinicAndDay(day, clinic.getClinicId());
-
             List<SlotDetailsResponse> slotDetailResponses = new ArrayList<>();
 
             for (Slot slot: slots) {

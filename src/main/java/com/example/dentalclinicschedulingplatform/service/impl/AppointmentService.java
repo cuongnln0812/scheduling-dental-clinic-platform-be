@@ -129,7 +129,8 @@ public class AppointmentService implements IAppointmentService {
         Page<Appointment> appointments = appointmentRepository.findAppointmentsByClinicBranch_BranchId(clinicBranch.getBranchId(), pageable);
 
         for (Appointment appointment: appointments) {
-            if (appointment.getStatus().equals(AppointmentStatus.PENDING)) {
+            if (appointment.getStatus().equals(AppointmentStatus.PENDING) ||
+                    appointment.getStatus().equals(AppointmentStatus.DONE)) {
 
                 Appointment currAppointment = appointmentRepository.findById(appointment.getId())
                         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));

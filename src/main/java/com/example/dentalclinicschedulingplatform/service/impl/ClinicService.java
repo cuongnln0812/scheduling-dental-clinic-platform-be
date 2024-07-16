@@ -104,12 +104,18 @@ public class ClinicService implements IClinicService {
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
         if(clinic.getStatus().equals(ClinicStatus.INACTIVE) || clinic.getStatus().equals(ClinicStatus.PENDING))
             throw new ApiException(HttpStatus.CONFLICT, "You cannot update clinic information because this clinic is inactive or pending!");
-        if(clinicRepository.existsByEmail(request.getEmail()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "This email is already registered by another clinic!");
-        if(clinicRepository.existsByPhone(request.getPhone()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "This phone is already registered by another clinic!");
-        if(clinicRepository.existsByPhone(request.getWebsiteUrl()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "This website is already registered by another clinic!");
+        if (!clinic.getEmail().equals(request.getEmail())){
+            if(clinicRepository.existsByEmail(request.getEmail()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "This email is already registered by another clinic!");
+        }
+        if (!clinic.getPhone().equals(request.getPhone())){
+            if(clinicRepository.existsByPhone(request.getPhone()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "This phone is already registered by another clinic!");
+        }
+        if (!clinic.getWebsiteUrl().equals(request.getWebsiteUrl())) {
+            if(clinicRepository.existsByWebsiteUrl(request.getWebsiteUrl()))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "This website is already registered by another clinic!");
+        }
         clinic.setAddress(request.getAddress());
         clinic.setEmail(request.getEmail());
         clinic.setCity(request.getCity());
