@@ -5,6 +5,9 @@ import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRe
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import org.springframework.data.domain.Page;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public interface IClinicService {
     ClinicRegisterResponse registerClinic(ClinicRegisterRequest request);
     ApprovedClinicResponse approveClinic(Long clinicId, boolean isApproved);
@@ -17,4 +20,5 @@ public interface IClinicService {
     ClinicDetailResponse reactivateClinic(Long clinicId);
     ClinicDetailResponse deactivateClinic(Long clinicId);
     ClinicStaffAndDentistResponse getAllStaffAndDentistByOwner();
+    Map<String, Object> search(int page, int size, String searchValue, String filter);
 }
