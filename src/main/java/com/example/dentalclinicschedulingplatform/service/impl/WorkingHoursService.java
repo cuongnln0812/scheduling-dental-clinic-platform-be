@@ -132,16 +132,6 @@ public class WorkingHoursService implements IWorkingHoursService {
         Clinic ownerClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
 
-        List<Long> getAllSlotOfClinic = slotRepository.findSlotIdByClinic(ownerClinic.getClinicId());
-
-        List<Long> getAllBranchOfClinic = branchRepository.findClinicBranchIdsByClinic(ownerClinic.getClinicId());
-
-        List<Appointment> appointments = appointmentRepository.findByClinicBranch(getAllBranchOfClinic, getAllSlotOfClinic);
-
-        if (!appointments.isEmpty()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Working hours has booked slot, can not modified");
-        }
-
         for (WorkingHoursCreateRequest updateWorkingHour: workingHours) {
 
             Clinic currClinic = clinicRepository.findById(updateWorkingHour.getClinicId())
@@ -193,8 +183,21 @@ public class WorkingHoursService implements IWorkingHoursService {
                     || (currUpdateWorkingHours.getEndTime() != null && !currUpdateWorkingHours.getEndTime().equals(oldEndTime));
 
             if (isStartTimeDifferent || isEndTimeDifferent) {
+
+                List<Long> getAllSlotOfClinic = slotRepository.findSlotIdByClinic( updateWorkingHour.getDay().name() ,ownerClinic.getClinicId());
+
+                List<Long> getAllBranchOfClinic = branchRepository.findClinicBranchIdsByClinic(ownerClinic.getClinicId());
+
+                List<Appointment> appointments = appointmentRepository.findByClinicBranch(getAllBranchOfClinic, getAllSlotOfClinic);
+
+                if (!appointments.isEmpty()) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Working hours "+updateWorkingHour.getDay().name()+" already has booked slot, can not modified");
+                }
+
                 slotService.generateSlotForUpdatingWorkingHoursDentalClinic(currUpdateWorkingHours.getId());
             }
+
+            workingHourRepository.save(currUpdateWorkingHours);
 
             updateWorkingHoursResponseList.add(modelMapper.map(currUpdateWorkingHours, WorkingHoursResponse.class));
         }
