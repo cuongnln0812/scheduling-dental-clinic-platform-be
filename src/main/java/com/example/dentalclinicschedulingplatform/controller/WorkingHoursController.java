@@ -44,7 +44,7 @@ public class WorkingHoursController {
 //    @PreAuthorize("hasAnyRole('OWNER')")
     @PutMapping
     public ResponseEntity<ApiResponse<List<WorkingHoursResponse>>> updateWorkingHours
-            (@Valid @RequestBody List<WorkingHoursUpdateRequest> request){
+            (@Valid @RequestBody List<WorkingHoursCreateRequest> request){
         List<WorkingHoursResponse> updateWorkingHoursResponse = workingHourService.updateWorkingHour(request);
         ApiResponse<List<WorkingHoursResponse>> response = new ApiResponse<>(
                 HttpStatus.OK,

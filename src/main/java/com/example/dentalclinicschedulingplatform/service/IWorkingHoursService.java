@@ -9,6 +9,6 @@ import java.util.List;
 public interface IWorkingHoursService {
     List<WorkingHoursResponse> createWorkingHour(List<WorkingHoursCreateRequest> workingHours);
 
-    List<WorkingHoursResponse> updateWorkingHour(List<WorkingHoursUpdateRequest> workingHours);
+    List<WorkingHoursResponse> updateWorkingHour(List<WorkingHoursCreateRequest> workingHours);
     List<WorkingHoursResponse> viewWorkingHour(Long clinicId);
 }

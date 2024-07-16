@@ -116,7 +116,7 @@ public class WorkingHoursService implements IWorkingHoursService {
     }
 
     @Override
-    public List<WorkingHoursResponse> updateWorkingHour(List<WorkingHoursUpdateRequest> workingHours) {
+    public List<WorkingHoursResponse> updateWorkingHour(List<WorkingHoursCreateRequest> workingHours) {
 
         if (!authenticateService.getUserInfo().getRole().equals(UserType.OWNER.toString())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Do not have permission");
@@ -130,7 +130,7 @@ public class WorkingHoursService implements IWorkingHoursService {
         Clinic ownerClinic = clinicRepository.findByClinicOwnerId(owner.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic not found"));
 
-        for (WorkingHoursUpdateRequest updateWorkingHour: workingHours) {
+        for (WorkingHoursCreateRequest updateWorkingHour: workingHours) {
 
             Clinic currClinic = clinicRepository.findById(updateWorkingHour.getClinicId())
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Inputted Clinic not found"));

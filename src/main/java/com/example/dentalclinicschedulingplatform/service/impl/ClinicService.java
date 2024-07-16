@@ -116,9 +116,15 @@ public class ClinicService implements IClinicService {
         if(clinic.getStatus().equals(ClinicStatus.APPROVED)){
             if(request.getWorkingHours().isEmpty())
                 throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
-            List<WorkingHoursResponse> workingHoursResponses = workingHoursService.createWorkingHour(request.getWorkingHours());
-            res.setWorkingHours(workingHoursResponses);
+            workingHoursService.createWorkingHour(request.getWorkingHours());
+        }else if (clinic.getStatus().equals(ClinicStatus.ACTIVE)){
+            if (request.getWorkingHours().isEmpty()){
+                throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
+            }
+            workingHoursService.updateWorkingHour(request.getWorkingHours());
         }
+        List<WorkingHoursResponse> clinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
+        res.setWorkingHours(clinicWorkingHours);
         return res;
     }
 
