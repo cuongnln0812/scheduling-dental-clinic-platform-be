@@ -51,12 +51,14 @@ public class OwnerService implements IOwnerService {
     }
 
     @Override
+    public OwnerViewResponse getOwnerDetail(Long id) {
+        ClinicOwner owner = ownerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner", "id", id));
+        return modelMapper.map(owner, OwnerViewResponse.class);
+    }
+
+    @Override
     public OwnerViewResponse activateDeactivateOwner(Long ownerId) {
-
-        if (!authenticateService.getUserInfo().getRole().equals(UserType.ADMIN.toString())){
-            throw new ApiException(HttpStatus.NOT_FOUND, "Do not have permission");
-        }
-
         ClinicOwner currOwner = ownerRepository.findById(ownerId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
 

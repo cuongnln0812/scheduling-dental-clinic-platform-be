@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final IAccountService accountService;
-    private final IOwnerService ownerService;
 
     @Operation(
             summary = "Get all account in the system", description = "Only System Admin can perform this!"
@@ -38,34 +37,6 @@ public class AccountController {
                 HttpStatus.OK,
                 "Get all account successfully",
                 accountService.getAllAccount(page, size));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @Operation(
-            summary = "Activate/ Deactivate Clinic owner"
-    )
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @PutMapping("/owner/activate-deactivate/{id}")
-    public ResponseEntity<ApiResponse<OwnerViewResponse>> activateDeactivateOwner(@PathVariable("id") Long id) {
-        OwnerViewResponse owner = ownerService.activateDeactivateOwner(id);
-        ApiResponse<OwnerViewResponse> response = new ApiResponse<>(
-                HttpStatus.OK,
-                owner.getStatus().equals(ClinicStatus.ACTIVE) ? "Activate owner successfully" : "Deactivate owner successfully",
-                owner);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @Operation(
-            summary = "Activate/ Deactivate customer"
-    )
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @PutMapping("/customer/activate-deactivate/{id}")
-    public ResponseEntity<ApiResponse<CustomerViewResponse>> activateDeactivateCustomer(@PathVariable("id") Long id) {
-        CustomerViewResponse customer = accountService.activateDeactivateCustomer(id);
-        ApiResponse<CustomerViewResponse> response = new ApiResponse<>(
-                HttpStatus.OK,
-                customer.isStatus() ? "Activate customer successfully" : "Deactivate customer successfully",
-                customer);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
