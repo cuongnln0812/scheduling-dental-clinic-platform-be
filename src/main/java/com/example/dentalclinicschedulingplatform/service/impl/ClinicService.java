@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
@@ -20,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,18 +116,38 @@ public class ClinicService implements IClinicService {
         branchService.updateMainBranch(request);
         Clinic updatedClinic = clinicRepository.save(clinic);
         ClinicUpdateResponse res = modelMapper.map(updatedClinic, ClinicUpdateResponse.class);
-        if(clinic.getStatus().equals(ClinicStatus.APPROVED)){
+
+        List<WorkingHoursResponse> clinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
+
+        if(clinic.getStatus().equals(ClinicStatus.APPROVED) || clinic.getStatus().equals(ClinicStatus.ACTIVE)){
             if(request.getWorkingHours().isEmpty())
                 throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
-            workingHoursService.createWorkingHour(request.getWorkingHours());
-        }else if (clinic.getStatus().equals(ClinicStatus.ACTIVE)){
-            if (request.getWorkingHours().isEmpty()){
-                throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
+
+            List<WorkingHoursCreateRequest> workingHoursToCreate = new ArrayList<>();
+            List<WorkingHoursCreateRequest> workingHoursToUpdate = new ArrayList<>();
+
+            for (WorkingHoursCreateRequest reqWorkingHour: request.getWorkingHours()) {
+                Optional<WorkingHoursResponse> existingWorkingHours = clinicWorkingHours.stream()
+                        .filter(clinicWorkingHour -> clinicWorkingHour.getDay().equals(reqWorkingHour.getDay())).findFirst();
+
+                if (existingWorkingHours.isPresent()) {
+                    workingHoursToUpdate.add(reqWorkingHour);
+                }else {
+                    workingHoursToCreate.add(reqWorkingHour);
+                }
             }
-            workingHoursService.updateWorkingHour(request.getWorkingHours());
+
+            if (!workingHoursToCreate.isEmpty()) {
+                workingHoursService.createWorkingHour(workingHoursToCreate);
+            }
+
+            if (!workingHoursToUpdate.isEmpty()) {
+                workingHoursService.updateWorkingHour(workingHoursToUpdate);
+            }
         }
-        List<WorkingHoursResponse> clinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
-        res.setWorkingHours(clinicWorkingHours);
+
+        List<WorkingHoursResponse> newClinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
+        res.setWorkingHours(newClinicWorkingHours);
         return res;
     }
 
