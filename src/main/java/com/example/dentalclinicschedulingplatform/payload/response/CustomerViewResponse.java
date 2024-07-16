@@ -16,8 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerViewResponse {
-
-    private Long customerId;
+    private Long id;
     private String username;
     private String fullName;
     private String email;

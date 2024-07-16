@@ -1,8 +1,9 @@
 package com.example.dentalclinicschedulingplatform.service;
 
-import com.example.dentalclinicschedulingplatform.payload.response.CustomerDetailRes;
+import com.example.dentalclinicschedulingplatform.payload.response.CustomerViewResponse;
 
 public interface ICustomerService {
-    CustomerDetailRes getCustomerDetail(Long id);
-    CustomerDetailRes changeCustomerStatus(Long id);
+    CustomerViewResponse getCustomerDetail(Long id);
+
+    CustomerViewResponse activateDeactivateCustomer(Long customerId);
 }

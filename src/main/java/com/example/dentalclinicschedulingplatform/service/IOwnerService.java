@@ -7,5 +7,6 @@ import com.example.dentalclinicschedulingplatform.payload.response.OwnerViewResp
 public interface IOwnerService {
     ClinicOwner registerOwnerFromRequest(OwnerRegisterRequest request);
     ClinicOwner approveOwnerAccount(Long ownerId, String password);
+    OwnerViewResponse getOwnerDetail(Long id);
     OwnerViewResponse activateDeactivateOwner(Long ownerId);
 }

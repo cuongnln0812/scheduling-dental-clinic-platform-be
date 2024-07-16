@@ -5,8 +5,5 @@ import com.example.dentalclinicschedulingplatform.payload.response.CustomerViewR
 import org.springframework.data.domain.Page;
 
 public interface IAccountService {
-
     Page<AccountListResponse> getAllAccount(int page, int size);
-
-    CustomerViewResponse activateDeactivateCustomer(Long customerId);
 }

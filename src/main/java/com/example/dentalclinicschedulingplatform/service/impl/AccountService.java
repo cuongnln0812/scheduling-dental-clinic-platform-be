@@ -90,20 +90,4 @@ public class AccountService implements IAccountService {
                 }
         );
     }
-
-    @Override
-    public CustomerViewResponse activateDeactivateCustomer(Long customerId) {
-        if (!authenticateService.getUserInfo().getRole().equals(UserType.ADMIN.toString())){
-            throw new ApiException(HttpStatus.NOT_FOUND, "Do not have permission");
-        }
-
-        Customer currCustomer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
-
-        currCustomer.setStatus(!currCustomer.isStatus());
-
-        customerRepository.save(currCustomer);
-
-        return modelMapper.map(currCustomer, CustomerViewResponse.class);
-    }
 }

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class OwnerViewResponse {
 
-    private Long ownerId;
+    private Long id;
     private String username;
     private String fullName;
     private String email;
