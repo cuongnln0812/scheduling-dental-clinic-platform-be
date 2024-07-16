@@ -1,7 +1,9 @@
 package com.example.dentalclinicschedulingplatform.service.impl;
 
 import com.example.dentalclinicschedulingplatform.entity.*;
+import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.payload.response.AccountListResponse;
+import com.example.dentalclinicschedulingplatform.payload.response.CustomerViewResponse;
 import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IAccountService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -25,6 +28,7 @@ public class AccountService implements IAccountService {
     private final StaffRepository staffRepository;
     private final OwnerRepository ownerRepository;
     private final SystemAdminRepository adminRepository;
+    private final AuthenticateService authenticateService;
 
     @Override
     public Page<AccountListResponse> getAllAccount(int page, int size) {
@@ -85,5 +89,21 @@ public class AccountService implements IAccountService {
                     return totalElements;
                 }
         );
+    }
+
+    @Override
+    public CustomerViewResponse activateDeactivateCustomer(Long customerId) {
+        if (!authenticateService.getUserInfo().getRole().equals(UserType.ADMIN.toString())){
+            throw new ApiException(HttpStatus.NOT_FOUND, "Do not have permission");
+        }
+
+        Customer currCustomer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Owner not found"));
+
+        currCustomer.setStatus(!currCustomer.isStatus());
+
+        customerRepository.save(currCustomer);
+
+        return modelMapper.map(currCustomer, CustomerViewResponse.class);
     }
 }
