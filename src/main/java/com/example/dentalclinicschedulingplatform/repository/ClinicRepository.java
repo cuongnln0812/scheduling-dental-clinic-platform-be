@@ -12,4 +12,8 @@ public interface ClinicRepository extends JpaRepository<Clinic, Long> {
     Optional<Clinic> findById(Long id);
     Optional<Clinic> findByClinicOwnerId(Long clinicOwnerId);
     Page<Clinic> findAllByStatus(ClinicStatus status, Pageable pageable);
+    boolean existsByEmail(String email);
+    boolean existsByWebsiteUrl(String url);
+    boolean existsByPhone(String phone);
+
 }

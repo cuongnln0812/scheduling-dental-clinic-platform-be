@@ -253,6 +253,11 @@ public class SlotService implements ISlotService {
     }
 
     public void generateSlots(WorkingHours workingHours) {
+
+        if (workingHours.getStartTime() == null){
+            return;
+        }
+
         LocalTime slotStartTime = workingHours.getStartTime();
 
         int slotNo = 1;
@@ -265,8 +270,11 @@ public class SlotService implements ISlotService {
                 break;
             }
 
-            if (slotStartTime.equals(LocalTime.of(12, 0))){
-                slotStartTime = LocalTime.of(12, 0).plusHours(1);
+            if (slotStartTime.equals(LocalTime.of(12, 0))
+                    || slotStartTime.equals(LocalTime.of(12, 15))
+                    || slotStartTime.equals(LocalTime.of(12, 30))
+                    || slotStartTime.equals(LocalTime.of(12, 45))){
+                slotStartTime = LocalTime.of(slotStartTime.getHour(), slotStartTime.getMinute()).plusHours(1);
                 continue;
             }
 

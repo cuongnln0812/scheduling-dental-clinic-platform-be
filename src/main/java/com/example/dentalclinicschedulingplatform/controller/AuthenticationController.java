@@ -92,4 +92,24 @@ public class AuthenticationController {
                 authenticationService.loginWithGoogle(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<ApiResponse<String>> recoverPassword(@Valid @RequestBody RecoverPasswordRequest request) {
+        authenticationService.recoverPassword(request);
+        ApiResponse<String> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Verification code sent to email successfully!",
+                "Success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/verify-reset-password")
+    public ResponseEntity<ApiResponse<String>> verifyResetPassword(@Valid @RequestBody VerifyResetPasswordRequest request) {
+        authenticationService.verifyAndResetPassword(request);
+        ApiResponse<String> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Password reset successfully!",
+                "Success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

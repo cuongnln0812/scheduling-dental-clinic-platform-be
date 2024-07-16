@@ -561,7 +561,7 @@ public class AppointmentService implements IAppointmentService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
         if (currAppointment.getStatus().equals(AppointmentStatus.CANCELED)){
-            throw new ApiException(HttpStatus.BAD_REQUEST, "The current appointment is canceled");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "The current appointment is already CANCELED");
         }
 
         if (currAppointment.getStatus().equals(AppointmentStatus.DONE)){

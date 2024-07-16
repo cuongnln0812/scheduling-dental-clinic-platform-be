@@ -63,7 +63,9 @@ public class SecurityConfiguration {
                                                         "/api/v1/auth/login-google",
                                                         "api/v1/clinics/{clinicId}",
                                                         "api/v1/clinics",
-                                                "api/v1/dentists/clinic/{clinicId}")
+                                                "api/v1/dentists/clinic/{clinicId}",
+                                                        "api/v1/auth/recover-password",
+                                                        "api/v1/auth/verify-reset-password")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",

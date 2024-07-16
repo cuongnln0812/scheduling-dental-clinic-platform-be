@@ -5,6 +5,7 @@ import com.example.dentalclinicschedulingplatform.exception.ApiException;
 import com.example.dentalclinicschedulingplatform.exception.ResourceNotFoundException;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegisterRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
+import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
 import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
 import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
@@ -20,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,6 +104,12 @@ public class ClinicService implements IClinicService {
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
         if(clinic.getStatus().equals(ClinicStatus.INACTIVE) || clinic.getStatus().equals(ClinicStatus.PENDING))
             throw new ApiException(HttpStatus.CONFLICT, "You cannot update clinic information because this clinic is inactive or pending!");
+        if(clinicRepository.existsByEmail(request.getEmail()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "This email is already registered by another clinic!");
+        if(clinicRepository.existsByPhone(request.getPhone()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "This phone is already registered by another clinic!");
+        if(clinicRepository.existsByPhone(request.getWebsiteUrl()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "This website is already registered by another clinic!");
         clinic.setAddress(request.getAddress());
         clinic.setEmail(request.getEmail());
         clinic.setCity(request.getCity());
@@ -113,12 +122,38 @@ public class ClinicService implements IClinicService {
         branchService.updateMainBranch(request);
         Clinic updatedClinic = clinicRepository.save(clinic);
         ClinicUpdateResponse res = modelMapper.map(updatedClinic, ClinicUpdateResponse.class);
-        if(clinic.getStatus().equals(ClinicStatus.APPROVED)){
+
+        List<WorkingHoursResponse> clinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
+
+        if(clinic.getStatus().equals(ClinicStatus.APPROVED) || clinic.getStatus().equals(ClinicStatus.ACTIVE)){
             if(request.getWorkingHours().isEmpty())
                 throw new ApiException(HttpStatus.NOT_FOUND, "Working hours must not be empty");
-            List<WorkingHoursResponse> workingHoursResponses = workingHoursService.createWorkingHour(request.getWorkingHours());
-            res.setWorkingHours(workingHoursResponses);
+
+            List<WorkingHoursCreateRequest> workingHoursToCreate = new ArrayList<>();
+            List<WorkingHoursCreateRequest> workingHoursToUpdate = new ArrayList<>();
+
+            for (WorkingHoursCreateRequest reqWorkingHour: request.getWorkingHours()) {
+                Optional<WorkingHoursResponse> existingWorkingHours = clinicWorkingHours.stream()
+                        .filter(clinicWorkingHour -> clinicWorkingHour.getDay().equals(reqWorkingHour.getDay())).findFirst();
+
+                if (existingWorkingHours.isPresent()) {
+                    workingHoursToUpdate.add(reqWorkingHour);
+                }else {
+                    workingHoursToCreate.add(reqWorkingHour);
+                }
+            }
+
+            if (!workingHoursToCreate.isEmpty()) {
+                workingHoursService.createWorkingHour(workingHoursToCreate);
+            }
+
+            if (!workingHoursToUpdate.isEmpty()) {
+                workingHoursService.updateWorkingHour(workingHoursToUpdate);
+            }
         }
+
+        List<WorkingHoursResponse> newClinicWorkingHours = workingHoursService.viewWorkingHour(clinic.getClinicId());
+        res.setWorkingHours(newClinicWorkingHours);
         return res;
     }
 
@@ -200,7 +235,7 @@ public class ClinicService implements IClinicService {
     private ClinicListResponse mapListRes(Clinic clinic){
         ClinicListResponse res = modelMapper.map(clinic, ClinicListResponse.class);
         res.setOwnerName(clinic.getClinicOwner().getFullName());
-        res.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).size());
+        res.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks ( ).size ());
         return res;
     }
 
