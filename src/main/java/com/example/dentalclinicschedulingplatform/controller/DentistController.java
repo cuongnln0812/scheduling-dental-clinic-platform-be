@@ -134,7 +134,7 @@ public class DentistController {
 
     @Operation(summary = "Deactivate dentist account (SOFT DELETE)", description = "Remove dentist account by change the status to INACTIVE. " +
             "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
-    @PreAuthorize("hasAnyRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
     @DeleteMapping("/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> removeDentist(
             @PathVariable("dentistId") Long dentistId){
@@ -148,7 +148,7 @@ public class DentistController {
     @Operation(summary = "Re-activate dentist account", description = "Re-activate dentist account by change the status from INACTIVE to ACTIVE. " +
             "Only dentist account with INACTIVE can re-activate. " +
             "Only System Admin, Clinic Owner, Clinic Staff can perform this request!")
-    @PreAuthorize("hasAnyRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
     @PutMapping("/re-activate/{dentistId}")
     public ResponseEntity<ApiResponse<DentistDetailResponse>> reactivateDentist(
             @PathVariable("dentistId") Long dentistId){
