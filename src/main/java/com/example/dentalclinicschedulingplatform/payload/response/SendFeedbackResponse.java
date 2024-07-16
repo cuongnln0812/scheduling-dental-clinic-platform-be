@@ -15,4 +15,6 @@ public class SendFeedbackResponse {
     private double rating;
     private String customerFullName;
     private String branchName;
+    private String branchCity;
+    private String customerAvatar;
 }

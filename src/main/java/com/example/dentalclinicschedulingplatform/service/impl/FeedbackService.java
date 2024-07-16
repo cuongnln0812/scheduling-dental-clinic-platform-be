@@ -49,7 +49,12 @@ public class FeedbackService implements IFeedbackService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch Clinic not found"));
         feedback.setClinicBranch(clinicBranch);
         feedback = feedbackRepository.save(feedback);
-        return modelMapper.map(feedback, SendFeedbackResponse.class);
+
+        SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
+        response.setBranchCity(clinicBranch.getCity());
+        response.setCustomerAvatar(customer.getAvatar());
+
+        return response;
     }
 
     private String getCurrentUsername() {
@@ -98,7 +103,12 @@ public class FeedbackService implements IFeedbackService {
                 .collect(Collectors.toList());
 
         List<SendFeedbackResponse> feedbackResponses = feedbackList.stream()
-                .map(feedback -> modelMapper.map(feedback, SendFeedbackResponse.class))
+                .map(feedback -> {
+                    SendFeedbackResponse response = modelMapper.map(feedback, SendFeedbackResponse.class);
+                    response.setBranchCity(feedback.getClinicBranch().getCity());
+                    response.setCustomerAvatar(feedback.getCustomer().getAvatar());
+                    return response;
+                })
                 .collect(Collectors.toList());
 
         return new SummaryFeedbackResponse(feedbackResponses, averageRating, totalFeedback, starRatings);
