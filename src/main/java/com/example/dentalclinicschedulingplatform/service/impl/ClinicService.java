@@ -116,6 +116,7 @@ public class ClinicService implements IClinicService {
             if(clinicRepository.existsByWebsiteUrl(request.getWebsiteUrl()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "This website is already registered by another clinic!");
         }
+        clinic.setClinicName(request.getClinicName());
         clinic.setAddress(request.getAddress());
         clinic.setEmail(request.getEmail());
         clinic.setCity(request.getCity());
