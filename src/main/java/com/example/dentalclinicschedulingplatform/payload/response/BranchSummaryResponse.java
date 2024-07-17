@@ -23,6 +23,7 @@ public class BranchSummaryResponse {
     private ClinicStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private boolean isMain;
 
     public BranchSummaryResponse(ClinicBranch clinicBranch) {
         this.branchId = clinicBranch.getBranchId();

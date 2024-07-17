@@ -49,8 +49,8 @@ public class ClinicService implements IClinicService {
         clinic.setCity(request.getCity());
         clinic.setPhone(request.getClinicPhone());
         clinic.setClinicRegistration(request.getClinicRegistration());
-        clinic.setWebsiteUrl(clinic.getWebsiteUrl());
-        clinic.setClinicImage(clinic.getClinicImage());
+        clinic.setWebsiteUrl(request.getWebsiteUrl());
+        clinic.setClinicImage(request.getClinicImage());
         clinic.setStatus(ClinicStatus.PENDING);
         ClinicOwner tmpOwner = ownerService.registerOwnerFromRequest(request.getOwnerInformation());
         clinic.setClinicOwner(tmpOwner);
