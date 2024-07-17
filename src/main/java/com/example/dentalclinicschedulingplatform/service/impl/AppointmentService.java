@@ -440,6 +440,10 @@ public class AppointmentService implements IAppointmentService {
         Slot currSlot = slotRepository.findById((appointment.getSlotId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
+        if (currSlot.getStartTime().isBefore(LocalTime.now()) && appointment.getAppointmentDate().equals(LocalDate.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selected slot has passed, please select again");
+        }
+
         if (currSlot != currAppointment.getSlot()){
             if (!slotList.contains(currSlot)){
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Current slot is occupied");
