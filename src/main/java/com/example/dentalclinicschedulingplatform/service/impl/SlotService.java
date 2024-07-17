@@ -283,10 +283,7 @@ public class SlotService implements ISlotService {
                 break;
             }
 
-            if (slotStartTime.equals(LocalTime.of(12, 0))
-                    || slotStartTime.equals(LocalTime.of(12, 15))
-                    || slotStartTime.equals(LocalTime.of(12, 30))
-                    || slotStartTime.equals(LocalTime.of(12, 45))){
+            if (slotStartTime.equals(LocalTime.of(12, slotStartTime.getMinute()))){
                 slotStartTime = LocalTime.of(slotStartTime.getHour(), slotStartTime.getMinute()).plusHours(1);
                 continue;
             }
