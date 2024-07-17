@@ -65,7 +65,10 @@ public class SecurityConfiguration {
                                                         "api/v1/clinics",
                                                 "api/v1/dentists/clinic/{clinicId}",
                                                         "api/v1/auth/recover-password",
-                                                        "api/v1/auth/verify-reset-password")
+                                                        "api/v1/auth/verify-reset-password",
+                                                        "api/v1/feedback/clinic/{clinicId}",
+                                                        "api/v1/feedback/branch/{branchId}",
+                                                        "api/v1/feedback/all")
                                                 .permitAll()
                                                 .requestMatchers(
                                                         "/api/v1/auth/user-information",

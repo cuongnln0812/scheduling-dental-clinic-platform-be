@@ -1,6 +1,7 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
 import com.example.dentalclinicschedulingplatform.entity.Appointment;
+import com.example.dentalclinicschedulingplatform.entity.AppointmentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query(value = "SELECT * FROM appointment where branch_id in (:branchList) and slot_id in (:slotList) and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByClinicBranch(List<Long> branchList, List<Long> slotList);
+
+    List<Appointment> findAllByReminderSentIsFalseAndAppointmentDateAndStatus(LocalDate date, AppointmentStatus status);
 }

@@ -37,7 +37,6 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Get Feedback by Clinic Branch ID")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/branch/{branchId}")
     public ResponseEntity<ApiResponse<SummaryFeedbackResponse>> getFeedbackByBranchId(@PathVariable Long branchId) {
         SummaryFeedbackResponse feedbackResponses = feedbackService.getFeedbackByBranchId(branchId);
@@ -49,7 +48,6 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Get Feedback by Clinic ID")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/clinic/{clinicId}")
     public ResponseEntity<ApiResponse<SummaryFeedbackResponse>> getFeedbackByClinicId(@PathVariable Long clinicId) {
         SummaryFeedbackResponse feedbackResponses = feedbackService.getFeedbackByClinicId(clinicId);
@@ -61,7 +59,6 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Get All Feedback")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'STAFF', 'CUSTOMER', 'DENTIST')")
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<SummaryFeedbackResponse>> getAllFeedback() {
         SummaryFeedbackResponse feedbackResponses = feedbackService.getAllFeedback();
@@ -73,7 +70,6 @@ public class FeedbackController {
     }
 
     @Operation(summary = "Delete Feedback")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{feedbackId}")
     public ResponseEntity<ApiResponse<Void>> deleteFeedback(@Valid @RequestBody DeleteFeedbackRequest feedbackId) {
         feedbackService.deleteFeedback(feedbackId.getFeedbackID());

@@ -83,7 +83,7 @@ public class AppointmentController {
             (@Valid @RequestBody AppointmentCreateRequest request){
         ApiResponse<AppointmentViewDetailsResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Get appointments successfully",
+                "Make appointments successfully",
                 appointmentService.makeAppointment(request));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

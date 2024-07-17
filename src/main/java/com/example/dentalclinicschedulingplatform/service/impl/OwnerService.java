@@ -23,8 +23,6 @@ public class OwnerService implements IOwnerService {
 
     private final PasswordEncoder passwordEncoder;
     private final OwnerRepository ownerRepository;
-    private final IMailService mailService;
-    private final AuthenticateService authenticateService;
     private final ModelMapper modelMapper;
 
     @Override

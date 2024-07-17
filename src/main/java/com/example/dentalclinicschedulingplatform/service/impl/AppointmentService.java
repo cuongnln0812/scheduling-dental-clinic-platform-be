@@ -17,10 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +72,7 @@ public class AppointmentService implements IAppointmentService {
 
         List<AppointmentViewDetailsResponse> pendingAppointments = new ArrayList<>();
 
-        List<AppointmentViewListResponse> doneAppointments = new ArrayList<>();
+        List<AppointmentViewListResponse> cancelDoneAppointment = new ArrayList<>();
 
         for (Appointment appointment: appointments) {
             if (appointment.getStatus().equals(AppointmentStatus.PENDING)) {
@@ -98,13 +100,14 @@ public class AppointmentService implements IAppointmentService {
                         , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                         , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
 
-            }else if (appointment.getStatus().equals(AppointmentStatus.DONE)){
-                doneAppointments.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
+            }else if (appointment.getStatus().equals(AppointmentStatus.DONE)
+                    || appointment.getStatus().equals(AppointmentStatus.CANCELED)){
+                cancelDoneAppointment.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
             }
         }
 
         customerAppointments.put("Current Appointment", pendingAppointments);
-        customerAppointments.put("Appointment History", doneAppointments);
+        customerAppointments.put("Appointment History", cancelDoneAppointment);
 
         return customerAppointments;
     }
@@ -211,6 +214,10 @@ public class AppointmentService implements IAppointmentService {
         Slot currSlot = slotRepository.findById((appointment.getSlotId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
+        if (currSlot.getStartTime().isBefore(LocalTime.now()) && appointment.getAppointmentDate().equals(LocalDate.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selected slot has passed, please select again");
+        }
+
         if (!slotList.contains(currSlot)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "Current slot is occupied");
         }
@@ -266,6 +273,7 @@ public class AppointmentService implements IAppointmentService {
         newAppointment.setClinicBranch(currClinicBranch);
         newAppointment.setDentist(currDentist);
         newAppointment.setService(currService);
+//        newAppointment.setReminderSent(false);
         newAppointment.setCustomer(customer);
 
         appointmentRepository.save(newAppointment);
@@ -433,6 +441,10 @@ public class AppointmentService implements IAppointmentService {
         Slot currSlot = slotRepository.findById((appointment.getSlotId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
+        if (currSlot.getStartTime().isBefore(LocalTime.now()) && appointment.getAppointmentDate().equals(LocalDate.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selected slot has passed, please select again");
+        }
+
         if (currSlot != currAppointment.getSlot()){
             if (!slotList.contains(currSlot)){
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Current slot is occupied");
@@ -561,6 +573,10 @@ public class AppointmentService implements IAppointmentService {
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
+        if (LocalDate.now().isBefore(currAppointment.getAppointmentDate())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Can not complete unfinished appointment");
+        }
+
         if (currAppointment.getStatus().equals(AppointmentStatus.CANCELED)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "The current appointment is already CANCELED");
         }
@@ -595,5 +611,22 @@ public class AppointmentService implements IAppointmentService {
                 currAppointment.getCustomerDob(), currAppointment.getCustomerGender(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
+    }
+
+    @Override
+    @Scheduled(cron = "0 0/30 8-22 * * *") // Runs every 30 mins between 8 AM and 10 PM
+    public void remindAppointment() {
+        List<Appointment> appointments = appointmentRepository.findAllByReminderSentIsFalseAndAppointmentDateAndStatus(LocalDate.now().plusDays(1), AppointmentStatus.PENDING);
+        LocalTime now = LocalTime.now();
+
+        for (Appointment appointment : appointments) {
+            // Calculate the reminder time (24 hours before the appointment time)
+            LocalTime reminderTime = appointment.getSlot().getStartTime();
+            if (reminderTime.isBefore(now)) {
+                mailService.sendRemindAppointmentMail(appointment);
+                appointment.setReminderSent(true);
+                appointmentRepository.save(appointment);
+            }
+        }
     }
 }

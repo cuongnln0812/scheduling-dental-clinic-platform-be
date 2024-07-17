@@ -275,6 +275,28 @@ public class MailService implements IMailService {
         mailSender.send(message);
     }
 
+    @Override
+    public void sendRemindAppointmentMail(Appointment appointment) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("\"F-Dental\" <fdental.automatic.noreply@gmail.com>");
+        message.setTo(appointment.getCustomerEmail());
+        message.setSubject("[F-Dental] - Nhắc nhở lịch hẹn");
+
+        String body = "Kính gửi " + appointment.getCustomerName() + ",\n\n" +
+                "Đây là mail nhắc nhở của hệ thống về cuộc hẹn của bạn tại " + appointment.getClinicBranch().getBranchName() + ".\n\n" +
+                "Thông tin cuộc hẹn: \n\n" +
+                "* Dịch vụ đã đặt: " + appointment.getService().getServiceName() + "\n\n" +
+                "* Phòng khám/Chi nhánh: " + appointment.getClinicBranch().getBranchName() + "\n\n" +
+                "* Nha sĩ: " + appointment.getDentist().getFullName() + "\n\n" +
+                "* Thời gian hẹn: " + appointment.getAppointmentDate() + "\n\n" +
+                "* Tại địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
+                "Vui lòng có mặt đúng giờ. Nếu bạn cần thay đổi hoặc hủy lịch hẹn, xin vui lòng liên hệ với phòng khám bạn đã đặt.\n\n" +
+                "Trân trọng,\n\n" +
+                "Đội ngũ F-Dental";
+        message.setText(body);
+        mailSender.send(message);
+    }
+
 //    @Async
 //    @Override
 //    public void sendBranchRequestApprovalMail(ClinicOwner owner) {

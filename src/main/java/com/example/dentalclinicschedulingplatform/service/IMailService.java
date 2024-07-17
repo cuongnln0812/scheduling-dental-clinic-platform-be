@@ -14,6 +14,7 @@ public interface IMailService {
     void sendCustomerAppointmentRequestConfirmationMail(Customer customer, Appointment appointment);
     void sendCustomerAppointmentCancelConfirmationMail(Customer customer, Appointment appointment, String reason);
     void sendPasswordRecoveryMail(String email, String verificationCode);
+    void sendRemindAppointmentMail(Appointment appointment);
 
 //    void sendBranchRequestApprovalMail(ClinicOwner owner);
 //    void sendBranchRequestRejectionMail(ClinicOwner owner);

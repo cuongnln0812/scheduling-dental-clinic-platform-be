@@ -34,6 +34,11 @@ public class ReportFeedbackService implements IReportFeedbackService {
         Feedback feedback = feedbackRepository.findById(request.getFeedbackId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Feedback not found"));
         String reporter = getCurrentUsername();
+
+        if (reporter.equals(request.getReportedCustomer())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "You cannot report yourself.");
+        }
+
         reportRepository.findByFeedback_FeedbackIdAndReporter(request.getFeedbackId(), reporter)
                 .ifPresent(existingReport -> {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "You have already reported this feedback.");

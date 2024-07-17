@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/clinics")
 @SecurityRequirement(name = "bearerAuth")
@@ -169,6 +171,20 @@ public class ClinicController {
                 HttpStatus.OK,
                 "Get all staff and dentist successfully!",
                 clinicService.getAllStaffAndDentistByOwner());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Search")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> search(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int size,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SEARCH_FILTER, required = false)  String filter, String searchValue)
+    {
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Search successfully!",
+                clinicService.search(page, size, searchValue, filter));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

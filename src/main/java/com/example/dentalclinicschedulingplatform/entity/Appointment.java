@@ -44,6 +44,8 @@ public class Appointment {
     private int duration;
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+    @Column(name = "reminder_sent")
+    private boolean reminderSent = false;
     @CreatedDate
     @Column(name = "created_date",nullable = false, updatable = false)
     private LocalDateTime createdDate;

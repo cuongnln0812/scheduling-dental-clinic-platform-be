@@ -146,7 +146,14 @@ public class SlotService implements ISlotService {
 
         for (Slot slot :slots) {
             if (!bookedSlots.contains(slot)){
-                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                if (date.equals(LocalDate.now())) {
+                    if (slot.getStartTime().isAfter(LocalTime.now())) {
+                        slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                    }
+                }else {
+                    slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                }
+
             }
         }
 
@@ -232,7 +239,14 @@ public class SlotService implements ISlotService {
 
         for (Slot slot :slots) {
             if (!bookedSlots.contains(slot)){
-                slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                if (date.equals(LocalDate.now())) {
+                    if (slot.getStartTime().isAfter(LocalTime.now())) {
+                        slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                    }
+                }else {
+                    slotDetailResponses.add(new SlotDetailsResponse(slot.getId(), slot.getSlotNo(), slot.getStartTime(), slot.getEndTime(), slot.isStatus()));
+                }
+
             }
         }
 
