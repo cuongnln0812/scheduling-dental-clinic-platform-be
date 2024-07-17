@@ -7,9 +7,7 @@ import com.example.dentalclinicschedulingplatform.payload.request.ClinicRegister
 import com.example.dentalclinicschedulingplatform.payload.request.ClinicUpdateRequest;
 import com.example.dentalclinicschedulingplatform.payload.request.WorkingHoursCreateRequest;
 import com.example.dentalclinicschedulingplatform.payload.response.*;
-import com.example.dentalclinicschedulingplatform.repository.ClinicBranchRepository;
-import com.example.dentalclinicschedulingplatform.repository.ClinicRepository;
-import com.example.dentalclinicschedulingplatform.repository.OwnerRepository;
+import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.*;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +30,9 @@ public class ClinicService implements IClinicService {
     private final ClinicRepository clinicRepository;
     private final OwnerRepository ownerRepository;
     private final ClinicBranchRepository branchRepository;
+    private final ServiceRepository serviceRepository;
+    private final DentistRepository dentistRepository;
+    private final BlogRepository blogRepository;
     private final IMailService mailService;
     private final IBranchService branchService;
     private final IOwnerService ownerService;
@@ -291,5 +290,56 @@ public class ClinicService implements IClinicService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public Map<String, Object> search(int page, int size, String searchValue, String filter) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Map<String, Object> searchResult = new HashMap<>();
+
+        List<DentistListResponse> dentistViewListResponses = new ArrayList<>();
+        List<ServiceViewListResponse> serviceViewListResponses = new ArrayList<>();
+        List<ClinicListResponse> clinicListResponses = new ArrayList<>();
+        List<BlogListResponse> blogListResponses = new ArrayList<>();
+
+
+        switch (filter){
+            case "DentalClinic":
+                Page<Clinic> searchDentalClinic = clinicRepository.findClinic(searchValue, pageable);
+                for (Clinic clinic : searchDentalClinic) {
+                    ClinicListResponse clinicListResponse = modelMapper.map(clinic, ClinicListResponse.class);
+                    clinicListResponse.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks().size());
+                    clinicListResponses.add(clinicListResponse);
+                }
+                searchResult.put("Searched clinic", clinicListResponses);
+                break;
+            case "Dentist":
+                Page<Dentist> searchDentist = dentistRepository.findDentist(searchValue, pageable);
+                for (Dentist dentist : searchDentist) {
+                    dentistViewListResponses.add(modelMapper.map(dentist, DentistListResponse.class));
+                }
+                searchResult.put("Searched Dentist", dentistViewListResponses);
+                break;
+            case "Service":
+                Page<com.example.dentalclinicschedulingplatform.entity.Service> searchServices = serviceRepository.findServices(searchValue, pageable);
+                for (com.example.dentalclinicschedulingplatform.entity.Service service: searchServices) {
+                    serviceViewListResponses.add(modelMapper.map(service, ServiceViewListResponse.class));
+                }
+                searchResult.put("Searched service", serviceViewListResponses);
+                break;
+            case "Blog":
+                Page<Blog> searchBlog = blogRepository.findBlogs(searchValue, pageable);
+                for (Blog blog : searchBlog) {
+                    blogListResponses.add(modelMapper.map(blog, BlogListResponse.class));
+                }
+                searchResult.put("Searched Blog", blogListResponses);
+                break;
+            default:
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid filter");
+        }
+
+        return searchResult;
     }
 }

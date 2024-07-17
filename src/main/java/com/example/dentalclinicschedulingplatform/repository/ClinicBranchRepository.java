@@ -1,5 +1,6 @@
 package com.example.dentalclinicschedulingplatform.repository;
 
+import com.example.dentalclinicschedulingplatform.entity.Clinic;
 import com.example.dentalclinicschedulingplatform.entity.ClinicBranch;
 import com.example.dentalclinicschedulingplatform.entity.ClinicStatus;
 import org.springframework.data.domain.Page;
@@ -36,4 +37,8 @@ public interface ClinicBranchRepository extends JpaRepository<ClinicBranch, Long
 
     @Query(value = "SELECT branch_id FROM clinic_branch where clinic_id = :clinicId and status = 'ACTIVE' ", nativeQuery = true)
     List<Long> findClinicBranchIdsByClinic(Long clinicId);
+
+    @Query("SELECT cb FROM ClinicBranch cb WHERE LOWER(cb.branchName) LIKE LOWER(CONCAT('%', :searchValue, '%'))")
+
+    Page<ClinicBranch> findClinic(String searchValue, Pageable pageable);
 }
