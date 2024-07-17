@@ -213,6 +213,10 @@ public class AppointmentService implements IAppointmentService {
         Slot currSlot = slotRepository.findById((appointment.getSlotId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
+        if (currSlot.getStartTime().isBefore(LocalTime.now()) && appointment.getAppointmentDate().equals(LocalDate.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selected slot has passed, please select again");
+        }
+
         if (!slotList.contains(currSlot)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "Current slot is occupied");
         }
@@ -268,6 +272,7 @@ public class AppointmentService implements IAppointmentService {
         newAppointment.setClinicBranch(currClinicBranch);
         newAppointment.setDentist(currDentist);
         newAppointment.setService(currService);
+//        newAppointment.setReminderSent(false);
         newAppointment.setCustomer(customer);
 
         appointmentRepository.save(newAppointment);
@@ -562,6 +567,10 @@ public class AppointmentService implements IAppointmentService {
 
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
+
+        if (LocalDate.now().isBefore(currAppointment.getAppointmentDate())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Can not complete unfinished appointment");
+        }
 
         if (currAppointment.getStatus().equals(AppointmentStatus.CANCELED)){
             throw new ApiException(HttpStatus.BAD_REQUEST, "The current appointment is already CANCELED");
