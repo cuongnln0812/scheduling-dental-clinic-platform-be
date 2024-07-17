@@ -14,8 +14,9 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void init() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/firebase-service-account.json");
+        String serviceAccountPath = "/path/to/render/secret/firebase-service-account.json";
 
+        FileInputStream serviceAccount = new FileInputStream(serviceAccountPath);
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl("https://spring-dental-clinic-chat-default-rtdb.firebaseio.com")
