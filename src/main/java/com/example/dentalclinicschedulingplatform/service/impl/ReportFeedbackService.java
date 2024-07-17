@@ -53,7 +53,7 @@ public class ReportFeedbackService implements IReportFeedbackService {
         report.setClinic(feedback.getClinicBranch().getClinic());
         report.setBranch(feedback.getClinicBranch());
         report = reportRepository.save(report);
-        return modelMapper.map(report, ReportResponse.class);
+        return convertToReportResponse(report);
     }
 
     private String getCurrentUsername() {
@@ -99,6 +99,13 @@ public class ReportFeedbackService implements IReportFeedbackService {
     private ReportResponse convertToReportResponse(Report report) {
         ReportResponse response = modelMapper.map(report, ReportResponse.class);
         Feedback feedback = report.getFeedback();
+        response.setReportReasons(
+                String.join(", ",
+                        report.getReportReasons().stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toList())
+                )
+        );
         response.setAvatar(feedback.getCustomer().getAvatar());
         response.setFullName(feedback.getCustomer().getFullName());
         response.setBranchName(feedback.getClinicBranch().getBranchName());

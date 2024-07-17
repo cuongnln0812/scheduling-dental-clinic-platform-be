@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +103,10 @@ public class AppointmentService implements IAppointmentService {
             }
         }
 
+        pendingAppointments.sort(Comparator.comparing(AppointmentViewDetailsResponse::getCreatedDate).reversed());
+
+        cancelDoneAppointment.sort(Comparator.comparing(AppointmentViewListResponse::getCreatedDate).reversed());
+
         customerAppointments.put("Current Appointment", pendingAppointments);
         customerAppointments.put("Appointment History", cancelDoneAppointment);
 
@@ -158,6 +159,8 @@ public class AppointmentService implements IAppointmentService {
                         currDentist.getFullName(), currAppointment.getCreatedDate()));
             }
         }
+
+        appointmentBranchResponses.sort(Comparator.comparing(AppointmentBranchResponse::getCreatedDate).reversed());
 
         return appointmentBranchResponses;
     }
