@@ -103,7 +103,7 @@ public class ClinicService implements IClinicService {
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
         if(clinic.getStatus().equals(ClinicStatus.INACTIVE) || clinic.getStatus().equals(ClinicStatus.PENDING))
             throw new ApiException(HttpStatus.CONFLICT, "You cannot update clinic information because this clinic is inactive or pending!");
-        if (!clinic.getEmail().equals(request.getEmail())){
+        if (clinic.getEmail() != null && !clinic.getEmail().equals(request.getEmail())){
             if(clinicRepository.existsByEmail(request.getEmail()))
                 throw new ApiException(HttpStatus.BAD_REQUEST, "This email is already registered by another clinic!");
         }

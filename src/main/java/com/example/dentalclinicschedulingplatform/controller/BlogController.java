@@ -51,13 +51,13 @@ public class BlogController {
             summary = "Approve blog"
     )
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PostMapping("/approval/{id}")
     public ResponseEntity<ApiResponse<BlogDetailResponse>> approveBlog(@PathVariable("id") Long id,
                                                                        @RequestParam boolean isApproved) {
         log.info("Has request with data: {}", id.toString());
         ApiResponse<BlogDetailResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "Approve blog successfully",
+                isApproved ? "Approve blog successfully" : "Decline blog successfully",
                 blogService.approveBlog(id, isApproved));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

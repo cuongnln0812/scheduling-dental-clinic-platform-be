@@ -45,7 +45,7 @@ public class FeedbackService implements IFeedbackService {
         feedback.setComment(request.getComment());
         feedback.setRating(request.getRating());
         feedback.setCustomer(customer);
-        ClinicBranch clinicBranch = clinicBranchRepository.findById(request.getBranchclinicID())
+        ClinicBranch clinicBranch = clinicBranchRepository.findById(request.getBranchclinicId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Branch Clinic not found"));
         feedback.setClinicBranch(clinicBranch);
         feedback = feedbackRepository.save(feedback);

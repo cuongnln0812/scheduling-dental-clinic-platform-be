@@ -20,5 +20,5 @@ public class SendFeedbackRequest {
     private Integer rating;
 
     @NotNull(message = "BranchClinicID cannot be null")
-    private long branchclinicID;
+    private long branchclinicId;
 }

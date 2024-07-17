@@ -23,7 +23,7 @@ public class BranchSummaryResponse {
     private ClinicStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
-    private boolean isMain;
+    private boolean main;
 
     public BranchSummaryResponse(ClinicBranch clinicBranch) {
         this.branchId = clinicBranch.getBranchId();
@@ -35,5 +35,6 @@ public class BranchSummaryResponse {
         this.status = clinicBranch.getStatus();
         this.createdDate = clinicBranch.getCreatedDate();
         this.modifiedDate = clinicBranch.getModifiedDate();
+        this.main = clinicBranch.isMain();
     }
 }

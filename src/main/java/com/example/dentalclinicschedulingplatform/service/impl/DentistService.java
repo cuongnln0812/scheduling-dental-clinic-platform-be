@@ -125,6 +125,8 @@ public class DentistService implements IDentistService  {
         dentist.setStatus(ClinicStatus.PENDING);
         dentist.setClinicBranch(branch);
         dentist = dentistRepository.save(dentist);
+        branch.getDentists().add(dentist);
+        branchRepository.save(branch);
         mailService.senDentistRequestConfirmationMail(dentist, owner);
         return mapDetailRes(dentist);
     }
