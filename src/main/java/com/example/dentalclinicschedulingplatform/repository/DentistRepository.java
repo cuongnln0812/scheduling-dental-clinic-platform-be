@@ -27,4 +27,7 @@ public interface DentistRepository extends JpaRepository<Dentist, Long> {
 
     @Query("SELECT d FROM Dentist d WHERE LOWER(d.fullName) LIKE LOWER(CONCAT('%', :searchValue, '%'))")
     Page<Dentist> findDentist(String searchValue, Pageable pageable);
+
+    @Query(value = "SELECT COUNT(d) FROM Dentist d WHERE d.clinicBranch.clinic.clinicOwner.username = :username")
+    Long countAllByOwnerUsername(String username);
 }
