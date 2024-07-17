@@ -35,4 +35,8 @@ app:
 #  server-url: "http://localhost:8080/"
 
 server:
-  port: 5000
+  port: 8080
+
+logging:
+  level:
+    root: DEBUG
