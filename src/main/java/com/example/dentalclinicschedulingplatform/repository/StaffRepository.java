@@ -50,4 +50,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     List<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId);
     @Query("SELECT d FROM ClinicStaff d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
     Page<ClinicStaff> findAllActiveAndInactive(Pageable pageable);
+
+    @Query(value = "SELECT COUNT(d) FROM ClinicStaff d WHERE d.clinicBranch.clinic.clinicOwner.username = :username")
+    Long countAllByOwnerUsername(String username);
 }

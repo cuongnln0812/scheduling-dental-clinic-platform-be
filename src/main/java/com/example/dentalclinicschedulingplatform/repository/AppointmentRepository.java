@@ -32,4 +32,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByClinicBranch(List<Long> branchList, List<Long> slotList);
 
     List<Appointment> findAllByReminderSentIsFalseAndAppointmentDateAndStatus(LocalDate date, AppointmentStatus status);
+
+    @Query(value = "SELECT a FROM Appointment a WHERE a.clinicBranch.clinic.clinicOwner.username = :username")
+    List<Appointment> findAllByOwnerUsername(String username);
 }
