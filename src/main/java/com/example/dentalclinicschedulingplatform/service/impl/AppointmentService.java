@@ -616,7 +616,7 @@ public class AppointmentService implements IAppointmentService {
     @Override
     @Scheduled(cron = "0 0/30 8-22 * * *") // Runs every 30 mins between 8 AM and 10 PM
     public void remindAppointment() {
-        List<Appointment> appointments = appointmentRepository.findAllByReminderSentIsFalseAndAppointmentDate(LocalDate.now().plusDays(1));
+        List<Appointment> appointments = appointmentRepository.findAllByReminderSentIsFalseAndAppointmentDateAndStatus(LocalDate.now().plusDays(1), AppointmentStatus.PENDING);
         LocalTime now = LocalTime.now();
 
         for (Appointment appointment : appointments) {
