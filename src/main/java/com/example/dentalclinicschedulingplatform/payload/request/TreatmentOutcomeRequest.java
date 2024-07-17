@@ -25,7 +25,4 @@ public class TreatmentOutcomeRequest {
 
     @NotNull(message = "Appointment ID cannot be null")
     private Long appointmentId;
-
-    @NotBlank(message = "Customer username cannot be blank")
-    private String customerUsername;
 }

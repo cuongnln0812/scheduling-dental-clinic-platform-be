@@ -35,18 +35,15 @@ public class TreatmentOutcomeService implements ITreatmentOutcomeService {
         treatmentOutcome.setRecommendations(request.getRecommendations());
         treatmentOutcome.setFollowUpDate(LocalDate.parse(request.getFollowUpDate()));
 
-        Customer customer = customerRepository.findByUsername(request.getCustomerUsername())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Customer not found"));
-        treatmentOutcome.setCustomer(customer);
-
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
         treatmentOutcome.setAppointment(appointment);
+        treatmentOutcome.setCustomer(appointment.getCustomer());
 
         treatmentOutcome = treatmentOutcomeRepository.save(treatmentOutcome);
 
         return new TreatmentOutcomeResponse(treatmentOutcome.getId(), treatmentOutcome.getDiagnosis(), treatmentOutcome.getTreatmentPlan(), treatmentOutcome.getPrescription(), treatmentOutcome.getRecommendations(), treatmentOutcome.getFollowUpDate().toString(),
-                treatmentOutcome.getCreatedBy(), treatmentOutcome.getModifiedBy(), appointment.getId(), customer.getId(), appointment.getCustomerName(), appointment.getDentist().getFullName(), appointment.getClinicBranch().getBranchName());
+                treatmentOutcome.getCreatedBy(), treatmentOutcome.getModifiedBy(), appointment.getId(), appointment.getCustomer().getId(), appointment.getCustomerName(), appointment.getDentist().getFullName(), appointment.getClinicBranch().getBranchName());
     }
 
     @Override
