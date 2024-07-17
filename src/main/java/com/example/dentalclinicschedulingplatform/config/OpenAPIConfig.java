@@ -13,12 +13,16 @@ import org.springframework.beans.factory.annotation.Value;
         info = @Info(
                 title = "F-Dental API Specification",
                 version = "v1"),
-        servers = {
-                @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8080/" //đẩy ra env
-                )
-        },
+//        servers = {
+//                @Server(
+//                        description = "Local ENV",
+//                        url = "http://localhost:8080/" //đẩy ra env
+//                ),
+//                @Server(
+//                        description = "Production ENV",
+//                        url = "http://fdental.ap-southeast-1.elasticbeanstalk.com/" //đẩy ra env
+//                )
+//        },
         security = @SecurityRequirement(name = "BearerAuth")
 )
 @SecurityScheme(
