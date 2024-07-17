@@ -29,4 +29,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query(value = "SELECT * FROM appointment where branch_id in (:branchList) and slot_id in (:slotList) and status = 'PENDING' ", nativeQuery = true)
     List<Appointment> findByClinicBranch(List<Long> branchList, List<Long> slotList);
+
+    List<Appointment> findAllByReminderSentIsFalseAndAppointmentDate(LocalDate date);
 }

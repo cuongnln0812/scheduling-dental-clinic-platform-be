@@ -17,10 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -595,5 +597,22 @@ public class AppointmentService implements IAppointmentService {
                 currAppointment.getCustomerDob(), currAppointment.getCustomerGender(), currAppointment.getCustomerAge(), currAppointment.getCustomerEmail(), currAppointment.getAppointmentDate()
                 , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                 , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate());
+    }
+
+    @Override
+    @Scheduled(cron = "0 0/30 8-22 * * *") // Runs every 30 mins between 8 AM and 10 PM
+    public void remindAppointment() {
+        List<Appointment> appointments = appointmentRepository.findAllByReminderSentIsFalseAndAppointmentDate(LocalDate.now().plusDays(1));
+        LocalTime now = LocalTime.now();
+
+        for (Appointment appointment : appointments) {
+            // Calculate the reminder time (24 hours before the appointment time)
+            LocalTime reminderTime = appointment.getSlot().getStartTime();
+            if (reminderTime.isBefore(now)) {
+                mailService.sendRemindAppointmentMail(appointment);
+                appointment.setReminderSent(true);
+                appointmentRepository.save(appointment);
+            }
+        }
     }
 }

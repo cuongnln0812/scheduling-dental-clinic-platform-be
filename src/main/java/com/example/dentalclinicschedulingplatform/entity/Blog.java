@@ -28,6 +28,7 @@ public class Blog {
     @Column(name = "blog_id")
     private Long id;
     private String title;
+    @Column(length = Length.LOB_DEFAULT)
     private String summary;
     @Column(length = Length.LOB_DEFAULT)
     private String content;
