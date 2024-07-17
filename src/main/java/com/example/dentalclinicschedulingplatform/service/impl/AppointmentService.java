@@ -72,7 +72,7 @@ public class AppointmentService implements IAppointmentService {
 
         List<AppointmentViewDetailsResponse> pendingAppointments = new ArrayList<>();
 
-        List<AppointmentViewListResponse> doneAppointments = new ArrayList<>();
+        List<AppointmentViewListResponse> cancelDoneAppointment = new ArrayList<>();
 
         for (Appointment appointment: appointments) {
             if (appointment.getStatus().equals(AppointmentStatus.PENDING)) {
@@ -100,13 +100,14 @@ public class AppointmentService implements IAppointmentService {
                         , currService.getDuration(), modelMapper.map(currSlot, SlotDetailsResponse.class), modelMapper.map(currBranch, BranchSummaryResponse.class ), modelMapper.map(currDentist, DentistViewListResponse.class)
                         , modelMapper.map(currService, ServiceViewListResponse.class), currAppointment.getCreatedDate()));
 
-            }else if (appointment.getStatus().equals(AppointmentStatus.DONE)){
-                doneAppointments.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
+            }else if (appointment.getStatus().equals(AppointmentStatus.DONE)
+                    || appointment.getStatus().equals(AppointmentStatus.CANCELED)){
+                cancelDoneAppointment.add(modelMapper.map(appointment, AppointmentViewListResponse.class));
             }
         }
 
         customerAppointments.put("Current Appointment", pendingAppointments);
-        customerAppointments.put("Appointment History", doneAppointments);
+        customerAppointments.put("Appointment History", cancelDoneAppointment);
 
         return customerAppointments;
     }
@@ -439,6 +440,10 @@ public class AppointmentService implements IAppointmentService {
 
         Slot currSlot = slotRepository.findById((appointment.getSlotId()))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+        if (currSlot.getStartTime().isBefore(LocalTime.now()) && appointment.getAppointmentDate().equals(LocalDate.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selected slot has passed, please select again");
+        }
 
         if (currSlot != currAppointment.getSlot()){
             if (!slotList.contains(currSlot)){
