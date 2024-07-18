@@ -285,11 +285,11 @@ public class MailService implements IMailService {
         String body = "Kính gửi " + appointment.getCustomerName() + ",\n\n" +
                 "Đây là mail nhắc nhở của hệ thống về cuộc hẹn của bạn tại " + appointment.getClinicBranch().getBranchName() + ".\n\n" +
                 "Thông tin cuộc hẹn: \n\n" +
-                "* Dịch vụ đã đặt: " + appointment.getService().getServiceName() + "\n\n" +
-                "* Phòng khám/Chi nhánh: " + appointment.getClinicBranch().getBranchName() + "\n\n" +
-                "* Nha sĩ: " + appointment.getDentist().getFullName() + "\n\n" +
-                "* Thời gian hẹn: " + appointment.getAppointmentDate() + "\n\n" +
-                "* Tại địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
+                "• Ngày hẹn: " + appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
+                "• Giờ hẹn: " + appointment.getSlot().getStartTime() + " - " + appointment.getSlot().getEndTime() + "\n" +
+                "• Nha sĩ: " + appointment.getDentist().getFullName() + "\n" +
+                "• Dịch vụ: " + appointment.getService().getServiceName() + "\n" +
+                "• Địa chỉ: " + appointment.getClinicBranch().getAddress() + "\n\n" +
                 "Vui lòng có mặt đúng giờ. Nếu bạn cần thay đổi hoặc hủy lịch hẹn, xin vui lòng liên hệ với phòng khám bạn đã đặt.\n\n" +
                 "Trân trọng,\n\n" +
                 "Đội ngũ F-Dental";

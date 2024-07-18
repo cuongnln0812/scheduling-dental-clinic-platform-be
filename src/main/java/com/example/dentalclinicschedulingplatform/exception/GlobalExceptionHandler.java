@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        ApiResponse<List<String>> response = new ApiResponse<>((HttpStatus.resolve(status.value())), false, "Invalid arguments", errors);
+        ApiResponse<List<String>> response = new ApiResponse<>((HttpStatus.resolve(status.value())), false, "Invalid field! Please check all fields again.", errors);
         return new ResponseEntity<>(response, status);
     }
 }

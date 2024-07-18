@@ -39,6 +39,7 @@ public class ClinicService implements IClinicService {
     private final IFeedbackService feedbackService;
     private final IWorkingHoursService workingHoursService;
     private final IAuthenticateService authenticateService;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional
@@ -300,7 +301,7 @@ public class ClinicService implements IClinicService {
         Map<String, Object> searchResult = new HashMap<>();
 
         List<DentistListResponse> dentistViewListResponses = new ArrayList<>();
-        List<ServiceViewListResponse> serviceViewListResponses = new ArrayList<>();
+        List<CategoryViewListResponse> categoryViewListResponses = new ArrayList<>();
         List<ClinicListResponse> clinicListResponses = new ArrayList<>();
         List<BlogListResponse> blogListResponses = new ArrayList<>();
 
@@ -309,30 +310,38 @@ public class ClinicService implements IClinicService {
             case "DentalClinic":
                 Page<Clinic> searchDentalClinic = clinicRepository.findClinic(searchValue, pageable);
                 for (Clinic clinic : searchDentalClinic) {
-                    ClinicListResponse clinicListResponse = modelMapper.map(clinic, ClinicListResponse.class);
-                    clinicListResponse.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks().size());
-                    clinicListResponses.add(clinicListResponse);
+                    if (clinic.getStatus().equals(ClinicStatus.ACTIVE)){
+                        ClinicListResponse clinicListResponse = modelMapper.map(clinic, ClinicListResponse.class);
+                        clinicListResponse.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks().size());
+                        clinicListResponses.add(clinicListResponse);
+                    }
                 }
                 searchResult.put("Searched clinic", clinicListResponses);
                 break;
             case "Dentist":
                 Page<Dentist> searchDentist = dentistRepository.findDentist(searchValue, pageable);
                 for (Dentist dentist : searchDentist) {
-                    dentistViewListResponses.add(modelMapper.map(dentist, DentistListResponse.class));
+                    if (dentist.getStatus().equals(ClinicStatus.ACTIVE)){
+                        dentistViewListResponses.add(modelMapper.map(dentist, DentistListResponse.class));
+                    }
                 }
                 searchResult.put("Searched Dentist", dentistViewListResponses);
                 break;
             case "Service":
-                Page<com.example.dentalclinicschedulingplatform.entity.Service> searchServices = serviceRepository.findServices(searchValue, pageable);
-                for (com.example.dentalclinicschedulingplatform.entity.Service service: searchServices) {
-                    serviceViewListResponses.add(modelMapper.map(service, ServiceViewListResponse.class));
+                Page<Category> searchCategories = categoryRepository.findCategory(searchValue, pageable);
+                for (Category category: searchCategories) {
+                    if (category.isStatus()){
+                        categoryViewListResponses.add(modelMapper.map(category, CategoryViewListResponse.class));
+                    }
                 }
-                searchResult.put("Searched service", serviceViewListResponses);
+                searchResult.put("Searched service", categoryViewListResponses);
                 break;
             case "Blog":
                 Page<Blog> searchBlog = blogRepository.findBlogs(searchValue, pageable);
                 for (Blog blog : searchBlog) {
-                    blogListResponses.add(modelMapper.map(blog, BlogListResponse.class));
+                    if (blog.getStatus().equals(ClinicStatus.ACTIVE)){
+                        blogListResponses.add(modelMapper.map(blog, BlogListResponse.class));
+                    }
                 }
                 searchResult.put("Searched Blog", blogListResponses);
                 break;
