@@ -15,6 +15,7 @@ public interface OwnerRepository extends JpaRepository<ClinicOwner, Long> {
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     @Query("SELECT d FROM ClinicOwner d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
     Page<ClinicOwner> findAllActiveAndInactive(Pageable pageable);
 ;}

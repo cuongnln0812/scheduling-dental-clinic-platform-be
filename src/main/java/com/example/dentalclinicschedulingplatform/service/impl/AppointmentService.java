@@ -576,7 +576,11 @@ public class AppointmentService implements IAppointmentService {
         Appointment currAppointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
-        if (LocalDate.now().isBefore(currAppointment.getAppointmentDate())) {
+        Slot currSlot = slotRepository.findById(currAppointment.getSlot().getId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+
+        if ((LocalTime.now().isBefore(currSlot.getEndTime()) && currAppointment.getAppointmentDate().equals(LocalDate.now()))
+                || LocalDate.now().isBefore(currAppointment.getAppointmentDate())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Can not complete unfinished appointment");
         }
 
@@ -597,8 +601,8 @@ public class AppointmentService implements IAppointmentService {
         com.example.dentalclinicschedulingplatform.entity.Service currService = serviceRepository.findById(currAppointment.getService().getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Service not found"));
 
-        Slot currSlot = slotRepository.findById(currAppointment.getSlot().getId())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
+//        Slot currSlot = slotRepository.findById(currAppointment.getSlot().getId())
+//                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Slot not found"));
 
         Dentist currDentist = dentistRepository.findById(currAppointment.getDentist().getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Dentist not found"));

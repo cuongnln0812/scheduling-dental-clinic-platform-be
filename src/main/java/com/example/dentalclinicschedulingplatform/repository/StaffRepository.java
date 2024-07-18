@@ -20,7 +20,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     Optional<ClinicStaff> findByPhone(String phone);
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
-
+    boolean existsByPhone(String phone);
 
     @Query(value = "SELECT s.* " +
                    "FROM clinic_staff s " +

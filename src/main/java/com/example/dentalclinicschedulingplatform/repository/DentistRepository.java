@@ -21,6 +21,7 @@ public interface DentistRepository extends JpaRepository<Dentist, Long> {
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     List<Dentist> findAllByClinicBranch_BranchId(Long branchId);
     @Query("SELECT d FROM Dentist d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
     Page<Dentist> findAllActiveAndInactive(Pageable pageable);

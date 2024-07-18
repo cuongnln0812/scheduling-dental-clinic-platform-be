@@ -131,7 +131,7 @@ public class AccountService implements IAccountService {
         Long numOfClinic = (long) clinics.size();
         Long numOfBlogs = blogRepository.count();
         AdminDashboardResponse response = new AdminDashboardResponse();
-        response.setNumberOfActiveDentalClinic(numOfClinic);
+        response.setNumberOfDentalClinic(numOfClinic);
         response.setNumberOfActiveDentalClinic(clinics.stream()
                 .filter(clinic -> clinic.getStatus() == ClinicStatus.ACTIVE).count());
         response.setNumberOfInactiveDentalClinic(clinics.stream()
@@ -143,6 +143,7 @@ public class AccountService implements IAccountService {
         response.setNumberOfCustomers(numOfCus);
         response.setNumberOfClinicOwners(numOfOwner);
         response.setNumberOfBlogs(numOfBlogs);
+        response.setNumberOfClinicUsers(numOfCus+numOfDent+numOfOwner+numOfStaff);
         return response;
     }
 }
