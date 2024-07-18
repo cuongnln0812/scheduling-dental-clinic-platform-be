@@ -152,11 +152,13 @@ public class DentistService implements IDentistService  {
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", request.getId()));
         if(!existingDentist.getUsername().equals(request.getUsername()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
-        if(!existingDentist.getEmail().equals(request.getEmail()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+        if(dentistRepository.existsByEmail(request.getEmail()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
-        if (!request.getPhone().equals(existingDentist.getPhone())){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
+        if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "You must be over or equals 18 years old!");
+        if(dentistRepository.existsByPhone(request.getPhone())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used");
         }
         ClinicStatus.isValid(request.getStatus());
