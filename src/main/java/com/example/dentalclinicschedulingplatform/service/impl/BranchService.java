@@ -199,8 +199,11 @@ public class BranchService implements IBranchService {
                                                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not found"));
             if(!clinicBranch.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.CONFLICT, "Clinic branch is not active");
 
-            ClinicBranch clinicBranchCheck = branchRepository.findByAddress(request.getAddress());
-            if(clinicBranchCheck != null) throw new ApiException(HttpStatus.BAD_REQUEST, "Address is used");
+            if (!clinicBranch.getAddress().equals(request.getAddress())){
+                ClinicBranch clinicBranchCheck = branchRepository.findByAddress(request.getAddress());
+                if(clinicBranchCheck != null) throw new ApiException(HttpStatus.BAD_REQUEST, "Address is used");
+
+            }
 
             List<ClinicBranch> branchList = branchRepository.findAllByClinic_ClinicId(clinic.getClinicId());
             boolean branchExists = false;
@@ -214,9 +217,9 @@ public class BranchService implements IBranchService {
                 throw new ApiException(HttpStatus.NOT_FOUND, "Clinic branch not belong to owner");
             }
 
-            ClinicBranch clinicBranch1 = branchRepository.findByPhone(request.getPhone());
-            if(clinicBranch1 != null) {
-                throw new ApiException(HttpStatus.BAD_REQUEST, "Phone number is existed");
+            if(!clinicBranch.getPhone().equals(request.getPhone())) {
+                ClinicBranch clinicBranchCheck = branchRepository.findByPhone(request.getPhone());
+                if(clinicBranchCheck != null) throw new ApiException(HttpStatus.BAD_REQUEST, "Phone number is used");
             } else  {
                 clinicBranch.setPhone(request.getPhone());
             }
