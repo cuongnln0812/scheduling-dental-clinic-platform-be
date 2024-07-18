@@ -85,6 +85,9 @@ public class AuthenticateService implements IAuthenticateService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Your birthday cannot be after present date!");
         if(Period.between(request.getDob(), LocalDate.now()).getYears() < 16)
             throw new ApiException(HttpStatus.BAD_REQUEST, "You must be 16 years old or over to register!");
+        if (customerRepository.existsByPhone(request.getPhone())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Phone number is already used");
+        }
         Customer user = new Customer();
         modelMapper.map(request, user);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -138,6 +141,11 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
             if(Period.between(request.getDob(), LocalDate.now()).getYears() < 16)
                 throw new ApiException(HttpStatus.BAD_REQUEST, "You must be 16 years old or over to register!");
+            if (!existingUser.getPhone().equals(request.getPhone())){
+                if (customerRepository.existsByPhone(request.getPhone())){
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used by another customer");
+                }
+            }
             modelMapper.map(request, existingUser);
             var updated = customerRepository.save(existingUser);
             return mapUserRes(updated);
@@ -152,6 +160,11 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
                 throw new ApiException(HttpStatus.BAD_REQUEST, "You must be 18 years old or over to register!");
+            if (!existingUser.getPhone().equals(request.getPhone())){
+                if (dentistRepository.existsByPhone(request.getPhone())){
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used by another customer");
+                }
+            }
             modelMapper.map(request, existingUser);
             var updated = dentistRepository.save(existingUser);
             return mapUserRes(updated);
@@ -166,6 +179,11 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
             if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
                 throw new ApiException(HttpStatus.BAD_REQUEST, "You must be 18 years old or over to register!");
+            if (!existingUser.getPhone().equals(request.getPhone())){
+                if (staffRepository.existsByPhone(request.getPhone())){
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used by another customer");
+                }
+            }
             modelMapper.map(request, existingUser);
             var updated = staffRepository.save(existingUser);
             return mapUserRes(updated);
@@ -180,6 +198,11 @@ public class AuthenticateService implements IAuthenticateService {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
             if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
                 throw new ApiException(HttpStatus.BAD_REQUEST, "You must be 18 years old or over to register!");
+            if (!existingUser.getPhone().equals(request.getPhone())){
+                if (ownerRepository.existsByPhone(request.getPhone())){
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used by another customer");
+                }
+            }
             modelMapper.map(request, existingUser);
             var updated = ownerRepository.save(existingUser);
             return mapUserRes(updated);

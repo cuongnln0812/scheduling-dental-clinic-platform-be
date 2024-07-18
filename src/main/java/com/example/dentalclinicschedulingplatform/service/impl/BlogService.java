@@ -45,7 +45,7 @@ public class BlogService implements IBlogService {
     @Override
     public BlogDetailResponse createBlog(BlogCreateRequest request) {
         try {
-                if(!authenticateService.getUserInfo().getRole().equals(UserType.STAFF.toString())) throw new ApiException(HttpStatus.BAD_REQUEST, "You do not have permission");
+            if(!authenticateService.getUserInfo().getRole().equals(UserType.STAFF.toString())) throw new ApiException(HttpStatus.BAD_REQUEST, "You do not have permission");
             ClinicStaff staff = staffRepository.findByUsername(authenticateService.getUserInfo().getUsername())
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Staff not found"));
             Clinic clinic = staff.getClinicBranch().getClinic();
@@ -59,7 +59,13 @@ public class BlogService implements IBlogService {
             blog.setClinic(clinic);
 
             blogRepository.save(blog);
-            return modelMapper.map(blog, BlogDetailResponse.class);
+            BlogDetailResponse response = modelMapper.map(blog, BlogDetailResponse.class);
+            String publisherName = staffRepository.findByUsername(blog.getCreatedBy())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Publisher not found"))
+                    .getFullName();
+            response.setPublisherName(publisherName);
+
+            return response;
         } catch (Exception e) {
             throw e;
         }
@@ -80,7 +86,14 @@ public class BlogService implements IBlogService {
             }
 
             blog = blogRepository.save(blog);
-            return modelMapper.map(blog, BlogDetailResponse.class);
+            BlogDetailResponse response = modelMapper.map(blog, BlogDetailResponse.class);
+
+            String publisherName = staffRepository.findByUsername(blog.getCreatedBy())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Publisher not found"))
+                    .getFullName();
+            response.setPublisherName(publisherName);
+
+            return response;
         } catch (Exception e) {
             throw e;
         }
@@ -92,7 +105,14 @@ public class BlogService implements IBlogService {
             Blog blog = blogRepository.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Blog not found"));
             //if(!blog.getStatus().equals(ClinicStatus.ACTIVE)) throw new ApiException(HttpStatus.BAD_REQUEST, "Blog is not active");
 
-            return modelMapper.map(blog, BlogDetailResponse.class);
+            BlogDetailResponse response = modelMapper.map(blog, BlogDetailResponse.class);
+
+            String publisherName = staffRepository.findByUsername(blog.getCreatedBy())
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Publisher not found"))
+                    .getFullName();
+            response.setPublisherName(publisherName);
+
+            return response;
         } catch (Exception e) {
             throw e;
         }
@@ -108,7 +128,7 @@ public class BlogService implements IBlogService {
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
                             blog.getThumbnail(), blog.getPublishDate(),
-                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getStatus(), blog.getCreatedBy(), staffRepository.findByUsername(blog.getCreatedBy()).get().getFullName(),
                             blog.getCreatedDate(), blog.getModifiedBy(),
                             blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {
@@ -126,7 +146,7 @@ public class BlogService implements IBlogService {
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
                             blog.getThumbnail(), blog.getPublishDate(),
-                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getStatus(), blog.getCreatedBy(), staffRepository.findByUsername(blog.getCreatedBy()).get().getFullName(),
                             blog.getCreatedDate(), blog.getModifiedBy(),
                             blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {
@@ -144,7 +164,7 @@ public class BlogService implements IBlogService {
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
                             blog.getThumbnail(), blog.getPublishDate(),
-                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getStatus(), blog.getCreatedBy(), staffRepository.findByUsername(blog.getCreatedBy()).get().getFullName(),
                             blog.getCreatedDate(), blog.getModifiedBy(),
                             blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {
@@ -164,7 +184,7 @@ public class BlogService implements IBlogService {
                     new BlogDetailResponse(blog.getId(), blog.getTitle(),
                             blog.getSummary(), blog.getContent(),
                             blog.getThumbnail(), blog.getPublishDate(),
-                            blog.getStatus(), blog.getCreatedBy(),
+                            blog.getStatus(), blog.getCreatedBy(), staffRepository.findByUsername(blog.getCreatedBy()).get().getFullName(),
                             blog.getCreatedDate(), blog.getModifiedBy(),
                             blog.getModifiedDate(), blog.getClinic().getClinicName()));
         } catch (Exception e) {

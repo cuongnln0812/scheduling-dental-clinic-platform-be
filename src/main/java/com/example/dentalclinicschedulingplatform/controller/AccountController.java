@@ -39,4 +39,33 @@ public class AccountController {
                 accountService.getAllAccount(page, size));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "Owner dashboard response", description = "Only Owner can perform this!"
+    )
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/owner/dashboard")
+    public ResponseEntity<ApiResponse<OwnerDashboardResponse>> getOwnerDashboardRes()
+    {
+        ApiResponse<OwnerDashboardResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get owner dashboard data successfully",
+                accountService.getOwnerDashboardStatistics());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Admin dashboard response", description = "Only System Admin can perform this!"
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/dashboard")
+    public ResponseEntity<ApiResponse<AdminDashboardResponse>> getAdminDashboardRes()
+    {
+        ApiResponse<AdminDashboardResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "Get admin dashboard data successfully",
+                accountService.getAdminDashboardStatistics());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

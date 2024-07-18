@@ -12,6 +12,7 @@ import com.example.dentalclinicschedulingplatform.repository.*;
 import com.example.dentalclinicschedulingplatform.service.IDentistService;
 import com.example.dentalclinicschedulingplatform.service.IMailService;
 import com.example.dentalclinicschedulingplatform.utils.AutomaticGeneratedPassword;
+import com.google.api.Http;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -117,16 +118,29 @@ public class DentistService implements IDentistService  {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
         if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
             throw new ApiException(HttpStatus.BAD_REQUEST, "Dob must be over or equals 18 years old!");
+        if(dentistRepository.existsByPhone(request.getPhone())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used");
+        }
         ClinicBranch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic Branch", "id", request.getBranchId()));
 
         Dentist dentist = new Dentist();
-        modelMapper.map(request, dentist);
+//        modelMapper.map(request, dentist);
+        dentist.setFullName(request.getFullName());
+        dentist.setEmail(request.getEmail());
+        dentist.setGender(request.getGender());
+        dentist.setPhone(request.getPhone());
+        dentist.setDob(request.getDob());
+        dentist.setAddress(request.getAddress());
+        dentist.setDescription(request.getDescription());
+        dentist.setSpecialty(request.getSpecialty());
+        dentist.setExperience(request.getExperience());
+        dentist.setAvatar(request.getAvatar());
         dentist.setStatus(ClinicStatus.PENDING);
         dentist.setClinicBranch(branch);
         dentist = dentistRepository.save(dentist);
-        branch.getDentists().add(dentist);
-        branchRepository.save(branch);
+//        branch.getDentists().add(dentist);
+//        branchRepository.save(branch);
         mailService.senDentistRequestConfirmationMail(dentist, owner);
         return mapDetailRes(dentist);
     }
@@ -138,10 +152,15 @@ public class DentistService implements IDentistService  {
                 .orElseThrow(() -> new ResourceNotFoundException("Dentist", "id", request.getId()));
         if(!existingDentist.getUsername().equals(request.getUsername()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Username cannot be changed!");
-        if(!existingDentist.getEmail().equals(request.getEmail()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Email cannot be changed!");
+        if(dentistRepository.existsByEmail(request.getEmail()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already used");
         if(request.getDob().isAfter(LocalDate.now()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Dob cannot be after present date!");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Date of birth cannot be after present date!");
+        if(Period.between(request.getDob(), LocalDate.now()).getYears() < 18)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "You must be over or equals 18 years old!");
+        if(dentistRepository.existsByPhone(request.getPhone())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Phone is already used");
+        }
         ClinicStatus.isValid(request.getStatus());
         if(existingDentist.getStatus().equals(ClinicStatus.PENDING) || existingDentist.getStatus().equals(ClinicStatus.DENIED))
             throw new ApiException(HttpStatus.CONFLICT, "ClinicStatus cannot be changed");

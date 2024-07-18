@@ -20,7 +20,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     Optional<ClinicStaff> findByPhone(String phone);
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
-
+    boolean existsByPhone(String phone);
 
     @Query(value = "SELECT s.* " +
                    "FROM clinic_staff s " +
@@ -50,4 +50,7 @@ public interface StaffRepository extends JpaRepository<ClinicStaff, Long> {
     List<ClinicStaff> findAllByClinicBranch_BranchId(Long branchId);
     @Query("SELECT d FROM ClinicStaff d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
     Page<ClinicStaff> findAllActiveAndInactive(Pageable pageable);
+
+    @Query(value = "SELECT COUNT(d) FROM ClinicStaff d WHERE d.clinicBranch.clinic.clinicOwner.username = :username")
+    Long countAllByOwnerUsername(String username);
 }

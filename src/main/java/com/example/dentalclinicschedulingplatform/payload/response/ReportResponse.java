@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class ReportResponse {
     private Long reportId;
     private Long feedbackId;
-    private ReportReason reportReason;
+    private String reportReasons;
     private String reporter;
     private String reportedCustomer;
     private LocalDateTime createdDateTime;

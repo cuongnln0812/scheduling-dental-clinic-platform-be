@@ -21,10 +21,14 @@ public interface DentistRepository extends JpaRepository<Dentist, Long> {
     boolean existsByEmailOrUsername(String username, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     List<Dentist> findAllByClinicBranch_BranchId(Long branchId);
     @Query("SELECT d FROM Dentist d WHERE d.status = 'INACTIVE' OR d.status = 'ACTIVE'")
     Page<Dentist> findAllActiveAndInactive(Pageable pageable);
 
     @Query("SELECT d FROM Dentist d WHERE LOWER(d.fullName) LIKE LOWER(CONCAT('%', :searchValue, '%'))")
     Page<Dentist> findDentist(String searchValue, Pageable pageable);
+
+    @Query(value = "SELECT COUNT(d) FROM Dentist d WHERE d.clinicBranch.clinic.clinicOwner.username = :username")
+    Long countAllByOwnerUsername(String username);
 }

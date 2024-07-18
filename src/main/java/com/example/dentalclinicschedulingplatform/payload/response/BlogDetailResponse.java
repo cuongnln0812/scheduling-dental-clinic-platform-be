@@ -23,6 +23,7 @@ public class BlogDetailResponse {
     private LocalDate publishDate;
     private ClinicStatus status;
     private String createdBy;
+    private String publisherName;
     private LocalDateTime createdDate;
     private String modifiedBy;
     private LocalDateTime modifiedDate;
