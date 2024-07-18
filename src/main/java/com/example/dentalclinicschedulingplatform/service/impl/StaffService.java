@@ -143,9 +143,6 @@ public class StaffService implements IStaffService {
             if(StringUtils.isNotBlank(request.getFullName())){
                 clinicStaff.setFullName(request.getFullName());
             }
-            if(StringUtils.isNotBlank(request.getPassword())) {
-                clinicStaff.setPassword(passwordEncoder.encode(request.getPassword()));
-            }
             if(StringUtils.isNotBlank(request.getPhone())) {
                 clinicStaff.setPhone(request.getPhone());
             }
