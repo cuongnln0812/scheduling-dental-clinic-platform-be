@@ -43,7 +43,7 @@ public class AccountController {
     @Operation(
             summary = "Owner dashboard response", description = "Only Owner can perform this!"
     )
-    @PreAuthorize("hasRole('Owner')")
+    @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/owner/dashboard")
     public ResponseEntity<ApiResponse<OwnerDashboardResponse>> getOwnerDashboardRes()
     {
