@@ -309,30 +309,38 @@ public class ClinicService implements IClinicService {
             case "DentalClinic":
                 Page<Clinic> searchDentalClinic = clinicRepository.findClinic(searchValue, pageable);
                 for (Clinic clinic : searchDentalClinic) {
-                    ClinicListResponse clinicListResponse = modelMapper.map(clinic, ClinicListResponse.class);
-                    clinicListResponse.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks().size());
-                    clinicListResponses.add(clinicListResponse);
+                    if (clinic.getStatus().equals(ClinicStatus.ACTIVE)){
+                        ClinicListResponse clinicListResponse = modelMapper.map(clinic, ClinicListResponse.class);
+                        clinicListResponse.setFeedbackCount(feedbackService.getFeedbackByClinicId(clinic.getClinicId()).getFeedbacks().size());
+                        clinicListResponses.add(clinicListResponse);
+                    }
                 }
                 searchResult.put("Searched clinic", clinicListResponses);
                 break;
             case "Dentist":
                 Page<Dentist> searchDentist = dentistRepository.findDentist(searchValue, pageable);
                 for (Dentist dentist : searchDentist) {
-                    dentistViewListResponses.add(modelMapper.map(dentist, DentistListResponse.class));
+                    if (dentist.getStatus().equals(ClinicStatus.ACTIVE)){
+                        dentistViewListResponses.add(modelMapper.map(dentist, DentistListResponse.class));
+                    }
                 }
                 searchResult.put("Searched Dentist", dentistViewListResponses);
                 break;
             case "Service":
                 Page<com.example.dentalclinicschedulingplatform.entity.Service> searchServices = serviceRepository.findServices(searchValue, pageable);
                 for (com.example.dentalclinicschedulingplatform.entity.Service service: searchServices) {
-                    serviceViewListResponses.add(modelMapper.map(service, ServiceViewListResponse.class));
+                    if (service.isStatus()){
+                        serviceViewListResponses.add(modelMapper.map(service, ServiceViewListResponse.class));
+                    }
                 }
                 searchResult.put("Searched service", serviceViewListResponses);
                 break;
             case "Blog":
                 Page<Blog> searchBlog = blogRepository.findBlogs(searchValue, pageable);
                 for (Blog blog : searchBlog) {
-                    blogListResponses.add(modelMapper.map(blog, BlogListResponse.class));
+                    if (blog.getStatus().equals(ClinicStatus.ACTIVE)){
+                        blogListResponses.add(modelMapper.map(blog, BlogListResponse.class));
+                    }
                 }
                 searchResult.put("Searched Blog", blogListResponses);
                 break;
