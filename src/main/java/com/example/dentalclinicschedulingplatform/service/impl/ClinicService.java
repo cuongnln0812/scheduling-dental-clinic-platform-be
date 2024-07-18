@@ -39,6 +39,7 @@ public class ClinicService implements IClinicService {
     private final IFeedbackService feedbackService;
     private final IWorkingHoursService workingHoursService;
     private final IAuthenticateService authenticateService;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional
@@ -300,7 +301,7 @@ public class ClinicService implements IClinicService {
         Map<String, Object> searchResult = new HashMap<>();
 
         List<DentistListResponse> dentistViewListResponses = new ArrayList<>();
-        List<ServiceViewListResponse> serviceViewListResponses = new ArrayList<>();
+        List<CategoryViewListResponse> categoryViewListResponses = new ArrayList<>();
         List<ClinicListResponse> clinicListResponses = new ArrayList<>();
         List<BlogListResponse> blogListResponses = new ArrayList<>();
 
@@ -327,13 +328,13 @@ public class ClinicService implements IClinicService {
                 searchResult.put("Searched Dentist", dentistViewListResponses);
                 break;
             case "Service":
-                Page<com.example.dentalclinicschedulingplatform.entity.Service> searchServices = serviceRepository.findServices(searchValue, pageable);
-                for (com.example.dentalclinicschedulingplatform.entity.Service service: searchServices) {
-                    if (service.isStatus()){
-                        serviceViewListResponses.add(modelMapper.map(service, ServiceViewListResponse.class));
+                Page<Category> searchCategories = categoryRepository.findCategory(searchValue, pageable);
+                for (Category category: searchCategories) {
+                    if (category.isStatus()){
+                        categoryViewListResponses.add(modelMapper.map(category, CategoryViewListResponse.class));
                     }
                 }
-                searchResult.put("Searched service", serviceViewListResponses);
+                searchResult.put("Searched service", categoryViewListResponses);
                 break;
             case "Blog":
                 Page<Blog> searchBlog = blogRepository.findBlogs(searchValue, pageable);
